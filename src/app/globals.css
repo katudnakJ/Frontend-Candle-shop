@@ -8,14 +8,22 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-prompt), var(--font-geist-sans),ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
+  --color-cprojectone:    #F8F4EC;
+  --color-cprojecttwo:    #FFFDFA;
+  --color-cprojectthree:  #E2B6A8;
+  --color-cprojectfour:   #EFE1B8;
+  --color-cprojectfive:   #EFE1B8;
+
 }
+
+
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #ffffff;
   }
 }
 
