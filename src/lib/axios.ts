@@ -1,4 +1,5 @@
 import axios from "axios";
+
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 10000,
@@ -19,18 +20,51 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      console.error("Unauthorized! Please login again.");
-
-    //   callback to Login page
-    //if (typeof window !== 'undefined') {
-    //   localStorage.removeItem('token');
-    //   window.location.href = '/login';
-    // }
+  (response) => {
+    if (response.data && response.data.success === false) {
+      return Promise.reject(response.data.message || "Error");
     }
-    return Promise.reject(error);
+    return response.data;
+  },
+  (error) => {
+    let errorMessage = "A connection error occurred. Please try again.";
+    if (error.response) {
+      const serverMessage = error.response?.data?.message;
+      switch (error.response?.status) {
+        case 400:
+          errorMessage = serverMessage || "Bad Request.";
+          break;
+        case 401:
+          errorMessage = "Session expired. Please login again.";
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+            if (window.location.pathname !== "/login") {
+              alert("Session expired. Please login again.");
+              window.location.href = "/login";
+            }
+          }
+          break;
+        case 403:
+          errorMessage = "You do not have permission to access this section.";
+          if (typeof window !== "undefined") {
+              alert(errorMessage);
+              window.location.href = "/home";
+            }
+          break;
+        case 404:
+          errorMessage = "sorry, the resource you requested was not found.";
+          break;
+        case 500:
+          errorMessage = "Internal Server Error.";
+          break;
+        default:
+          errorMessage = serverMessage || errorMessage;
+      }
+    } else if (error.request) {
+      errorMessage =
+        "No response received from server. Please check your network.";
+    }
+    return Promise.reject(errorMessage);
   },
 );
 
