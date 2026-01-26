@@ -1,0 +1,14 @@
+# ชื่อแอปพลิเคชัน
+next_public_app_name= /*CandleShop*/
+# รับBackend ที่ URL 
+NEXT_PUBLIC_API_URL= /*TODO: Add your backend URL here */
+
+# พอร์ตของBackend
+NEXT_PUBLIC_API_PORT= /*TODO: Add your backend port here */
+
+# คีย์โทเค็นการรับรองความถูกต้อง(JWT)
+NEXT_PUBLIC_AUTH_TOKEN_KEY= /*TODO: Add your backend auth_token here */
+
+DB_HOST=localhost
+DB_USER=myuser
+DB_PASS=supersecret
