@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono,Prompt} from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
     <html lang="th">
       <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} antialiased`}>
         <QueryProvider>
+          <Toaster toastOptions={{className: 'font-prompt', }}/>
           {children}
         </QueryProvider>
       </body>
