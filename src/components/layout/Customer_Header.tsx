@@ -16,22 +16,23 @@ import {
 const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center">
           <Link
             href="/customer/home"
             className="flex items-center gap-2 text-base font-medium text-black hover:text-yellow-500 transition-colors"
           >
-            <Home size={30} strokeWidth={2.5} />
+            <Home className="w-6 h-6 md:w-8 md:h-8 text-black" />
+            
           </Link>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 md:gap-8">
           <Link
             href="/customer/myshoppingcart"
             className="relative p-1  text-black hover:text-yellow-500 transition-colors"
           >
-            <ShoppingCart size={30} />
+            <ShoppingCart className="w-6 h-6 md:w-8 md:h-8" />
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white font-bold">
               0
             </span>
