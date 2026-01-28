@@ -1,2 +1,5 @@
 install axios
 install TanStack Query
+install lucide-react
+install react-hot-toast
+install @headlessui/react
