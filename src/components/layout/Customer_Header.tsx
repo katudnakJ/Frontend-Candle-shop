@@ -15,7 +15,7 @@ import {
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
+    <header className=" top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center">
           <Link

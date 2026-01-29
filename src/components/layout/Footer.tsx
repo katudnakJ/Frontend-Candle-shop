@@ -8,7 +8,7 @@ const Footer = () => {
   return (
     <footer className="w-full border-t bg-white">
     
-      <div className="block bg-cprojectone py-4">
+      <div className="block bg-cprojectone py-2">
         <div className="container mx-auto px-4 grid grid-cols-1 gap-4 text-sm text-gray-600">
           <div className="ml-auto">
             <div className="flex items-center gap-7">
@@ -31,7 +31,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="bg-white py-2 border-t">
+      <div className="bg-cprojectone py-2 border-t">
         <p className="text-center text-xs text-gray-400">© 2026 Candle Shop.</p>
       </div>
     </footer>

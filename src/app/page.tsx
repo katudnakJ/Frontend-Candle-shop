@@ -1,26 +1,68 @@
 "use client";
 
 import Image from "next/image";
+import Head from "next/head";
+
 import Header from "@/components/layout/Customer_Header";
 import Footer from "@/components/layout/Footer";
-import Head from "next/head";
+import { useState, useEffect } from "react";
+import { Customer } from "@/modules/customers/types";
 import { User } from "lucide-react";
+import axiosInstance from "@/lib/axios";
+import { ApiResponse } from "@/types/api.type";
 
 export default function Home() {
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+
+        const res = await axiosInstance.get<void, ApiResponse<Customer>>(
+          "/customers/profile",
+        );
+
+        if (res.success) {
+          setCustomer(res.data);
+        }
+      } catch (error) {
+        console.log("Local UI handling: stop loading");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow bg-white ">
-        <section className="py-6 border-b  border-b-blue-600 ml-10 mr-10">
+      <main className="flex-grow bg-white font-sans">
+        <section className="py-6 border-b-2  border-gray-500 ml-10 mr-10">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-4">
             <div className="p-3 text-black">
               <User size={60} className="" />
             </div>
-            <h1 className="text-2xl md:text-3xl text-black font-sans">
-              สวัสดีค่ะคุณ <span className="font-bold">สมรศรี</span>
-            </h1>
+
+            <div>
+              {loading ? (
+                <div className="h-8 w-32 bg-gray-200 animate-pulse rounded"></div>
+              ) : (
+                <h1 className="text-2xl md:text-3xl text-black">
+                  สวัสดีค่ะคุณ{" "}
+                  <span className="font-bold">
+                    {customer ? `${customer.Customer_First_Name}` : "ลูกค้า"}
+                  </span>
+                </h1>
+              )}
+            </div>
           </div>
         </section>
+
+        
       </main>
       <Footer />
     </div>

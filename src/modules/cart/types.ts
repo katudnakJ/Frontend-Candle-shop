@@ -1,4 +1,4 @@
-import { Product } from "../products/type";
+import { Product } from "../products/types";
 
 export interface ShoppingCartItem {
   Shopping_Cart_Item_id: string;
