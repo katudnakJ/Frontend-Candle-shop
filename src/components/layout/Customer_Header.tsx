@@ -15,11 +15,11 @@ import {
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center">
           <Link
-            href="/customer/home"
+            href="/"
             className="flex items-center gap-2 text-base font-medium text-black hover:text-yellow-500 transition-colors"
           >
             <Home className="w-6 h-6 md:w-8 md:h-8 text-black" />
@@ -90,7 +90,7 @@ const Header = () => {
                       href="/customer/orders"
                       className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex items-center px-4 py-2 text-sm`}
                     >
-                    <ClipboardList size={18} className="mr-2" />
+                    <ClipboardList size={18} className="mr-2 " />
                       ประวัติการสั่งซื้อ
                     </Link>
                   )}
