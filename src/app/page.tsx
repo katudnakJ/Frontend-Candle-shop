@@ -9,21 +9,23 @@ import Header from "@/components/layout/Customer_Header";
 import Footer from "@/components/layout/Footer";
 import { useState, useEffect } from "react";
 import { Customer } from "@/modules/customers/types";
-import { User } from "lucide-react";
+import { User, ListFilter } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import { ApiResponse } from "@/types/api.type";
 
 export default function Home() {
- 
- 
-  {/* ตรวจสอบว่าเป็นสินค้าแนะนำไหม*/}
+  {
+    /* ตรวจสอบว่าเป็นสินค้าแนะนำไหม*/
+  }
   const recommendedItems = mockProducts.filter(
     (item) => item.is_featured == true,
   );
 
-  {/* ตรวจสอบว่ามีสินค้าทั้งหมดกี่อย่าง*/}
+  {
+    /* ตรวจสอบว่ามีสินค้าทั้งหมดกี่อย่าง*/
+  }
   const totalItem = mockProducts.length;
-  
+
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -97,13 +99,22 @@ export default function Home() {
           {/* สินค้าทั้งหมด      */}
 
           <section>
-            
             <h2 className="text-2xl font-bold mb-4 text-black ">
               สินค้าทั้งหมด
             </h2>
-            <h3 className="text-sm text-gray-400 mb-4">
-              จำนวนทั้งหมด {totalItem} ชิ้น
-            </h3>
+            <div className="flex justify-between mb-4">
+              <p className="text-sm text-gray-400 ">
+                จำนวนทั้งหมด {totalItem} ชิ้น
+              </p>
+              <button className=" p-2 border bg-cprojectone border-black rounded-xl 
+              cursor-pointer 
+              hover:translate-y-1 
+              transition-all duration-300
+              ">
+                <ListFilter size={14} className="text-black" />
+              </button>
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {mockProducts.map((item) => (
                 <ProductCard key={item.product_id} product={item} />
