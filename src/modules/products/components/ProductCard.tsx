@@ -13,11 +13,13 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
     product.images?.find((img) => img.is_primary)?.product_img_slug ||
     product.images?.[0]?.product_img_slug ||
     "";
+
   const getFinalSrc = (slug: string) => {
     if (!slug) return "/placeholder-image.jpg";
 
     if (slug.startsWith("http://") || slug.startsWith("https://")) {
-      return slug;
+        const separator = slug.includes("?") ? "&" : "?";
+      return `${slug}${separator}w=400&q=80&auto=format&fit=crop`;
     }
     return slug;
   };
@@ -25,7 +27,13 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
   const [imgSrc, setImgSrc] = useState(getFinalSrc(displayImage));
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+
+
+      <div className="group
+      bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm
+      cursor-pointer
+      hover:shadow-lg hover:translate-y-1
+      transition-all duration-300">
       <div className="p-3">
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-50">
        
@@ -58,7 +66,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
           </div>
           {!isRecommended && (
             <button className="p-2 border border-black rounded-lg hover:bg-gray-50 transition-colors">
-              <ShoppingCart size={18} className="text-black" />
+              <ShoppingCart size={18} className="text-black hover:text-yellow-500 transition-colors"/>
             </button>
           )}
         </div>
