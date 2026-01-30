@@ -2,7 +2,6 @@ export interface ProductImage {
   product_img_id: string;
   product_id: string;
   product_img_slug: string;
-  img_slug: string;
   is_primary: boolean;
 }
 
