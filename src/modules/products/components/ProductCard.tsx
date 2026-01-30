@@ -1,3 +1,5 @@
+"use client";
+
 import { Product } from "@/modules/products/types";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
