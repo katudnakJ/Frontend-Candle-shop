@@ -30,7 +30,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
 
 
       <div className="group
-      bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm
+      bg-cprojecttwo border border-gray-200 rounded-2xl overflow-hidden shadow-sm
       cursor-pointer
       hover:shadow-lg hover:translate-y-1
       transition-all duration-300">
