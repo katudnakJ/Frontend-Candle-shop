@@ -76,5 +76,6 @@ export const mockProducts: Product[] = [
         is_primary: true,
       }
     ],
-  }
+  },
+  
 ];
