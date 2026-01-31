@@ -4,6 +4,7 @@ import { Product } from "@/modules/products/types";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import {useState} from "react"
+import Link from "next/link";
 
 interface ProductCardProps {
   product: Product;
@@ -30,7 +31,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
 
   return (
 
-
+    <Link href={`/product/${product.slug}`}>
       <div className="group
       bg-cprojecttwo border border-gray-200 rounded-2xl overflow-hidden shadow-sm
       cursor-pointer
@@ -74,6 +75,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
         </div>
       </div>
     </div>
+    </Link>
   );
 };
 
