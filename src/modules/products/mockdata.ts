@@ -6,7 +6,7 @@ export const mockProducts: Product[] = [
     product_name: "เทียนหอมกลิ่น Vanilla Dream",
     price: 350,
     weight: 200,
-    description: "กลิ่นวานิลลาหอมละมุน ช่วยให้ผ่อนคลาย",
+    description: "เปลี่ยนห้องให้เป็นสปาส่วนตัวด้วยกลิ่นวานิลลาแสนหวาน หอมนุ่มลึก สร้างบรรยากาศที่แสนพิเศษ",
     slug: "vanilla-dream",
     is_active: true,
     is_featured: true,
