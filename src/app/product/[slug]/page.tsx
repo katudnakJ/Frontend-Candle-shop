@@ -3,6 +3,7 @@ import { mockProducts } from "@/modules/products/mockdata";
 import Image from "next/image";
 import Header from "@/components/layout/Customer_Header";
 import Footer from "@/components/layout/Footer";
+import ProductImageCarousel  from "@/modules/products/components/ProductImageCarousel";
 import { ChevronLeft, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
@@ -37,17 +38,18 @@ export default async function ProductDetailPage({
       
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">
             <div className="relative aspect-square w-full max-w-[400px] rounded-3xl overflow-hidden bg-gray-50 shadow-md drop-shadow-orange-300 border-cprojectfour border-4 ">
-              <Image
+              {/* <Image
                 src={
                   product.images?.find((img) => img.is_primary)
                     ?.product_img_slug ||
                   product.images?.[0]?.product_img_slug ||
-                  "/placeholder-image.jpg"
+                  "/placeholder-image.svg"
                 }
                 alt={product.product_name}
                 fill
                 className="object-cover"
-              />
+              /> */}
+              <ProductImageCarousel images={product.images || []} />
             </div>
           </div>
 

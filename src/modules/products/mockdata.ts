@@ -47,6 +47,12 @@ export const mockProducts: Product[] = [
         product_id: "p2",
         product_img_slug: "https://images.unsplash.com/photo-1605651202774-7d573fd3f12d",
         is_primary: false,
+      },
+      {
+        product_img_id: "img6",
+        product_id: "p2",
+        product_img_slug: "https://images.unsplash.com/photo-1605651202774-7d573fd3f12d",
+        is_primary: false,
       }
     ],
   },

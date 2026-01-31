@@ -18,7 +18,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
     "";
 
   const getFinalSrc = (slug: string) => {
-    if (!slug) return "/placeholder-image.jpg";
+    if (!slug) return "/placeholder-image.svg";
 
     if (slug.startsWith("http://") || slug.startsWith("https://")) {
         const separator = slug.includes("?") ? "&" : "?";
