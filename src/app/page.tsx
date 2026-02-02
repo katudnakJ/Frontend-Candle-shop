@@ -46,7 +46,7 @@ export default function Home() {
                 {recommendedItems.map((item) => (
                   <div
                     key={item.product_id}
-                    className="min-w-[180px] w-[180px] md:w-[220px]"
+                    className="min-w-[180px] w-[180px] md:w-[200px] lg:w-[400px]"
                   >
                     <ProductCard product={item} isRecommended={true} />
                   </div>
