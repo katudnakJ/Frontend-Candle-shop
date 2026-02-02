@@ -15,14 +15,14 @@ import {
 
 const Header = () => {
   return (
-    <header className=" top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
+    <header className=" border border-cprojectone top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
+      <div className=" mx-3 md:mx-10 flex h-20 md:h-24 items-center justify-between px-4 md:px-8">
         <div className="flex items-center">
           <Link
             href="/"
             className="flex items-center gap-2 text-base font-medium text-black hover:text-yellow-500 transition-colors"
           >
-            <Home className="w-6 h-6 md:w-8 md:h-8 text-black" />
+            <Home className="w-10 h-10 md:w-13 md:h-13 text-black" />
             
           </Link>
         </div>
@@ -32,16 +32,16 @@ const Header = () => {
             href="/customer/myshoppingcart"
             className="relative p-1  text-black hover:text-yellow-500 transition-colors"
           >
-            <ShoppingCart className="w-6 h-6 md:w-8 md:h-8" />
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white font-bold">
+            <ShoppingCart className="w-10 h-10 md:w-13 md:h-13" />
+            <span className="absolute -right-0.5 -top-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[15px] text-white font-bold">
               0
             </span>
           </Link>
 
           <Menu as="div" className="relative inline-block text-left">
             <MenuButton className="flex items-center gap-1 cursor-pointer group outline-none">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-black text-black group-hover:text-yellow-500 transition-colors">
-                <User size={30} />
+              <div className="flex w-10 h-10 md:w-13 md:h-13 items-center justify-center rounded-full border border-black text-black group-hover:text-yellow-500 transition-colors">
+                <User size={40} />
               </div>
               <ChevronDown size={18} className="text-black" />
             </MenuButton>
