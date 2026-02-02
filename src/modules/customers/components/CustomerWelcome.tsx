@@ -32,7 +32,7 @@ export default function CustomerWelcome() {
 
   return (
     <div className="bg-cprojectone border border-cprojectone">
-    <section className="bg-white rounded-2xl drop-shadow-md py-6 m-10">
+    <section className="max-w-[1200px] m-10 xl:mx-auto py-6 px-4 md:px-10 bg-white rounded-2xl drop-shadow-md ">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-4">
         <div className="p-3 text-black">
           <User size={60} className="" />

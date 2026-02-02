@@ -16,6 +16,7 @@ import {
 const Header = () => {
   return (
     <header className=" border border-cprojectone top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
+      <div className="max-w-[1200px] mx-auto">
       <div className=" mx-3 md:mx-10 flex h-20 md:h-24 items-center justify-between px-4 md:px-8">
         <div className="flex items-center">
           <Link
@@ -101,6 +102,7 @@ const Header = () => {
           </Menu>
 
         </div>
+      </div>
       </div>
     </header>
   );

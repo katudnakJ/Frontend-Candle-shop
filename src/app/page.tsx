@@ -2,7 +2,7 @@ import Head from "next/head";
 
 import ProductCard from "@/modules/products/components/ProductCard";
 import { mockProducts } from "@/modules/products/mockdata";
-import Header from "@/components/layout/Customer_Header";
+import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import { ListFilter } from "lucide-react";
 import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
@@ -35,7 +35,7 @@ export default function Home() {
         </div>
 
         <div className="bg-cprojectone w-full min-h-screen">
-          <div className="max-full mx-auto md:mx-10 p-4 space-y-8 bg-white ">
+          <div className="max-w-[1200px] mx-auto p-4 space-y-8 bg-white ">
             {/* สินค้าแนะนำ      */}
 
             <section>

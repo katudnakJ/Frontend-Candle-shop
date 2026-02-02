@@ -1,7 +1,7 @@
 // app/product/[id]/page.tsx
 import { mockProducts } from "@/modules/products/mockdata";
 import Image from "next/image";
-import Header from "@/components/layout/Customer_Header";
+import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import ProductImageCarousel from "@/modules/products/components/ProductImageCarousel";
 import ProductPurchaseActions from "@/modules/products/components/ProductPurchaseActions";

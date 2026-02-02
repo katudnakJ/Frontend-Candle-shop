@@ -6,10 +6,10 @@ import FacebookIcon from "@/components/icon/facebookicon";
 
 const Footer = () => {
   return (
-    <footer className="w-full border-t bg-white">
+    <footer className="w-full border-t bg-cprojectone">
     
-      <div className="block bg-cprojectone py-2">
-        <div className="mx-0 md:mx-10 px-4 grid grid-cols-1 gap-4 text-sm text-gray-600">
+      <div className="max-w-[1200px] mx-auto py-6 px-4 block ">
+        <div className=" grid grid-cols-1 gap-4 text-sm text-gray-600">
           <div className="ml-auto">
             <div className="flex items-center gap-7">
               <p className="text-black text-xs md:text-sm">
