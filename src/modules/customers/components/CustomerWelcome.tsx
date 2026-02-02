@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { User } from "lucide-react";
+
 import { Customer } from "@/modules/customers/types";
 import { getCustomerProfile } from "@/modules/customers/services/CusProfile.service";
 
@@ -30,7 +31,8 @@ export default function CustomerWelcome() {
   }, []);
 
   return (
-    <section className="py-6 border-b-2  border-gray-500 ml-10 mr-10">
+    <div className="bg-cprojectone border border-cprojectone">
+    <section className="bg-white rounded-2xl drop-shadow-md py-6 m-10">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-4">
         <div className="p-3 text-black">
           <User size={60} className="" />
@@ -50,5 +52,6 @@ export default function CustomerWelcome() {
         </div>
       </div>
     </section>
+    </div>
   );
 }

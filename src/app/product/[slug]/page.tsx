@@ -36,6 +36,8 @@ export default async function ProductDetailPage({
 
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">
             <div className="relative aspect-square w-full max-w-[400px] rounded-3xl overflow-hidden bg-gray-50 shadow-md drop-shadow-orange-300 border-cprojectfour border-4 ">
+              
+              {/* แสดงรูปแบบปกติ */}
               {/* <Image
                 src={
                   product.images?.find((img) => img.is_primary)
@@ -47,6 +49,7 @@ export default async function ProductDetailPage({
                 fill
                 className="object-cover"
               /> */}
+               {/* แสดงรูปแบบเลื่อนได้ */}
               <ProductImageCarousel images={product.images || []} />
             </div>
           </div>
@@ -63,7 +66,7 @@ export default async function ProductDetailPage({
             </div>
           </div>
 
-          <div className="border border-gray-200 mx-6 p-6 rounded-2xl shadow-sm">
+          <div className="border border-gray-200 mx-6 md:mx-100 p-6 rounded-2xl shadow-sm">
             <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-red-500 border-b border-gray-200 pb-4 mb-4">
               <p className="text-black">ราคา</p>
               <p>฿{product.price} /ชิ้น</p>
