@@ -9,10 +9,10 @@ const Footer = () => {
     <footer className="w-full border-t bg-white">
     
       <div className="block bg-cprojectone py-2">
-        <div className="container mx-auto px-4 grid grid-cols-1 gap-4 text-sm text-gray-600">
+        <div className="mx-0 md:mx-10 px-4 grid grid-cols-1 gap-4 text-sm text-gray-600">
           <div className="ml-auto">
             <div className="flex items-center gap-7">
-              <p className="text-black  text-sm">
+              <p className="text-black text-xs md:text-sm">
                 <Link href="https://line.me" target="_blank">
                   Line: @Candle Shop
                 </Link>
@@ -21,7 +21,7 @@ const Footer = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <p className="text-black  text-sm ">
+              <p className="text-black  text-xs md:text-sm ">
                 <Link href="https://www.facebook.com/" target="_blank">
                   Facebook: Candle Shop
                 </Link>
