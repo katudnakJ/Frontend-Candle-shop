@@ -27,10 +27,10 @@ export default async function ProductDetailPage({
         <main className="flex-grow bg-white font-sans">
           <div className="p-4 flex items-center">
             <Link href="/">
-              <ChevronLeft size={28} className="text-black" />
+              <ChevronLeft className="w-10 h-10 md:w-13 md:h-13 text-black" />
             </Link>
             <span>
-              <p className="text-black">รายละเอียดสินค้า</p>
+              <p className="text-md md:text-2xl text-black">รายละเอียดสินค้า</p>
             </span>
           </div>
 
@@ -66,7 +66,7 @@ export default async function ProductDetailPage({
             </div>
           </div>
 
-          <div className="border border-gray-200 mx-6 md:mx-100 p-6 rounded-2xl shadow-sm">
+          <div className="border border-gray-200 mx-auto  p-6 rounded-2xl shadow-sm">
             <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-red-500 border-b border-gray-200 pb-4 mb-4">
               <p className="text-black">ราคา</p>
               <p>฿{product.price} /ชิ้น</p>

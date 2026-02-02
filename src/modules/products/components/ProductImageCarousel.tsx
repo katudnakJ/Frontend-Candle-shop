@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ProductImage } from "@/modules/products/types";
 
 
@@ -33,7 +33,7 @@ export default function ProductImageCarousel({ images }: { images: ProductImage[
   return (
     <div className="flex flex-col items-center w-full max-w-[400px] mx-auto">
       <div className="relative w-full aspect-square rounded-3xl overflow-hidden border-4 border-cprojectfour shadow-md">
-        <div className="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar">
+        <div className="flex w-full h-full overflow-x-auto snap-x snap-mandatory custom-scrollbar">
           {sortedImages.map((img, index) => (
             
             <CarouselImage key={img.product_img_id || index} img={img} index={index} />
