@@ -11,7 +11,7 @@ export default function ProductPurchaseActions({ price }: { price: number }) {
 
   return (
     <>
-      {/* ส่วนเลือกจำนวน - วางไว้ใต้ตารางรายละเอียด */}
+      {/* ส่วนเลือกจำนวน*/}
       <div className="flex justify-end items-center gap-4 px-6 mt-10 mb-6 text-black">
         <span className="text-lg font-bold">จำนวน</span>
         <div className="flex items-center border-2 border-black rounded-xl overflow-hidden">
@@ -37,23 +37,26 @@ export default function ProductPurchaseActions({ price }: { price: number }) {
       </div>
 
      
-      <div className="bottom-0 left-0 right-0   grid grid-cols-10 h-20 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-        {/* ปุ่ม Line */}
-        <button className="col-span-2 flex flex-col items-center justify-center border border-black  hover:bg-gray-50">
-           <LineIcon size={50} />
-          <span className="text-xl text-black font-bold mt-1">Line</span>
-        </button>
+      <div className="bottom-0 left-0 right-0 grid grid-cols-10 h-16 md:h-18 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-[2px]">
+      
+    
+      <button className="col-span-2 flex flex-col items-center justify-center border border-black hover:bg-gray-50">
+       
+         <LineIcon size={24} /> 
+         <span className="text-xs md:text-sm text-black font-bold">Line</span>
+      </button>
 
-        {/* ปุ่มเพิ่มลงรถเข็น */}
-        <button className="col-span-4 flex flex-col items-center justify-center border border-black bg-cprojectfive  hover:bg-[#e1e095] transition-colors">
-          <ShoppingCart size={24} className="text-black" />
-          <span className="text-xl text-black font-bold mt-1">เพิ่มสินค้าลงรถเข็น</span>
-        </button>
+     
+      <button className="col-span-4 flex flex-col items-center justify-center border border-black bg-cprojectfive hover:bg-[#e1e095] transition-colors">
+        <ShoppingCart size={20} className="text-black" />
+        <span className="text-xs md:text-sm text-black font-bold">เพิ่มสินค้าลงรถเข็น</span>
+      </button>
 
-        {/* ปุ่มซื้อสินค้าทันที */}
-        <button className="col-span-4 flex flex-col items-center justify-center border border-black bg-cprojectfive text-white hover:bg-[#e1e095] transition-colors">
-          <span className="text-3xl text-black font-bold">ซื้อสินค้าทันที</span>
-          <span className="text-md text-red-500 font-extrabold leading-none">฿{(price * quantity).toLocaleString()}</span>
+      
+      <button className="col-span-4 flex flex-col items-center justify-center border border-black bg-cprojectfive text-white hover:bg-[#e1e095] transition-colors">
+        <span className="text-xs md:text-sm text-black font-bold">ซื้อสินค้าทันที</span>
+        <span className="text-xs text-red-500 font-extrabold leading-none">
+          ฿{(price * quantity).toLocaleString()}</span>
         </button>
       </div>
     </>

@@ -25,7 +25,7 @@ export default async function ProductDetailPage({
         {" "}
         <Header />
         <main className="flex-grow bg-white font-sans">
-          <div className="p-4 flex items-center">
+          <div className="max-w-[1200px] mx-auto p-4 flex items-center">
             <Link href="/">
               <ChevronLeft className="w-10 h-10 md:w-13 md:h-13 text-black" />
             </Link>
@@ -36,7 +36,6 @@ export default async function ProductDetailPage({
 
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">
             <div className="relative aspect-square w-full max-w-[400px] rounded-3xl overflow-hidden bg-gray-50 shadow-md drop-shadow-orange-300 border-cprojectfour border-4 ">
-              
               {/* แสดงรูปแบบปกติ */}
               {/* <Image
                 src={
@@ -49,7 +48,7 @@ export default async function ProductDetailPage({
                 fill
                 className="object-cover"
               /> */}
-               {/* แสดงรูปแบบเลื่อนได้ */}
+              {/* แสดงรูปแบบเลื่อนได้ */}
               <ProductImageCarousel images={product.images || []} />
             </div>
           </div>
@@ -66,28 +65,32 @@ export default async function ProductDetailPage({
             </div>
           </div>
 
-          <div className="border border-gray-200 mx-auto  p-6 rounded-2xl shadow-sm">
-            <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-red-500 border-b border-gray-200 pb-4 mb-4">
-              <p className="text-black">ราคา</p>
-              <p>฿{product.price} /ชิ้น</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center text-sm sm:text-base border-b border-gray-200 pb-3">
-                <span className="text-gray-500">น้ำหนักสุทธิ</span>
-                <span className="text-black font-semibold">
-                  {product.weight || "200"} กรัม
-                </span>
+          <div className="max-w-[1200px] mx-auto ">
+            <div className=" border border-gray-200 p-6  rounded-2xl shadow-sm  ml-10 mr-10">
+              <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-red-500 border-b border-gray-200 pb-4 mb-4">
+                <p className="text-black">ราคา</p>
+                <p>฿{product.price} /ชิ้น</p>
               </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-sm sm:text-base border-b border-gray-200 pb-3">
+                  <span className="text-gray-500">น้ำหนักสุทธิ</span>
+                  <span className="text-black font-semibold">
+                    {product.weight || "200"} กรัม
+                  </span>
+                </div>
 
-              <div className="flex justify-between items-center text-sm sm:text-base">
-                <span className="text-gray-500">เวลาผลิต</span>
-                <span className="text-black font-semibold">3-5 วัน</span>
+                <div className="flex justify-between items-center text-sm sm:text-base">
+                  <span className="text-gray-500">เวลาผลิต</span>
+                  <span className="text-black font-semibold">3-5 วัน</span>
+                </div>
               </div>
             </div>
           </div>
-
-          <ProductPurchaseActions price={product.price} />
+          <div className="w-full">
+            <div className="max-w-[1200px] mx-auto">
+              <ProductPurchaseActions price={product.price} />
+            </div>
+          </div>
         </main>
       </div>
       <Footer />
