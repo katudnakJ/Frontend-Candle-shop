@@ -23,7 +23,7 @@ const Header = () => {
             href="/"
             className="flex items-center gap-2 text-base font-medium text-black hover:text-yellow-500 transition-colors"
           >
-            <Home className="w-10 h-10 md:w-13 md:h-13 text-black" />
+            <Home className="w-10 h-10 md:w-11 md:h-11 text-black" />
             
           </Link>
         </div>
@@ -33,7 +33,7 @@ const Header = () => {
             href="/customer/myshoppingcart"
             className="relative p-1  text-black hover:text-yellow-500 transition-colors"
           >
-            <ShoppingCart className="w-10 h-10 md:w-13 md:h-13" />
+            <ShoppingCart className="w-10 h-10 md:w-11 md:h-11" />
             <span className="absolute -right-0.5 -top-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[15px] text-white font-bold">
               0
             </span>
@@ -41,7 +41,7 @@ const Header = () => {
 
           <Menu as="div" className="relative inline-block text-left">
             <MenuButton className="flex items-center gap-1 cursor-pointer group outline-none">
-              <div className="flex w-10 h-10 md:w-13 md:h-13 items-center justify-center rounded-full border border-black text-black group-hover:text-yellow-500 transition-colors">
+              <div className="flex w-10 h-10 md:w-11 md:h-11 items-center justify-center rounded-full border-3 border-black text-black group-hover:text-yellow-500 transition-colors">
                 <User size={40} />
               </div>
               <ChevronDown size={18} className="text-black" />
