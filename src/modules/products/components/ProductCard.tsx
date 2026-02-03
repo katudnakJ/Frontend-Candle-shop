@@ -1,7 +1,10 @@
+"use client";
+
 import { Product } from "@/modules/products/types";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import {useState} from "react"
+import Link from "next/link";
 
 interface ProductCardProps {
   product: Product;
@@ -15,7 +18,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
     "";
 
   const getFinalSrc = (slug: string) => {
-    if (!slug) return "/placeholder-image.jpg";
+    if (!slug) return "/placeholder-image.svg";
 
     if (slug.startsWith("http://") || slug.startsWith("https://")) {
         const separator = slug.includes("?") ? "&" : "?";
@@ -28,7 +31,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
 
   return (
 
-
+    <Link href={`/product/${product.slug}`}>
       <div className="group
       bg-cprojecttwo border border-gray-200 rounded-2xl overflow-hidden shadow-sm
       cursor-pointer
@@ -72,6 +75,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
         </div>
       </div>
     </div>
+    </Link>
   );
 };
 

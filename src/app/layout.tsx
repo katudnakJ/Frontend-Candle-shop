@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} antialiased overflow-x-hidden` }>
         <QueryProvider>
           <Toaster toastOptions={{className: 'font-prompt', }}/>
           {children}
