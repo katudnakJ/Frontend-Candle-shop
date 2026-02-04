@@ -22,9 +22,9 @@ export default async function ProductDetailPage({
   return (
     <div >
       <div className="flex flex-col min-h-screen bg-white ">
-        {" "}
+      
         <Header />
-        <main className="flex-grow bg-white font-sans">
+        <main className="flex-grow bg-white pb-20">
           <div className="max-w-[1200px] mx-auto p-4 flex items-center">
             <Link href="/customerhome">
               <ChevronLeft className="w-10 h-10 md:w-13 md:h-13 text-black" />
@@ -86,14 +86,15 @@ export default async function ProductDetailPage({
               </div>
             </div>
           </div>
-          <div className="w-full">
-            <div className="max-w-[1200px] mx-auto">
+          
+            <div className="max-w-[1200px] mx-auto px-4 md:px-6">
               <ProductPurchaseActions price={product.price} />
             </div>
-          </div>
+         
         </main>
+        <Footer />
       </div>
-      <Footer />
+      
     </div>
   );
 }

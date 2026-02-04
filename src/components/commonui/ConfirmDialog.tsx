@@ -46,23 +46,11 @@ export default function ConfirmDialog({
         {title}
       </DialogTitle>
       <DialogContent>
-        <Typography textAlign="center" color="textSecondary">
+        <Typography component="div" textAlign="center" color="textSecondary">
           {content}
         </Typography>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center", gap: 2, pb: 3 }}>
-        <Button
-          onClick={onClose}
-          variant="outlined"
-          sx={{
-            borderRadius: "12px",
-            color: "gray",
-            borderColor: "gray",
-            px: 3,
-          }}
-        >
-          ยกเลิก
-        </Button>
         <Button
           onClick={onConfirm}
           variant="contained"
@@ -76,6 +64,18 @@ export default function ConfirmDialog({
           }}
         >
           ยืนยัน
+        </Button>
+           <Button
+          onClick={onClose}
+          variant="outlined"
+          sx={{
+            borderRadius: "12px",
+            color: "gray",
+            borderColor: "gray",
+            px: 3,
+          }}
+        >
+          ยกเลิก
         </Button>
       </DialogActions>
     </Dialog>
