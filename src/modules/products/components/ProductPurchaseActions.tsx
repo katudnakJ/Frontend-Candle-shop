@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
 import { ShoppingCart, Plus, Minus } from "lucide-react";
 import LineIcon from "@/components/icon/lineicon";
 import { toast } from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import QuantityInputButton from "@/components/Button/QuantityInputButton";
 
 export default function ProductPurchaseActions({ price }: { price: number }) {
   const [quantity, setQuantity] = useState(1);
@@ -56,31 +57,10 @@ export default function ProductPurchaseActions({ price }: { price: number }) {
   return (
     <>
       {/* ส่วนเลือกจำนวน*/}
-      <div className="flex justify-end items-center gap-4 px-6 mt-10 mb-6 text-black">
-        <span className="text-lg font-bold">จำนวน</span>
-        <div className="flex items-center border-2 border-black rounded-xl overflow-hidden">
-          <button
-            onClick={decrement}
-            className="p-2 hover:bg-gray-100 active:bg-gray-200 transition-colors"
-          >
-            <Minus size={20} />
-          </button>
-          <input
-            type="number"
-            value={quantity === 0 ? "" : quantity}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            className="w-12 text-center font-bold text-lg focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <button
-            onClick={increment}
-            className="p-2 hover:bg-gray-100 active:bg-gray-200 transition-colors"
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-      </div>
-
+      <section>
+      <QuantityInputButton value={quantity} onChange={setQuantity} />
+      </section>
+      
       <div className="grid grid-cols-10  border border-black  bg-white overflow-hidden shadow-sm">
         <Link href="https://line.me" target="_blank" className="col-span-2  border border-black hover:bg-gray-50 cursor-pointer flex flex-col items-center justify-center py-2">
           
@@ -128,3 +108,4 @@ export default function ProductPurchaseActions({ price }: { price: number }) {
     </>
   );
 }
+
