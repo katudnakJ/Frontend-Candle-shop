@@ -16,5 +16,5 @@ export interface Order {
   order_status: "PD" | "RJ" | "TS" | "TR" | "CM";
   order_created_date: string;
   total_amount_purchase: number;
-  total_quantity_amount: number;
+  order_no :string;
 }
