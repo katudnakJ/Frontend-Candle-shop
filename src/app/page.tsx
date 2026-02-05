@@ -1,4 +1,4 @@
-import LineLiffLogin from "@/components/lineLiffLogin";
+import LineLiffLogin from "@/auth/lineLiffLogin";
 
 export default function HomePage() {
     

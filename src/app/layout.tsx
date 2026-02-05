@@ -39,9 +39,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} antialiased overflow-x-hidden` }>
         <QueryProvider>
-          <Toaster toastOptions={{className: 'font-prompt', }}/>
+          <Toaster 
+          position="top-right"
+          containerClassName="mt-4 sm:mt-0"
+          toastOptions={{className: '', }}/>
           {children}
         </QueryProvider>
       </body>

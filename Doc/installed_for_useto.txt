@@ -3,3 +3,4 @@ install TanStack Query
 install lucide-react
 install react-hot-toast
 install @headlessui/react
+install mui

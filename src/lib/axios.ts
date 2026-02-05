@@ -29,6 +29,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     let errorMessage = "A connection error occurred. Please try again.";
     if (error.response) {
+
       const serverMessage = error.response?.data?.message;
       switch (error.response?.status) {
         case 400:
@@ -37,18 +38,20 @@ axiosInstance.interceptors.response.use(
         case 401:
           errorMessage = "Session expired. Please login again.";
           if (typeof window !== "undefined") {
+            const currentPath = window.location.pathname;
             localStorage.removeItem("token");
             if (window.location.pathname !== "/login") {
               alert("Session expired. Please login again.");
-              window.location.href = "/login";
+              window.location.href = `/login?callbackUrl=${encodeURIComponent(currentPath)}`;
             }
+            
           }
           break;
         case 403:
           errorMessage = "You do not have permission to access this section.";
           if (typeof window !== "undefined") {
               alert(errorMessage);
-              window.location.href = "/home";
+              window.location.href = "/";
             }
           break;
         case 404:

@@ -5,6 +5,8 @@
   --foreground: #171717;
 }
 
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -14,7 +16,7 @@
   --color-cprojecttwo:    #FFFDFA;
   --color-cprojectthree:  #E2B6A8;
   --color-cprojectfour:   #EFE1B8;
-  --color-cprojectfive:   #EFE1B8;
+  --color-cprojectfive:   #EFE8D8;
 
 }
 
@@ -33,11 +35,38 @@
   font-style: normal;
 }
 
+.MuiTypography-root, 
+.MuiButton-root, 
+.MuiDialog-root,
+.MuiDialogTitle-root,
+.MuiDialogContent-root,
+.MuiDialogActions-root,
+.MuiInputBase-root {
+  /* เรียกใช้ --font-prompt ตรงๆ ที่ส่งมาจาก layout.tsx */
+  font-family: var(--font-prompt), var(--font-geist-sans),ui-sans-serif, system-ui, sans-serif !important;
+}
+
+
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-prompt), var(--font-geist-sans),ui-sans-serif, system-ui, sans-serif ;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #9ca3af; 
+  border-radius: 20px;
   font-family: "K2D", Arial, Helvetica, sans-serif;
 }
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+
 
 
 
