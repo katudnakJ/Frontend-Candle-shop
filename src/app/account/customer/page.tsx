@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, ChevronLeft } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
 import { mockAddresses } from "@/modules/account/mockaddress"; // Import ข้อมูลจำลอง
@@ -10,17 +11,22 @@ import Footer from "@/components/layout/Footer";
 import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
 
 export default function CustomerAccountPage() {
-  // ใช้ mockAddresses เป็นค่าเริ่มต้น
+  const router = useRouter();
   const [addresses, setAddresses] = useState<Addresses[]>(mockAddresses);
+
+  const handleAdd = () => {
+    router.push("/account/address"); // ไปหน้าฟอร์มแบบไม่มี ID (แปลว่าเพิ่มใหม่)
+  };
 
   const handleEdit = (id: string) => {
     console.log("แก้ไขที่อยู่ ID:", id);
-    // ในอนาคตจะเปิด Modal แก้ไขที่นี่
+    router.push(`/account/address?id=${id}`);
+   
   };
 
   const handleDelete = (id: string) => {
     console.log("ลบที่อยู่ ID:", id);
-    // ในอนาคตจะเรียก ConfirmDialog และสั่ง Filter ออกจาก State
+    
   };
 
   return (
@@ -50,7 +56,7 @@ export default function CustomerAccountPage() {
               <Link
                 href={`/account/address`}
                 className="flex items-center gap-2 bg-cprojectone border-2 border-black text-black px-4 py-2 rounded-xl hover:bg-yellow-200 hover:translate-y-1  duration-400  transition-all cursor-pointer text-sm"
-                onClick={() => console.log("เปิด Modal เพิ่มที่อยู่")}
+                onClick={handleAdd}
               >
                 <Plus size={18} />
                 เพิ่มที่อยู่ใหม่

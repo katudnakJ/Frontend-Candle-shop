@@ -9,6 +9,17 @@ interface AddressCardProps {
   onDelete?: (id: string) => void;
   showActions?: boolean;
 }
+const formatPhone = (phone: string) => {
+  if (!phone) return "";
+
+  const cleaned = phone.replace(/\D/g, "");
+
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `${match[1]}-${match[2]}-${match[3]}`;
+  }
+  return phone; 
+};
 
 export default function AddressCard({
   address,
@@ -46,7 +57,7 @@ export default function AddressCard({
             {address.recipient_first_name} {address.recipient_last_name}
           </p>
           {/* เบอร์โทรศัพท์ */}
-          <p className="text-[16px] truncate flex-shrink-1">{address.recipient_phone}</p>
+          <p className="text-[16px] truncate flex-shrink-1">{formatPhone(address.recipient_phone)}</p>
         </div>
         {/* รายละเอียดที่อยู่แบบรวมร่าง */}
         <p className="leading-relaxed  max-[320px]:truncate">
