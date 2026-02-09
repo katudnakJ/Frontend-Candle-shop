@@ -1,73 +1,67 @@
 "use client";
 
-import liff from '@line/liff';
+import { ROUTE } from "@/constants/routes";
+import { useAuthStoreUserLogin } from "@/store/userLogin";
+import liff from "@line/liff";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface LineLiffUserProfileResp {
-    userId: string;
-    displayName: string;
-    pictureUrl?: string;
-    statusMessage?: string;
-}
-
 const useLiffLogin = () => {
+  const [error, setError] = useState<Error | null>(null);
 
-    const router = useRouter();
+  const router = useRouter();
 
-    const [lineProfile, setLineProfile] = useState<LineLiffUserProfileResp | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<Error | null>(null);
+  const { 
+    login: storeUserLogin, 
+    logout: storeUserLogout 
+  } = useAuthStoreUserLogin();
 
-    let liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
-    console.log("liffId", liffId);
-    
+  let liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
 
-    const initializeLiff = async () => {
-            try {
-                await liff.init({liffId});
-                if ( liff.isLoggedIn() ) {
-                    setIsLoading(false)
-                    const userProfile = await liff.getProfile();
-                    setLineProfile({
-                        userId: userProfile.userId,
-                        displayName: userProfile.displayName,
-                        pictureUrl: userProfile.pictureUrl,
-                        statusMessage: userProfile.statusMessage,
-                    } as LineLiffUserProfileResp);
-                }else{
-                    liff.login();
-                }
-            }catch (err) {
-                console.log("LIFF initialization failed : ",err);
-                setError("ไม่สามารถเชื่อมต่อกับ LIFF ได้" as unknown as Error);
-            }
-        }
+  const initializeLiff = async () => {
+    try {
+      await liff.init({ liffId });
+      if (liff.isLoggedIn()) {
+        const token = liff.getAccessToken() || "";
+        storeUserLogin(token);
+console.log(token);
 
-    useEffect(()=>{
-        initializeLiff();
-    },[liff.isLoggedIn()]);
-
-    const login = () => {
-        if (!liff.isLoggedIn()) {
-            liff.login();
-        }
+        router.push(ROUTE.HOME);
+      } else {
+        liff.login({
+          redirectUri: `${process.env.NEXT_PUBLIC_LINE_LIFF_REDIRECT_URL}`,
+        });
+        router.push(ROUTE.HOME);
+        return false;
+      }
+    } catch (err) {
+      console.log("LIFF initialization failed : ", err);
+      setError("ไม่สามารถเชื่อมต่อกับ Line ได้" as unknown as Error);
     }
+  };
 
-    const logout = () => {
-        if (liff.isLoggedIn()) {
-            liff.logout();
-            setLineProfile(null);
-            router.refresh();
-        }
+  useEffect(() => {
+    initializeLiff();
+  }, []);
+
+  // const login = () => {
+  //     if (!liff.isLoggedIn()) {
+  //         liff.login();
+  //     }
+  // }
+
+  const logout = async () => {
+    if (liff.isLoggedIn()) {
+      liff.logout();
+      storeUserLogout();
+      router.refresh();
     }
+  };
 
-    return {
-        lineProfile,
-        isLoading,
-        error,
-        login,
-        logout,
-    };
-}
+  return {
+    error,
+    // login,
+    logout,
+  };
+};
 export default useLiffLogin;

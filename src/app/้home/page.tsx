@@ -5,7 +5,7 @@ import Head from "next/head";
 
 import ProductCard from "@/modules/products/components/ProductCard";
 import { mockProducts } from "@/modules/products/mockdata";
-import Header from "@/components/layout/Customer_Header";
+import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import { useState, useEffect } from "react";
 import { Customer } from "@/modules/customers/types";
@@ -56,7 +56,7 @@ export default function Home() {
       {/* Header*/}
       <Header />
 
-      <main className="flex-grow bg-white font-sans">
+      <main className="grow bg-white font-sans">
         {/* Welcome Customer*/}
 
         <section className="py-6 border-b-2  border-gray-500 ml-10 mr-10">
