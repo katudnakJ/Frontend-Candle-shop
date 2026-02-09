@@ -4,3 +4,8 @@ install lucide-react
 install react-hot-toast
 install @headlessui/react
 install mui
+install react-hook-form
+install zod
+install react-number-format
+install react-thailand-address-autocomplete //เอาออก
+install antd

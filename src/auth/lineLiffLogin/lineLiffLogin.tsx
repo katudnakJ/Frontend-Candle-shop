@@ -35,7 +35,6 @@ const lineLiffLogin = () => {
               Hello คุณ {userData?.displayName}!
             </h1>
             <p className="text-lg text-gray-600">
-              Line id : {userData?.userId}
             </p>
           </div>
         </div>

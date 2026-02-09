@@ -10,8 +10,8 @@ mkcert localhost
 
 yarn add -D local-ssl-proxy
 
-ปล. ถ้ามันขึ้นเกี่ยวกับ Certify ให้กด yes ไปนะ
-
+ปล. ถ้ามันขึ้นเกี่ยวกับ Certify ให้กด yes ไปนะ 
+จากนี้ไปตอน dev ให้ใช้คำสั่ง yarn dev:https แทน
 จะมีไฟล์เพิ่มอีก 2 ไฟล์ ซึ่ง gitignore มัน ignore file ให้อยู่แล้ว
 
 
