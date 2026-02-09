@@ -1,21 +1,14 @@
 "use client";
-import { useState, useMemo } from "react";
-import { Addresses } from "@/modules/account/addresses";
+import { useAddressForm } from "../hooks/useAddressForm";
 import { PatternFormat } from "react-number-format";
 import { Select } from "antd";
-import type { DefaultOptionType } from "antd/es/select";
-import addressdata from "@/modules/account/addressdata.json";
-
-
-type ZipCode = number[];
-type Tambon = [string, ZipCode];
-type Amphoe = [string, Tambon[]];
-type Province = [string, Amphoe[]];
-
-const MockAddress = addressdata as unknown as Province[];
+import { Addresses } from "@/modules/account/addresses";
+import { toast } from "react-hot-toast";
+import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import { useState } from "react";
 
 interface AddressFormProps {
-  initialData?: Addresses; // ถ้ามีคือโหมดแก้ไข
+  initialData?: Addresses;
   onSubmit: (data: Addresses | Partial<Addresses>) => void;
   onCancel: () => void;
 }
@@ -25,259 +18,199 @@ export default function AddressForm({
   onSubmit,
   onCancel,
 }: AddressFormProps) {
-  // สร้าง State จาก initialData ถ้าไม่มีให้เป็นค่าเริ่มต้น
-  const [formData, setFormData] = useState<Partial<Addresses>>(() => {
-    return (
-      initialData || {
-        recipient_first_name: "",
-        recipient_last_name: "",
-        recipient_phone: "",
-        delivery_address: "",
-        sub_district: "",
-        district: "",
-        province: "",
-        postcode: "",
-        address_label: "บ้าน",
-        is_default: false,
-      }
-    );
-  });
+    
+  // Logic ทั้งหมดมาจาก Hook useAddressForm
+  const {
+    formData,
+    setFormData,
+    errors,
+    setErrors,
+    handleChange,
+    validateForm,
+    currentProvinceData,
+    currentAmphoeData,
+    provinces,
+  } = useAddressForm(initialData);
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    const nameRegex = /^[a-zA-Zก-ฮะ-์\s]+$/;
-    const phoneRegex = /^0\d{9}$/;
-    const addressRegex = /^[a-zA-Z0-9ก-ฮ\u0E00-\u0E7F\s\/\-\.,]+$/;
+  const [openConfirm, setOpenConfirm] = useState(false);
 
-    if (!formData.recipient_first_name?.trim()) {
-      newErrors.recipient_first_name = "กรุณากรอกชื่อ";
-    } else if (!nameRegex.test(formData.recipient_first_name)) {
-      newErrors.recipient_first_name = "ชื่อห้ามมีอักขระพิเศษหรือตัวเลข";
-    }
-
-    if (!formData.recipient_last_name?.trim()) {
-      newErrors.recipient_last_name = "กรุณากรอกนามสกุล";
-    } else if (!nameRegex.test(formData.recipient_last_name)) {
-      newErrors.recipient_last_name = "นามสกุลห้ามมีอักขระพิเศษหรือตัวเลข";
-    }
-
-    if (!formData.recipient_phone?.trim()) {
-      newErrors.recipient_phone = "กรุณากรอกเบอร์โทรศัพท์";
-    } else if (!phoneRegex.test(formData.recipient_phone)) {
-      newErrors.recipient_phone =
-        "เบอร์โทรต้องเป็นตัวเลข 10 หลัก และขึ้นต้นด้วย 0";
-    }
-
-    if (!formData.delivery_address?.trim()) {
-      newErrors.delivery_address = "กรุณากรอกที่อยู่";
-    } else if (formData.delivery_address.length < 5) {
-      newErrors.delivery_address = "กรุณากรอกรายละเอียดที่อยู่ให้ชัดเจนกว่านี้";
-    } else if (!addressRegex.test(formData.delivery_address)) {
-      newErrors.delivery_address = "ชื่อห้ามมีอักขระพิเศษหรือตัวเลข";
-    }
-
-    if (!formData.province) {
-      newErrors.province = "กรุณาเลือกจังหวัด";
-    }
-    if (!formData.district) {
-      newErrors.district = "กรุณาเลือกอำเภอ/เขต";
-    }
-    if (!formData.sub_district) {
-      newErrors.sub_district = "กรุณาเลือกตำบล/แขวง";
-    }
-    if (!formData.postcode) {
-      newErrors.postcode = "กรุณากรอกรหัสไปรษณีย์";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = () => {
+  const handleInternalSubmit = () => {
     if (validateForm()) {
       onSubmit(formData);
-      console.log(formData);
     }
   };
-
-  // อัปเดตข้อมูลเมื่อ initialData เปลี่ยน (กรณีเปิดหน้า Edit)
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleCheckValid = () => {
+    if (validateForm()) {
+      setOpenConfirm(true);
+    } else {
+      toast.error(
+        <div className="flex flex-col justify-center py-1">
+          <span className="leading-tight">
+            กรุณาระบุข้อมูลให้ครบถ้วน
+          </span>
+        </div>,
+        {
+          className:
+            " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
+          duration: 3000,
+        },
+      );
+    }
+  };
+  const handleConfirmAddToAccount = () => {
+    toast.success(
+      <div className="flex flex-col justify-center py-1">
+        <span className="leading-tight">เพิ่มที่อยู่จัดส่ง เรียบร้อยแล้ว!</span>
+      </div>,
+      {
+        className:
+          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
+        duration: 3000,
+      },
+    );
+    setOpenConfirm(false);
   };
 
-  const currentProvince = useMemo(() => MockAddress.find((p) => p[0] === formData.province),[formData.province]);
-  const currentAmphoe = useMemo(() =>currentProvince?.[1].find(
-    (a) => a[0] === formData.district),[currentProvince, formData.district]
-  );
-
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-black">
+    <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-black  ">
       <h2 className="text-xl font-bold mb-6 text-black">
         {initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"}
       </h2>
 
-      <div className="space-y-4">
-        {/* ชื่อ-นามสกุล */}
-        <div className="grid grid-cols-1 max-w-[400px] gap-y-0 ">
-          <div className=" flex flex-col w-full">
-            <div className="flex justify-end  mb-1">
-              {/* ตัวนับอักขระ ชื่อ*/}
-
+      <div className="space-y-6">
+        {/* ข้อมูลผู้รับ ชื่อ-นามสกุล*/}
+        <div className="grid grid-cols-1 max-w-[400px] gap-4">
+          {/* ชื่อผู้รับ */}
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-black">
+                ชื่อผู้รับ *
+              </label>
               <span
-                className={`text-[10px] mr-10 ${
-                  (formData.recipient_first_name?.length || 0) >= 45
-                    ? "text-red-500 font-bold"
-                    : "text-gray-400"
-                }`}
+                className={`text-[10px] ${formData.recipient_first_name?.length === 50 ? "text-red-500" : "text-gray-400"}`}
               >
                 {formData.recipient_first_name?.length || 0}/50
               </span>
             </div>
             <input
               name="recipient_first_name"
-              placeholder="ชื่อผู้รับ *"
               maxLength={50}
               value={formData.recipient_first_name}
               onChange={handleChange}
-              className={`w-full p-3 border-1 text-black  border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
+              placeholder="กรุณากรอกชื่อ"
+              className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none transition-all ${
                 errors.recipient_first_name
                   ? "border-red-500 bg-red-50"
                   : "border-gray-200"
               }`}
             />
             {errors.recipient_first_name && (
-              <span className="text-red-500 text-xs ml-1">
-                <br />
+              <span className="text-red-500 text-xs">
                 {errors.recipient_first_name}
               </span>
             )}
           </div>
 
-          <div className="flex flex-col w-full">
-            <div className="flex justify-end mb-1">
-              {/* ตัวนับอักขระ นามสกุล*/}
+          {/* นามสกุลผู้รับ */}
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-black">
+                นามสกุลผู้รับ *
+              </label>
               <span
-                className={`text-[10px] mr-10 ${
-                  (formData.recipient_last_name?.length || 0) >= 45
-                    ? "text-red-500 font-bold"
-                    : "text-gray-400"
-                }`}
+                className={`text-[10px] ${formData.recipient_last_name?.length === 50 ? "text-red-500" : "text-gray-400"}`}
               >
                 {formData.recipient_last_name?.length || 0}/50
               </span>
             </div>
-
             <input
               name="recipient_last_name"
-              placeholder="นามสกุลผู้รับ *"
               maxLength={50}
               value={formData.recipient_last_name}
               onChange={handleChange}
-              className={`max-[340px]:w-full p-3 border-1 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
+              placeholder="กรุณากรอกนามสกุล"
+              className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none transition-all ${
                 errors.recipient_last_name
                   ? "border-red-500 bg-red-50"
                   : "border-gray-200"
               }`}
             />
-
             {errors.recipient_last_name && (
-              <span className="text-red-500 text-xs ml-1">
-                <br />
+              <span className="text-red-500 text-xs">
                 {errors.recipient_last_name}
               </span>
             )}
           </div>
         </div>
 
-        {/* เบอร์โทร */}
-
-        <div className="flex justify-between items-end mb-1">
-          {/* ตัวนับอักขระ เบอร์โทร*/}
-          <span className={`text-[10px] ml-auto  mr-10 text-gray-400 `}>
-            {formData.recipient_phone?.length || 0}/10
-          </span>
-        </div>
-        <div>
+        {/* ช่องทางการติดต่อ  */}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-bold text-black">
+            เบอร์โทรศัพท์มือถือ *
+          </label>
           <PatternFormat
             format="###-###-####"
             mask="#"
-            name="recipient_phone"
-            placeholder="เบอร์โทรศัพท์มือถือ เช่น 0123456789 *"
-            
             value={formData.recipient_phone}
-            onValueChange={(values) => {
-              setFormData((prev) => ({
-                ...prev,
-                recipient_phone: values.value,
-              }));
-            }}
-            className={`w-full p-3 border-1 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
+            onValueChange={(v) =>
+              setFormData((prev) => ({ ...prev, recipient_phone: v.value }))
+            }
+            placeholder="เช่น 081-234-5678"
+            className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none transition-all ${
               errors.recipient_phone
                 ? "border-red-500 bg-red-50"
                 : "border-gray-200"
             }`}
           />
           {errors.recipient_phone && (
-            <span className="text-red-500 text-xs ml-1">
+            <span className="text-red-500 text-xs">
               {errors.recipient_phone}
             </span>
           )}
         </div>
 
-        {/* ที่อยู่ */}
+        {/* ข้อมูลที่อยู่ */}
+        <div className="space-y-4 pt-2 border-t border-gray-100">
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-black">ที่อยู่ *</label>
+              <span
+                className={`text-[10px] ${formData.delivery_address?.length === 100 ? "text-red-500" : "text-gray-400"}`}
+              >
+                {formData.delivery_address?.length || 0}/100
+              </span>
+            </div>
+            <textarea
+              name="delivery_address"
+              maxLength={100}
+              rows={2}
+              value={formData.delivery_address}
+              placeholder="บ้านเลขที่, ถนน, ซอย *"
+              onChange={handleChange}
+              className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none resize-none transition-all ${
+                errors.delivery_address
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-200"
+              }`}
+            />
+            {errors.delivery_address && (
+              <span className="text-red-500 text-xs ml-1">
+                {errors.delivery_address}
+              </span>
+            )}
+          </div>
 
-        <div className="flex justify-between items-end mb-1">
-          {/* ตัวนับอักขระ นามสกุล*/}
-          <span
-            className={`text-[10px] ml-auto  mr-10 ${
-              (formData.delivery_address?.length || 0) >= 70
-                ? "text-red-500 font-bold"
-                : "text-gray-400"
-            }`}
-          >
-            {formData.delivery_address?.length || 0}/100
-          </span>
-        </div>
-        <div>
-          <input
-            name="delivery_address"
-            placeholder="บ้านเลขที่, ถนน, ซอย *"
-            maxLength={100}
-            value={formData.delivery_address}
-            onChange={handleChange}
-            className={`w-full p-3 border-1 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
-              errors.delivery_address
-                ? "border-red-500 bg-red-50"
-                : "border-gray-200"
-            }`}
-          />
-          {errors.delivery_address && (
-            <span className="text-red-500 text-xs ml-1">
-              {errors.delivery_address}
-            </span>
-          )}
-        </div>
-
-        <div>
-          <div className="grid grid-cols-2 gap-4 pt-2 text-black">
+          <div className="grid grid-cols-2 gap-4">
+            {/* จังหวัด */}
             <div>
-              {/* จังหวัด */}
-
               <Select
                 showSearch
+                className="w-full h-12"
+                placeholder="เลือกจังหวัด *"
                 status={errors.province ? "error" : ""}
-                placeholder="จังหวัด *"
                 value={formData.province || undefined}
-                className="h-12 w-full custom-select rounded-xl "
-                options={MockAddress.map((p) => ({
-                  label: p[0],
-                  value: p[0],
-                }))}
-                onSelect={(val: string) => {
+                options={provinces.map((p) => ({ label: p, value: p }))}
+                onSelect={(val) => {
                   setFormData((prev) => ({
                     ...prev,
                     province: val,
@@ -295,30 +228,27 @@ export default function AddressForm({
               )}
             </div>
 
+            {/* อำเภอ */}
             <div>
-              {/* อำเภอ */}
               <Select
                 showSearch
                 disabled={!formData.province}
+                className="w-full h-12"
+                placeholder="เลือกอำเภอ *"
                 status={errors.district ? "error" : ""}
-                placeholder="อำเภอ/เขต *"
                 value={formData.district || undefined}
-                className="h-12 w-full"
-                options={currentProvince?.[1].map((a, index) => ({
+                options={currentProvinceData.map((a) => ({
                   label: a[0],
                   value: a[0],
-                  key: index,
                 }))}
-                onSelect={(val: string, option: DefaultOptionType) => {
-                  const aIdx = Number(option.key);
-                  // ดึงตำบลแรกของอำเภอนั้นมาใส่ให้เลยเพื่อความสะดวก
-                  const firstTambon = currentProvince?.[1][aIdx][1][0][0] || "";
+                onSelect={(val) => {
                   setFormData((prev) => ({
                     ...prev,
                     district: val,
-                    sub_district: firstTambon,
+                    sub_district: "",
                     postcode: "",
                   }));
+                  setErrors((prev) => ({ ...prev, district: "" }));
                 }}
               />
               {errors.district && (
@@ -328,30 +258,28 @@ export default function AddressForm({
               )}
             </div>
 
+            {/* ตำบล */}
             <div>
-              {/* ตำบล */}
               <Select
                 showSearch
                 disabled={!formData.district}
+                className="w-full h-12"
+                placeholder="เลือกตำบล *"
                 status={errors.sub_district ? "error" : ""}
-                placeholder="ตำบล/แขวง *"
                 value={formData.sub_district || undefined}
-                className="h-12 w-full"
-                options={currentAmphoe?.[1].map((t, index) => ({
+                options={currentAmphoeData.map((t) => ({
                   label: t[0],
                   value: t[0],
-                  key: index,
                 }))}
-                onSelect={(val: string, option: DefaultOptionType) => {
-                  const tIdx = Number(option.key);
-
-                  // ดึงรหัสไปรษณีย์ (Zipcode อยู่ที่ t[1][0])
-                  const zip = currentAmphoe?.[1][tIdx][1][0] || "";
+                onSelect={(val) => {
+                  const zip =
+                    currentAmphoeData.find((t) => t[0] === val)?.[1][0] || "";
                   setFormData((prev) => ({
                     ...prev,
                     sub_district: val,
                     postcode: zip.toString(),
                   }));
+                  setErrors((prev) => ({ ...prev, sub_district: "" }));
                 }}
               />
               {errors.sub_district && (
@@ -360,30 +288,32 @@ export default function AddressForm({
                 </span>
               )}
             </div>
-            <div>
-              {/* รหัสไปรษณีย์  */}
-              <input
-                readOnly
-                placeholder="รหัสไปรษณีย์ *"
-                value={formData.postcode}
-                className="p-3 border-2 border-gray-100 bg-gray-50 text-gray-500 rounded-xl outline-none w-full cursor-not-allowed"
-              />
-            </div>
-          </div>
 
-          {/* ประเภทที่อยู่ */}
-          <div className="inline-block space-x-2 md:space-x-3  items-center pt-2 mb-4">
-            <span className="text-sm text-black font-bold">ประเภทที่อยู่:</span>
+            {/* รหัสไปรษณีย์ */}
+            <input
+              readOnly
+              value={formData.postcode}
+              placeholder="รหัสไปรษณีย์"
+              className="w-full h-12 p-3 bg-gray-50 border-2 border-gray-100 rounded-xl text-gray-500 cursor-not-allowed"
+            />
+          </div>
+        </div>
+
+        {/* ประเภทที่อยู่ */}
+        <div className="pt-4 spac-y-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-bold text-black">ประเภท:</span>
             {["บ้าน", "ที่ทำงาน", "คอนโด", "อื่นๆ"].map((label) => (
               <button
                 key={label}
+                type="button"
                 onClick={() =>
-                  setFormData({ ...formData, address_label: label })
+                  setFormData((prev) => ({ ...prev, address_label: label }))
                 }
-                className={`px-4 py-2 rounded-xl border-2 transition-all ${
+                className={`px-4 py-2 rounded-xl border-2 font-medium transition-all ${
                   formData.address_label === label
-                    ? "border-black bg-black text-white"
-                    : "border-gray-200 text-black"
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-black border-gray-200 hover:border-black"
                 }`}
               >
                 {label}
@@ -391,7 +321,6 @@ export default function AddressForm({
             ))}
           </div>
 
-          {/* ปุ่มปรับ default */}
           <div className="flex item-center gap-3 pt-2 ">
             <button
               type="button"
@@ -411,22 +340,46 @@ export default function AddressForm({
                 }`}
               />
             </button>
-            <span className={`text-sm font-bold text-black content-center ${ formData.is_default ? "text-black " : "text-gray-500"}`}>
+            <span
+              className={`text-sm font-bold text-black content-center ${formData.is_default ? "text-black " : "text-gray-500"}`}
+            >
               ตั้งเป็นที่อยู่เริ่มต้น
             </span>
           </div>
 
-          {/* ปุ่มบันทึก/ยกเลิก */}
-          <div className="flex gap-3 pt-6">
+          {/* ปุ่มบันทึก */}
+          <div className="flex gap-4 pt-4 border-t border-gray-100">
             <button
-              onClick={handleSubmit}
-              className="flex-1 bg-cprojectpink p-4 rounded-2xl font-bold text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
+              onClick={handleCheckValid}
+              className="flex-1 bg-cprojectpink p-4 rounded-2xl font-bold text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
             >
-              บันทึก
+              บันทึกข้อมูล
             </button>
+            <ConfirmDialog
+              open={openConfirm}
+              onClose={() => setOpenConfirm(false)}
+              onConfirm={async () => {
+                await handleInternalSubmit();
+                handleConfirmAddToAccount();
+              }}
+              title={initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"}
+              content={
+                <div className="text-center space-y-2">
+                  <span>
+                    {" "}
+                    คุณต้องการ
+                    {initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"}
+                    ใช่หรือไม่?
+                  </span>
+                  <br />
+                  <span className="text-xl font-bold text-black"></span>
+                </div>
+              }
+            />
+
             <button
               onClick={onCancel}
-              className="flex-1 font-bold text-black  underline"
+              className="flex-1 font-bold text-gray-500 underline hover:text-black"
             >
               ยกเลิก
             </button>

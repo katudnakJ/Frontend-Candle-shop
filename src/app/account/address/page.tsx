@@ -3,7 +3,6 @@
 import { mockAddresses } from "@/modules/account/mockaddress";
 import { useSearchParams, useRouter } from "next/navigation";
 import AddressForm from "@/modules/account/components/AddressForm";
-import AddressFormVEdit from "@/modules/account/components/AddressFormVEdit";
 import { AddressFormSkeleton } from "@/modules/account/components/AddressFormSkeleton";
 import { useState, useEffect, Suspense } from "react";
 
@@ -32,7 +31,7 @@ function AddressPageContent() {
         {isLoading ? (
           <AddressFormSkeleton />
         ) : (
-          <AddressFormVEdit
+          <AddressForm
             key={addressId || "new"} 
             initialData={editingAddress}
             onCancel={() => router.back()} // กดยกเลิกแล้วถอยกลับหน้าเดิม
