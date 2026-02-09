@@ -1,8 +1,18 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Addresses } from "@/modules/account/addresses";
 import { PatternFormat } from "react-number-format";
-import ThailandAddressTypeahead from "react-thailand-address-autocomplete";
+import { Select } from "antd";
+import type { DefaultOptionType } from "antd/es/select";
+import addressdata from "@/modules/account/addressdata.json";
+
+
+type ZipCode = number[];
+type Tambon = [string, ZipCode];
+type Amphoe = [string, Tambon[]];
+type Province = [string, Amphoe[]];
+
+const MockAddress = addressdata as unknown as Province[];
 
 interface AddressFormProps {
   initialData?: Addresses; // ถ้ามีคือโหมดแก้ไข
@@ -36,9 +46,7 @@ export default function AddressForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
     const nameRegex = /^[a-zA-Zก-ฮะ-์\s]+$/;
-
     const phoneRegex = /^0\d{9}$/;
     const addressRegex = /^[a-zA-Z0-9ก-ฮ\u0E00-\u0E7F\s\/\-\.,]+$/;
 
@@ -69,6 +77,19 @@ export default function AddressForm({
       newErrors.delivery_address = "ชื่อห้ามมีอักขระพิเศษหรือตัวเลข";
     }
 
+    if (!formData.province) {
+      newErrors.province = "กรุณาเลือกจังหวัด";
+    }
+    if (!formData.district) {
+      newErrors.district = "กรุณาเลือกอำเภอ/เขต";
+    }
+    if (!formData.sub_district) {
+      newErrors.sub_district = "กรุณาเลือกตำบล/แขวง";
+    }
+    if (!formData.postcode) {
+      newErrors.postcode = "กรุณากรอกรหัสไปรษณีย์";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -85,19 +106,13 @@ export default function AddressForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    if (name === "recipient_first_name" && value.length > 50) {
-      return;
-    }
-    if (name === "recipient_last_name" && value.length > 50) {
-      return;
-    }
-    
-    if (name === "delivery_address" && value.length > 100) {
-      return;
-    }
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const currentProvince = useMemo(() => MockAddress.find((p) => p[0] === formData.province),[formData.province]);
+  const currentAmphoe = useMemo(() =>currentProvince?.[1].find(
+    (a) => a[0] === formData.district),[currentProvince, formData.district]
+  );
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-black">
@@ -107,26 +122,28 @@ export default function AddressForm({
 
       <div className="space-y-4">
         {/* ชื่อ-นามสกุล */}
-        <div className="grid grid-cols-2 gap-1 ">
-          <div className="flex justify-between items-end mb-1">
-            {/* ตัวนับอักขระ ชื่อ*/}
-            <span
-              className={`text-[10px] ml-auto  mr-10 ${
-                (formData.recipient_first_name?.length || 0) >= 45
-                  ? "text-red-500 font-bold"
-                  : "text-gray-400"
-              }`}
-            >
-              {formData.recipient_first_name?.length || 0}/50
-            </span>
-          </div>
-          <div className="col-span-2 mb-2">
+        <div className="grid grid-cols-1 max-w-[400px] gap-y-0 ">
+          <div className=" flex flex-col w-full">
+            <div className="flex justify-end  mb-1">
+              {/* ตัวนับอักขระ ชื่อ*/}
+
+              <span
+                className={`text-[10px] mr-10 ${
+                  (formData.recipient_first_name?.length || 0) >= 45
+                    ? "text-red-500 font-bold"
+                    : "text-gray-400"
+                }`}
+              >
+                {formData.recipient_first_name?.length || 0}/50
+              </span>
+            </div>
             <input
               name="recipient_first_name"
               placeholder="ชื่อผู้รับ *"
+              maxLength={50}
               value={formData.recipient_first_name}
               onChange={handleChange}
-              className={`p-3 border-2 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
+              className={`w-full p-3 border-1 text-black  border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
                 errors.recipient_first_name
                   ? "border-red-500 bg-red-50"
                   : "border-gray-200"
@@ -140,26 +157,27 @@ export default function AddressForm({
             )}
           </div>
 
-          <div className="flex justify-between items-end mb-1">
-            {/* ตัวนับอักขระ นามสกุล*/}
-            <span
-              className={`text-[10px] ml-auto  mr-10 ${
-                (formData.recipient_last_name?.length || 0) >= 45
-                  ? "text-red-500 font-bold"
-                  : "text-gray-400"
-              }`}
-            >
-              {formData.recipient_last_name?.length || 0}/50
-            </span>
-          </div>
+          <div className="flex flex-col w-full">
+            <div className="flex justify-end mb-1">
+              {/* ตัวนับอักขระ นามสกุล*/}
+              <span
+                className={`text-[10px] mr-10 ${
+                  (formData.recipient_last_name?.length || 0) >= 45
+                    ? "text-red-500 font-bold"
+                    : "text-gray-400"
+                }`}
+              >
+                {formData.recipient_last_name?.length || 0}/50
+              </span>
+            </div>
 
-          <div className="col-span-2 ">
             <input
               name="recipient_last_name"
               placeholder="นามสกุลผู้รับ *"
+              maxLength={50}
               value={formData.recipient_last_name}
               onChange={handleChange}
-              className={`p-3 border-2 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
+              className={`max-[340px]:w-full p-3 border-1 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
                 errors.recipient_last_name
                   ? "border-red-500 bg-red-50"
                   : "border-gray-200"
@@ -189,16 +207,15 @@ export default function AddressForm({
             mask="#"
             name="recipient_phone"
             placeholder="เบอร์โทรศัพท์มือถือ เช่น 0123456789 *"
+            
             value={formData.recipient_phone}
             onValueChange={(values) => {
               setFormData((prev) => ({
                 ...prev,
                 recipient_phone: values.value,
-                
               }));
-              
             }}
-            className={`w-full p-3 border-2 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
+            className={`w-full p-3 border-1 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
               errors.recipient_phone
                 ? "border-red-500 bg-red-50"
                 : "border-gray-200"
@@ -229,9 +246,10 @@ export default function AddressForm({
           <input
             name="delivery_address"
             placeholder="บ้านเลขที่, ถนน, ซอย *"
+            maxLength={100}
             value={formData.delivery_address}
             onChange={handleChange}
-            className={`w-full p-3 border-2 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
+            className={`w-full p-3 border-1 text-black border-gray-200 rounded-xl focus:border-black outline-none transition-all ${
               errors.delivery_address
                 ? "border-red-500 bg-red-50"
                 : "border-gray-200"
@@ -243,38 +261,176 @@ export default function AddressForm({
             </span>
           )}
         </div>
-        {/* ประเภทที่อยู่ */}
-        <div className="flex gap-4 items-center pt-2">
-          <span className="text-sm text-black font-bold">ประเภทที่อยู่:</span>
-          {["บ้าน", "ที่ทำงาน", "คอนโด", "อื่นๆ"].map((label) => (
+
+        <div>
+          <div className="grid grid-cols-2 gap-4 pt-2 text-black">
+            <div>
+              {/* จังหวัด */}
+
+              <Select
+                showSearch
+                status={errors.province ? "error" : ""}
+                placeholder="จังหวัด *"
+                value={formData.province || undefined}
+                className="h-12 w-full custom-select rounded-xl "
+                options={MockAddress.map((p) => ({
+                  label: p[0],
+                  value: p[0],
+                }))}
+                onSelect={(val: string) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    province: val,
+                    district: "",
+                    sub_district: "",
+                    postcode: "",
+                  }));
+                  setErrors((prev) => ({ ...prev, province: "" }));
+                }}
+              />
+              {errors.province && (
+                <span className="text-red-500 text-[10px] ml-1">
+                  {errors.province}
+                </span>
+              )}
+            </div>
+
+            <div>
+              {/* อำเภอ */}
+              <Select
+                showSearch
+                disabled={!formData.province}
+                status={errors.district ? "error" : ""}
+                placeholder="อำเภอ/เขต *"
+                value={formData.district || undefined}
+                className="h-12 w-full"
+                options={currentProvince?.[1].map((a, index) => ({
+                  label: a[0],
+                  value: a[0],
+                  key: index,
+                }))}
+                onSelect={(val: string, option: DefaultOptionType) => {
+                  const aIdx = Number(option.key);
+                  // ดึงตำบลแรกของอำเภอนั้นมาใส่ให้เลยเพื่อความสะดวก
+                  const firstTambon = currentProvince?.[1][aIdx][1][0][0] || "";
+                  setFormData((prev) => ({
+                    ...prev,
+                    district: val,
+                    sub_district: firstTambon,
+                    postcode: "",
+                  }));
+                }}
+              />
+              {errors.district && (
+                <span className="text-red-500 text-[10px] ml-1">
+                  {errors.district}
+                </span>
+              )}
+            </div>
+
+            <div>
+              {/* ตำบล */}
+              <Select
+                showSearch
+                disabled={!formData.district}
+                status={errors.sub_district ? "error" : ""}
+                placeholder="ตำบล/แขวง *"
+                value={formData.sub_district || undefined}
+                className="h-12 w-full"
+                options={currentAmphoe?.[1].map((t, index) => ({
+                  label: t[0],
+                  value: t[0],
+                  key: index,
+                }))}
+                onSelect={(val: string, option: DefaultOptionType) => {
+                  const tIdx = Number(option.key);
+
+                  // ดึงรหัสไปรษณีย์ (Zipcode อยู่ที่ t[1][0])
+                  const zip = currentAmphoe?.[1][tIdx][1][0] || "";
+                  setFormData((prev) => ({
+                    ...prev,
+                    sub_district: val,
+                    postcode: zip.toString(),
+                  }));
+                }}
+              />
+              {errors.sub_district && (
+                <span className="text-red-500 text-[10px] ml-1">
+                  {errors.sub_district}
+                </span>
+              )}
+            </div>
+            <div>
+              {/* รหัสไปรษณีย์  */}
+              <input
+                readOnly
+                placeholder="รหัสไปรษณีย์ *"
+                value={formData.postcode}
+                className="p-3 border-2 border-gray-100 bg-gray-50 text-gray-500 rounded-xl outline-none w-full cursor-not-allowed"
+              />
+            </div>
+          </div>
+
+          {/* ประเภทที่อยู่ */}
+          <div className="inline-block space-x-2 md:space-x-3  items-center pt-2 mb-4">
+            <span className="text-sm text-black font-bold">ประเภทที่อยู่:</span>
+            {["บ้าน", "ที่ทำงาน", "คอนโด", "อื่นๆ"].map((label) => (
+              <button
+                key={label}
+                onClick={() =>
+                  setFormData({ ...formData, address_label: label })
+                }
+                className={`px-4 py-2 rounded-xl border-2 transition-all ${
+                  formData.address_label === label
+                    ? "border-black bg-black text-white"
+                    : "border-gray-200 text-black"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* ปุ่มปรับ default */}
+          <div className="flex item-center gap-3 pt-2 ">
             <button
-              key={label}
-              onClick={() => setFormData({ ...formData, address_label: label })}
-              className={`px-4 py-2 rounded-xl border-2 transition-all ${
-                formData.address_label === label
-                  ? "border-black bg-black text-white"
-                  : "border-gray-200 text-black"
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  is_default: !prev.is_default,
+                }))
+              }
+              className={`relative inline-flex h-8 w-20 items-center rounded-full transition-colors focus:outline-none border-2 border-black ${
+                formData.is_default ? "bg-green-500" : "bg-gray-200"
               }`}
             >
-              {label}
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                  formData.is_default ? "translate-x-14" : "translate-x-1"
+                }`}
+              />
             </button>
-          ))}
-        </div>
+            <span className={`text-sm font-bold text-black content-center ${ formData.is_default ? "text-black " : "text-gray-500"}`}>
+              ตั้งเป็นที่อยู่เริ่มต้น
+            </span>
+          </div>
 
-        {/* ปุ่มบันทึก/ยกเลิก */}
-        <div className="flex gap-3 pt-6">
-          <button
-            onClick={handleSubmit}
-            className="flex-1 bg-cprojectpink p-4 rounded-2xl font-bold text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
-          >
-            บันทึก
-          </button>
-          <button
-            onClick={onCancel}
-            className="flex-1 font-bold text-black  underline"
-          >
-            ยกเลิก
-          </button>
+          {/* ปุ่มบันทึก/ยกเลิก */}
+          <div className="flex gap-3 pt-6">
+            <button
+              onClick={handleSubmit}
+              className="flex-1 bg-cprojectpink p-4 rounded-2xl font-bold text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
+            >
+              บันทึก
+            </button>
+            <button
+              onClick={onCancel}
+              className="flex-1 font-bold text-black  underline"
+            >
+              ยกเลิก
+            </button>
+          </div>
         </div>
       </div>
     </div>
