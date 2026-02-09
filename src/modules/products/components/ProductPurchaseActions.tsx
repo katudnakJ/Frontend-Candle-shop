@@ -11,32 +11,6 @@ import QuantityInputButton from "@/components/Button/QuantityInputButton";
 export default function ProductPurchaseActions({ price }: { price: number }) {
   const [quantity, setQuantity] = useState(1);
   const [openConfirm, setOpenConfirm] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputvalue = e.target.value;
-
-    if (inputvalue === "") {
-    setQuantity(0);
-    return;
-  }
-  const value = parseInt(inputvalue);
-    if (!isNaN(value)  ) {
-      setQuantity(value);
-    } 
-    if (value >1000){
-      setQuantity(1000)
-    }
-  };
-  const handleBlur = () => {
-  if (quantity < 1) {
-    setQuantity(1);
-  }
-};
-  
-
-
-  const increment = () => setQuantity((prev) => (prev >= 1000 ? 1000 : prev+1));
-  const decrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
   
   const handleConfirmAddToCart = () => {
     toast.success(
