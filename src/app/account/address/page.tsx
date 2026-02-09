@@ -5,9 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import AddressForm from "@/modules/account/components/AddressForm";
 import AddressFormVEdit from "@/modules/account/components/AddressFormVEdit";
 import { AddressFormSkeleton } from "@/modules/account/components/AddressFormSkeleton";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
-export default function AddressPage() {
+function AddressPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -44,5 +44,13 @@ export default function AddressPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function AddressPage() {
+  return (
+    <Suspense fallback={<AddressFormSkeleton />}>
+      <AddressPageContent />
+    </Suspense>
   );
 }
