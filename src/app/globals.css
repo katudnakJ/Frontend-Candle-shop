@@ -24,9 +24,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ffffff;
+    --background: #ffffff;
+    --foreground: #000000;
   }
+}
+
+.k2d-regular {
+  font-family: "K2D", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .MuiTypography-root, 
@@ -54,9 +60,14 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: #9ca3af; 
   border-radius: 20px;
+  font-family: "K2D", Arial, Helvetica, sans-serif;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent; 
 }
+
+
+
+
 
 
