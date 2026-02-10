@@ -30,7 +30,7 @@ const Header = () => {
 
         <div className="flex items-center gap-4 md:gap-8">
           <Link
-            href="/customer/myshoppingcart"
+            href="/shoppingcart"
             className="relative p-1  text-black hover:text-yellow-500 transition-colors"
           >
             <ShoppingCart className="w-10 h-10 md:w-11 md:h-11" />

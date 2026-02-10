@@ -3,6 +3,14 @@
 -- วิธีติดตั้ง
 https://chocolatey.org/install#individual
 Check -> choco -v 
+*************************************************************************************************
+ืNote                                                                                            *
+                                                                                                *
+ถ้ามีการใช้ import Image from "next/image"; ต้องไปตั้งค่า  next.config.ts  ว่ารูปนี้มาจาก แหล่ง ให้อนุญาตไหม *
+                                                                                                *
+                                                                                                *
+************************************************************************************************
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 choco install mkcert
 mkcert --version
