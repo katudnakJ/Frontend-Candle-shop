@@ -11,10 +11,8 @@ const useLiffLogin = () => {
 
   const router = useRouter();
 
-  const { 
-    login: storeUserLogin, 
-    logout: storeUserLogout 
-  } = useAuthStoreUserLogin();
+  const { login: storeUserLogin, logout: storeUserLogout } =
+    useAuthStoreUserLogin();
 
   let liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
 
@@ -24,14 +22,14 @@ const useLiffLogin = () => {
       if (liff.isLoggedIn()) {
         const token = liff.getAccessToken() || "";
         storeUserLogin(token);
-console.log(token);
+        console.log(token);
 
         router.push(ROUTE.HOME);
       } else {
         liff.login({
           redirectUri: `${process.env.NEXT_PUBLIC_LINE_LIFF_REDIRECT_URL}`,
         });
-        router.push(ROUTE.HOME);
+        router.push(ROUTE.HOME); //อาจมีการbug เรื่องทับซ้อนกัน Redirect
         return false;
       }
     } catch (err) {

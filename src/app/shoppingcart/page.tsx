@@ -25,7 +25,7 @@ export default function ShoppingCartPage() {
           {/* Header ส่วนย้อนกลับ */}
           <div className="flex items-center gap-2 mb-6">
             <Link href="/customerhome">
-              <ChevronLeft className="w-8 h-8 text-black border-2 border-black rounded-full hover:bg-gray-100 transition-colors" />
+              <ChevronLeft className="w-8 h-8 text-black   hover:bg-gray-100 transition-colors" />
             </Link>
             <h1 className="text-xl md:text-2xl font-black text-black">รถเข็นของฉัน ({items.length})</h1>
           </div>

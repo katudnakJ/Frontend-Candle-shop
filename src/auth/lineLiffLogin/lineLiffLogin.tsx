@@ -5,7 +5,7 @@ import useLiffLogin from "./lineLiffLogin.hook";
 import LoggingOut from "@/components/Loading/Loggingout";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
 
-const lineLiffLogin = () => {
+const LineLiffLogin = () => {
   const { error, logout } = useLiffLogin();
   const {
     isLoading,
@@ -43,4 +43,4 @@ const lineLiffLogin = () => {
   );
 };
 
-export default lineLiffLogin;
+export default LineLiffLogin;
