@@ -1,5 +1,5 @@
 import { ShoppingCart, ShoppingCartItem } from "../types";
-import { MOCK_CART_DATA } from "../mockcart"; 
+import { MOCK_CART_DATA } from "../mockcart";
 
 // จำลองการ Delay เหมือนการเรียก API จริง
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -25,9 +25,9 @@ export const cartService = {
     // ในอนาคต: await axios.delete(`/cart/items/${itemId}`);
   },
 
-  // 4. (แถม) ตรวจสอบสต็อกสินค้าก่อนเพิ่ม/ลด
-  async checkStock(productId: string): Promise<number> {
-    // สมมติว่าสต็อกมีจำกัด
-    return 10;
-  }
+  //   4. (แถม) ตรวจสอบสต็อกสินค้าก่อนเพิ่ม/ลด
+  //  async checkStock(productId: string): Promise<number> {
+  //     สมมติว่าสต็อกมีจำกัด
+  //     return 10;
+  //   }
 };

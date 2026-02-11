@@ -6,9 +6,9 @@ import FacebookIcon from "@/components/icon/facebookicon";
 
 const Footer = () => {
   return (
-    <footer className="w-full border-t bg-cprojectone">
+    <footer className="w-full bg-cprojectone ">
     
-      <div className="max-w-[1200px] mx-auto py-6 px-4 block ">
+      <div className="max-w-300 mx-auto py-6 px-4 block ">
         <div className=" grid grid-cols-1 gap-4 text-sm text-gray-600">
           <div className="ml-auto">
             <div className="flex items-center gap-7">
@@ -31,7 +31,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="bg-cprojectone py-2 border-t">
+      <div className="bg-cprojectone py-2 border-t border-gray-200">
         <p className="text-center text-xs text-gray-400">© 2026 Candle Shop.</p>
       </div>
     </footer>

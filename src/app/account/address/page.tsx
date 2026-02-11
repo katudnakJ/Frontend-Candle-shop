@@ -27,7 +27,7 @@ function AddressPageContent() {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <main className="max-w-4xl mx-auto p-6">
+      <main className="max-w-[1200px] mx-auto p-6">
         {isLoading ? (
           <AddressFormSkeleton />
         ) : (

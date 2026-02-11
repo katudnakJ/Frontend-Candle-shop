@@ -1,19 +1,21 @@
 import { useState, useMemo, useEffect } from "react";
 import { ShoppingCart, ShoppingCartItem } from "@/modules/cart/types";
 import { cartService } from "../services/cartService";
+import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 
 export const useCart = (initialCart: ShoppingCart) => {
   const [items, setItems] = useState<ShoppingCartItem[]>(initialCart.items || []);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const setTotalItems = useCartStore((state) => state.setTotalItems);
 
-  // โหลดข้อมูลจาก API
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const data = await cartService.getCart();
         const newItems = data.items || [];
         setItems(newItems);
+        setTotalItems(newItems.length);
         setSelectedIds(newItems.map(item => item.Shopping_Cart_Item_id));
       } finally {
         setIsLoading(false);
@@ -38,7 +40,7 @@ export const useCart = (initialCart: ShoppingCart) => {
 
   // ปรับจำนวนสินค้า 
   const updateQuantity = async (itemId: string, delta: number) => {
-    const previousItems = [...items]; // เก็บค่าเก่าไว้ก่อน
+    const previousItems = [...items];
     const item = items.find(i => i.Shopping_Cart_Item_id === itemId);
     if (!item) return;
 
@@ -71,7 +73,9 @@ export const useCart = (initialCart: ShoppingCart) => {
 
   const removeItem = async (itemId: string) => {
     const previousItems = [...items];
-    setItems(prev => prev.filter(item => item.Shopping_Cart_Item_id !== itemId));
+    const newItems = items.filter(item => item.Shopping_Cart_Item_id !== itemId);
+    setItems(newItems);
+    setTotalItems(newItems.length);
     try {
       await cartService.deleteItem(itemId);
     } catch (error) {
