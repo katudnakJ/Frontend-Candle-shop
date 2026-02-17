@@ -50,7 +50,7 @@ export default function AddressCard({
         className={`space-y-1 text-sm text-gray-700 font-sans ${address.is_default ? "text-gray-700" : "text-gray-500"}`}
       >
         {/* ชื่อผู้รับ */}
-        <div className="flex justify-between">
+        <div className="flex max-[400px]:flex-col justify-between">
           <p
             className={`text-xl font-bold truncate  ${address.is_default ? "text-black" : "text-gray-500"}`}
           >
@@ -60,7 +60,7 @@ export default function AddressCard({
           <p className="text-[16px] truncate flex-shrink-1">{formatPhone(address.recipient_phone)}</p>
         </div>
         {/* รายละเอียดที่อยู่แบบรวมร่าง */}
-        <p className="leading-relaxed  max-[320px]:truncate">
+        <p className="leading-relaxed  max-[320px]:truncate ">
           {address.delivery_address} {address.sub_district} {address.district}{address.province} {address.postcode}
           
         </p>
