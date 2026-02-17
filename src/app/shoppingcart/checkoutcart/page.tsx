@@ -18,10 +18,13 @@ import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import calculateShipping from "@/utils/calculateShipping";
 import { CartSummary } from "@/modules/cart/components/CartSummary";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
+
 
 export default function CheckoutPage() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { items, selectedIds, getPrimaryImage, refreshCart, setSelectedIds } =
     useCartStore();
   const selectedAddress = mockAddresses[0];
@@ -32,6 +35,9 @@ export default function CheckoutPage() {
     [items, selectedIds],
   );
   useEffect(() => {
+
+    const timer = setTimeout(() => setIsMounted(true), 800);
+
     if (items.length === 0) {
       refreshCart();
     }
@@ -42,6 +48,7 @@ export default function CheckoutPage() {
         setSelectedIds(JSON.parse(saved));
       }
     }
+    return () => clearTimeout(timer);
   }, [items.length, selectedIds.length, refreshCart, setSelectedIds]);
 
   const subtotal = selectedItems.reduce(
@@ -59,6 +66,16 @@ export default function CheckoutPage() {
     setIsOpen(false);
     router.push("/shoppingcart/success");
   };
+
+  if (!isMounted) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white">
+        <Header />
+        <CartCheckoutSkeletonpage />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">

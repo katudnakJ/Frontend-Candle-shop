@@ -9,10 +9,12 @@ import { CartHeader } from "@/modules/cart/components/CartHeader";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import { CartSummary } from "@/modules/cart/components/CartSummary";
 import EmptyCartState from "@/modules/cart/components/EmptyCartState";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
+import { ShoppingCartSkeletonpage } from "@/modules/cart/components/skeletoncart/ShoppingCartSkeletonpage";
 
 export default function ShoppingCartPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const { setSelectedIds, setItems } = useCartStore();
   const {
     items,
@@ -28,10 +30,26 @@ export default function ShoppingCartPage() {
   } = useCart(MOCK_CART_DATA);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 800);
+
     setItems(items);
     setSelectedIds(selectedIds);
     sessionStorage.setItem("selected_checkout_ids", JSON.stringify(selectedIds));
+    return () => clearTimeout(timer);
   }, [items, selectedIds, setItems, setSelectedIds]);
+
+
+  if (!isMounted) {
+    return (
+      <>
+        <Header />
+        <ShoppingCartSkeletonpage  />
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-white">
