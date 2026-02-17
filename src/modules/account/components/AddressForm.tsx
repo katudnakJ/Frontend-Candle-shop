@@ -1,11 +1,20 @@
 "use client";
 import { useAddressForm } from "../hooks/useAddressForm";
 import { PatternFormat } from "react-number-format";
-import { Select } from "antd";
 import { Addresses } from "@/modules/account/addresses";
 import { toast } from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { useState } from "react";
+import Grid from "@mui/material/Grid";
+import {
+  TextField,
+  Autocomplete,
+  Button,
+  Switch,
+  FormControlLabel,
+  Typography,
+  Box,
+} from "@mui/material";
 
 interface AddressFormProps {
   initialData?: Addresses;
@@ -18,7 +27,6 @@ export default function AddressForm({
   onSubmit,
   onCancel,
 }: AddressFormProps) {
-    
   // Logic ทั้งหมดมาจาก Hook useAddressForm
   const {
     formData,
@@ -45,9 +53,7 @@ export default function AddressForm({
     } else {
       toast.error(
         <div className="flex flex-col justify-center py-1">
-          <span className="leading-tight">
-            กรุณาระบุข้อมูลให้ครบถ้วน
-          </span>
+          <span className="leading-tight">กรุณาระบุข้อมูลให้ครบถ้วน</span>
         </div>,
         {
           className:
@@ -60,7 +66,11 @@ export default function AddressForm({
   const handleConfirmAddToAccount = () => {
     toast.success(
       <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight"> {initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"} เรียบร้อยแล้ว!</span>
+        <span className="leading-tight">
+          {" "}
+          {initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"}{" "}
+          เรียบร้อยแล้ว!
+        </span>
       </div>,
       {
         className:
@@ -203,22 +213,35 @@ export default function AddressForm({
           <div className="grid grid-cols-2 gap-4">
             {/* จังหวัด */}
             <div>
-              <Select
-                showSearch
-                className="w-full h-12"
-                placeholder="เลือกจังหวัด *"
-                status={errors.province ? "error" : ""}
-                value={formData.province || undefined}
-                options={provinces.map((p) => ({ label: p, value: p }))}
-                onSelect={(val) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    province: val,
+              <Autocomplete
+                options={provinces}
+                value={formData.province || null}
+                onChange={(_, val) => {
+                  setFormData((p) => ({
+                    ...p,
+                    province: val || "",
                     district: "",
                     sub_district: "",
                     postcode: "",
                   }));
-                  setErrors((prev) => ({ ...prev, province: "" }));
+                  setErrors((p) => ({ ...p, province: "" }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="เลือกจังหวัด *"
+                    error={!!errors.province}
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                // ใช้ className ของ Tailwind ช่วยจัดการ h-12 และ rounded
+                className="bg-white rounded-xl"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "12px",
+                    height: "48px",
+                  },
                 }}
               />
               {errors.province && (
@@ -230,25 +253,32 @@ export default function AddressForm({
 
             {/* อำเภอ */}
             <div>
-              <Select
-                showSearch
+              <Autocomplete
                 disabled={!formData.province}
-                className="w-full h-12"
-                placeholder="เลือกอำเภอ *"
-                status={errors.district ? "error" : ""}
-                value={formData.district || undefined}
-                options={currentProvinceData.map((a) => ({
-                  label: a[0],
-                  value: a[0],
-                }))}
-                onSelect={(val) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    district: val,
+                options={currentProvinceData.map((a) => a[0])}
+                value={formData.district || null}
+                onChange={(_, val) => {
+                  setFormData((p) => ({
+                    ...p,
+                    district: val || "",
                     sub_district: "",
                     postcode: "",
                   }));
-                  setErrors((prev) => ({ ...prev, district: "" }));
+                  setErrors((p) => ({ ...p, district: "" }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="เลือกอำเภอ *"
+                    error={!!errors.district}
+                    size="small"
+                  />
+                )}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "12px",
+                    height: "48px",
+                  },
                 }}
               />
               {errors.district && (
@@ -260,26 +290,33 @@ export default function AddressForm({
 
             {/* ตำบล */}
             <div>
-              <Select
-                showSearch
+              <Autocomplete
                 disabled={!formData.district}
-                className="w-full h-12"
-                placeholder="เลือกตำบล *"
-                status={errors.sub_district ? "error" : ""}
-                value={formData.sub_district || undefined}
-                options={currentAmphoeData.map((t) => ({
-                  label: t[0],
-                  value: t[0],
-                }))}
-                onSelect={(val) => {
+                options={currentAmphoeData.map((t) => t[0])}
+                value={formData.sub_district || null}
+                onChange={(_, val) => {
                   const zip =
                     currentAmphoeData.find((t) => t[0] === val)?.[1][0] || "";
-                  setFormData((prev) => ({
-                    ...prev,
-                    sub_district: val,
+                  setFormData((p) => ({
+                    ...p,
+                    sub_district: val || "",
                     postcode: zip.toString(),
                   }));
-                  setErrors((prev) => ({ ...prev, sub_district: "" }));
+                  setErrors((p) => ({ ...p, sub_district: "" }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="เลือกตำบล *"
+                    error={!!errors.sub_district}
+                    size="small"
+                  />
+                )}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "12px",
+                    height: "48px",
+                  },
                 }}
               />
               {errors.sub_district && (
@@ -322,29 +359,25 @@ export default function AddressForm({
           </div>
 
           <div className="flex item-center gap-3 pt-2 ">
-            <button
-              type="button"
-              onClick={() =>
-                setFormData((prev) => ({
-                  ...prev,
-                  is_default: !prev.is_default,
-                }))
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={formData.is_default}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      is_default: e.target.checked,
+                    }))
+                  }
+                  color="success"
+                />
               }
-              className={`relative inline-flex h-8 w-20 items-center rounded-full transition-colors focus:outline-none border-2 border-black ${
-                formData.is_default ? "bg-green-500" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                  formData.is_default ? "translate-x-14" : "translate-x-1"
-                }`}
-              />
-            </button>
-            <span
-              className={`text-sm font-bold text-black content-center ${formData.is_default ? "text-black " : "text-gray-500"}`}
-            >
-              ตั้งเป็นที่อยู่เริ่มต้น
-            </span>
+              label={
+                <Typography className="font-bold text-sm">
+                  ตั้งเป็นที่อยู่เริ่มต้น
+                </Typography>
+              }
+            />
           </div>
 
           {/* ปุ่มบันทึก */}
