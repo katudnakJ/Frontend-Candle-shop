@@ -16,10 +16,11 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import calculateShipping from "@/utils/calculateShipping";
-import { CartSummary } from "@/modules/cart/components/CartSummary";
+import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
+import { CartHeader } from "@/modules/cart/components/CartHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
-
+import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -35,7 +36,6 @@ export default function CheckoutPage() {
     [items, selectedIds],
   );
   useEffect(() => {
-
     const timer = setTimeout(() => setIsMounted(true), 800);
 
     if (items.length === 0) {
@@ -82,13 +82,8 @@ export default function CheckoutPage() {
       <Header />
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4 space-y-6">
-          <div className="flex items-center">
-            <Link href="/shoppingcart">
-              <ChevronLeft className="w-10 h-10 md:w-13 md:h-13 text-black" />
-            </Link>
-            <span>
-              <p className="text-md md:text-2xl text-black">บัญชีผู้ใช้</p>
-            </span>
+          <div>
+            <CartHeader itemCount={items.length} isCheckout={true} />
           </div>
           <section className="border-gray-300 border-b-2">
             <div className="flex font-black text-xl mb-3 gap-2 uppercase ">
@@ -139,53 +134,17 @@ export default function CheckoutPage() {
             </div>
           </section>
           {selectedItems.length > 0 && (
-            <section className="grid grid-cols-12 w-full mt-10 border-gray-300 border-t-2">
-              <div className="col-span-12 flex font-black text-xl mb-3 gap-2 uppercase mt-6">
-                <NotebookPen className="text-amber-800" />
-                ข้อมูลการชำระเงิน
-              </div>
-              <div className="col-start-1 col-span-12 md:col-start-2 md:col-span-10 bg-white p-6 rounded-[2rem] border-4 border-black mt-4">
-                <h3 className="font-black text-xl uppercase mb-6  flex items-center gap-2">
-                  <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-                  สรุปยอดชำระเงิน
-                </h3>
-
-                <div className="space-y-4 font-bold text-lg">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500 font-medium">
-                      ยอดรวมสินค้า ({totalQuantity} รายการ)
-                    </span>
-                    <span className="text-black font-black">
-                      ฿{subtotal.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-gray-500 font-medium">ค่าจัดส่ง</span>
-                    <span className="text-black font-black">
-                      ฿{shippingFee.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="border-t-4 border-black border-dashed pt-4 flex justify-between items-end">
-                    <div>
-                      <span className="text-2xl font-black uppercase italic ">
-                        ยอดรวมสุทธิ
-                      </span>
-                      <p className="text-xs text-gray-400 font-bold uppercase italic mt-1">
-                        Total Amount
-                      </p>
-                    </div>
-                    <span className="text-4xl font-black italic text-red-600 underline">
-                      ฿{totalAmount.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
+            <section>
+              <CartOrderSummaryCard
+                totalQuantity={totalQuantity}
+                subtotal={subtotal}
+                shippingFee={shippingFee}
+                totalAmount={totalAmount}
+              />
             </section>
           )}
           <section>
-            <CartSummary
+            <CartSummaryBar
               totalQuantity={totalQuantity}
               totalPrice={subtotal}
               isCheckout={true}

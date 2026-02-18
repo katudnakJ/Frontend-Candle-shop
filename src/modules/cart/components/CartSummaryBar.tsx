@@ -2,7 +2,7 @@ import Link from "next/link";
 import calculateShipping from "@/utils/calculateShipping";
 
 
-export const CartSummary = ({
+export const CartSummaryBar = ({
   totalQuantity,
   totalPrice,
   isCheckout = false,
