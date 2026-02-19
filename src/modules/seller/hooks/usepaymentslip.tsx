@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { PaymentService } from "../services/payment.service";
 import { toast } from "react-hot-toast";
+import imageCompression from "browser-image-compression";
 
 export const usePaymentSlip = (onFileSelect: (file: File | null) => void) => {
   const [slipPreview, setSlipPreview] = useState<string | null>(null);
