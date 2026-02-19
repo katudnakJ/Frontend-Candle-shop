@@ -7,7 +7,7 @@ import { useCart } from "@/modules/cart/hooks/useCart";
 import { MOCK_CART_DATA } from "@/modules/cart/mockcart";
 import { CartHeader } from "@/modules/cart/components/CartHeader";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
-import { CartSummary } from "@/modules/cart/components/CartSummary";
+import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
 import EmptyCartState from "@/modules/cart/components/EmptyCartState";
 import { useEffect,useState } from "react";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
@@ -92,7 +92,7 @@ export default function ShoppingCartPage() {
       </main>
       {items.length > 0 && (
         <div className="sticky bottom-0 z-10">
-          <CartSummary totalQuantity={totalQuantity} totalPrice={totalPrice} />
+          <CartSummaryBar totalQuantity={totalQuantity} totalPrice={totalPrice} />
         </div>
       )}
 

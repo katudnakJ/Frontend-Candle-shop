@@ -9,6 +9,12 @@ images: {
         port: '',
         pathname: '/**',
       },
+      {
+       protocol: 'https',
+        hostname: 'goerhyygukxfkphuyrnw.supabase.co', // ใส่ hostname ของคุณลงไป
+        port: '',
+        pathname: '/storage/v1/object/**',
+       },
        {
         protocol: 'https',
         hostname: 'localhost', 

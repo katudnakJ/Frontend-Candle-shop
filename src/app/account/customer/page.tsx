@@ -37,10 +37,10 @@ export default function CustomerAccountPage() {
 
          <div className="max-w-[1200px] mx-auto p-4 flex items-center ">
             <Link href="/customerhome">
-              <ChevronLeft className="w-10 h-10 md:w-13 md:h-13 text-black" />
+              <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
             </Link>
             <span>
-              <p className="text-md md:text-2xl text-black">บัญชีผู้ใช้</p>
+              <p className="text-xl md:text-2xl font-black text-black">บัญชีผู้ใช้</p>
             </span>
           </div>
 
