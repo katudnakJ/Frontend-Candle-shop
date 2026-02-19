@@ -103,7 +103,7 @@ export default function CheckoutPage() {
           <section className="space-y-4 ">
             <div className="flex font-black text-xl mb-3 gap-2 uppercase">
               <CircleCheckBig className="text-yellow-500" />
-              รายการสินค้า ({selectedItems.length})
+              รายการสินค้า ({totalQuantity})
             </div>
             <div className="grid grid-cols-12 w-full gap-4">
               <div className="col-start-1 col-span-12 md:col-start-2 md:col-span-10 space-y-4">

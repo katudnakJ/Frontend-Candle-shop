@@ -41,14 +41,7 @@ export const CartCheckoutSkeletonpage = () => (
     </div>
 
  
-    <div className="fixed bottom-0 left-0 right-0 h-24 bg-gray-50 border-t-2 border-gray-100 p-4">
-      <div className="max-w-[1200px] mx-auto flex justify-between items-center px-4">
-        <div className="space-y-2">
-          <div className="h-4 w-24 bg-gray-200 rounded"></div>
-          <div className="h-6 w-32 bg-gray-200 rounded"></div>
-        </div>
-        <div className="h-12 w-48 bg-gray-200 rounded-2xl"></div>
-      </div>
-    </div>
+
+
   </div>
 );

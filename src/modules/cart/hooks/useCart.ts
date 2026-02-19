@@ -16,7 +16,10 @@ export const useCart = (initialCart: ShoppingCart) => {
         const newItems = data.items || [];
         setItems(newItems);
         setTotalItems(newItems.length);
-        setSelectedIds(newItems.map(item => item.Shopping_Cart_Item_id));
+
+        //ถ้าอยากให้ตอนเริ่มต้นมีการเลือกสินค้าทั้งหมด
+        // setSelectedIds(newItems.map(item => item.Shopping_Cart_Item_id));
+
       } finally {
         setIsLoading(false);
       }

@@ -3,21 +3,14 @@
 import { useMemo, useEffect, useState } from "react";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
-import { mockAddresses } from "@/modules/account/mockaddress";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
-import {
-  ChevronLeft,
-  CircleCheckBig,
-  MapPinCheck,
-  NotebookPen,
-} from "lucide-react";
+import { CircleCheckBig } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import calculateShipping from "@/utils/calculateShipping";
-import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
 import { CartHeader } from "@/modules/cart/components/CartHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
-import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
+import { QRpaymentSkeletonpage } from "@/modules/cart/components/skeletoncart/QRpaymentSkeletonpage";
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
 import { Seller } from "@/modules/seller/types";
 import { PaymentMethodCard } from "@/modules/seller/components/PaymentMethodCard";
@@ -83,7 +76,7 @@ export default function PaymentPage() {
 
   const handleConfirm = () => {
     setIsOpen(false);
-    router.push("/shoppingcart/success");
+    router.replace("/customerhome");
   };
 
   const handleConfirmOrder = () => {
@@ -94,20 +87,20 @@ export default function PaymentPage() {
       return;
     }
 
-    // ถ้ามีไฟล์แล้ว ทำงานต่อได้...
-    console.log("กำลังอัปโหลดและสร้าง Order...");
+    
+    console.log("ยืนยันการอัปโหลด ...");
     setIsOpen(true);
   };
 
-  //   if (!isMounted) {
-  //     return (
-  //       <div className="flex flex-col min-h-screen bg-white">
-  //         <Header />
-  //         <CartCheckoutSkeletonpage />
-  //         <Footer />
-  //       </div>
-  //     );
-  //   }
+  if (!isMounted) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white">
+        <Header />
+        <QRpaymentSkeletonpage />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -152,7 +145,8 @@ export default function PaymentPage() {
                 <div className="mb-4 flex items-center gap-2 text-amber-600 animate-in fade-in slide-in-from-bottom-2">
                   <CircleCheckBig size={18} />
                   <span className="font-bold text-sm">
-                    การชำระเงินต้องรอการยืนยันจากทางร้านค้าภายใน 24 ชม.
+                    การชำระเงินต้องรอการยืนยันความถูกต้องจากทางร้านค้าภายใน 24
+                    ชม.
                   </span>
                 </div>
               )}
