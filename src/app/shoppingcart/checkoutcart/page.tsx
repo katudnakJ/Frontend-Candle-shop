@@ -1,16 +1,13 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
-import Link from "next/link";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import AddressCard from "@/modules/account/components/AddressCard";
 import { mockAddresses } from "@/modules/account/mockaddress";
 import {
-  ChevronLeft,
   CircleCheckBig,
   MapPinCheck,
-  NotebookPen,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
@@ -64,7 +61,7 @@ export default function CheckoutPage() {
 
   const handleConfirm = () => {
     setIsOpen(false);
-    router.push("/shoppingcart/success");
+    router.replace("/shoppingcart/checkoutcart/paymentcart");
   };
 
   if (!isMounted) {

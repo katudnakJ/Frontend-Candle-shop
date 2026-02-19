@@ -1,11 +1,11 @@
 // app/product/[id]/page.tsx
 import { mockProducts } from "@/modules/products/mockdata";
-import Image from "next/image";
+
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import ProductImageCarousel from "@/modules/products/components/ProductImageCarousel";
 import ProductPurchaseActions from "@/modules/products/components/ProductPurchaseActions";
-import { ChevronLeft, ShoppingCart } from "lucide-react";
+import { ChevronLeft} from "lucide-react";
 import Link from "next/link";
 
 export default async function ProductDetailPage({
@@ -27,10 +27,10 @@ export default async function ProductDetailPage({
         <main className="grow bg-white pb-20">
           <div className="max-w-[1200px] mx-auto p-4 flex items-center">
             <Link href="/customerhome">
-              <ChevronLeft className="w-10 h-10 md:w-13 md:h-13 text-black" />
+              <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
             </Link>
             <span>
-              <p className="text-md md:text-2xl text-black">รายละเอียดสินค้า</p>
+              <p className="text-xl md:text-2xl font-black text-black">รายละเอียดสินค้า</p>
             </span>
           </div>
 
