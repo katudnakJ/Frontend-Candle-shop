@@ -16,24 +16,22 @@ export const usePaymentSlip = (onFileSelect: (file: File | null) => void) => {
     }
   };
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const errorMessage = PaymentService.validateFile(file);
-    
-   if (errorMessage) {
 
+    if (errorMessage) {
       toast.error(
         <div className="flex flex-col justify-center py-1">
-          <span className="text-sm leading-tight">
-            {errorMessage}
-          </span>
+          <span className="text-sm leading-tight">{errorMessage}</span>
         </div>,
         {
-          className: "bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
+          className:
+            "bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
           duration: 3000,
-        }
+        },
       );
       setFileError(true);
       setSlipPreview(null);
@@ -42,10 +40,30 @@ export const usePaymentSlip = (onFileSelect: (file: File | null) => void) => {
     }
 
     setFileError(false);
-    onFileSelect(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setSlipPreview(reader.result as string);
-    reader.readAsDataURL(file);
+    const options = {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: 1280,
+      useWebWorker: true,
+    };
+    try {
+    
+      const compressedFile = await imageCompression(file, options);
+
+   
+      onFileSelect(compressedFile);
+
+    
+      if (slipPreview) URL.revokeObjectURL(slipPreview); 
+      const previewUrl = URL.createObjectURL(compressedFile);
+      setSlipPreview(previewUrl);
+    } catch (error) {
+      console.error("Compression failed:", error);
+ 
+      onFileSelect(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setSlipPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   };
 
   const resetFile = () => {
@@ -54,8 +72,13 @@ export const usePaymentSlip = (onFileSelect: (file: File | null) => void) => {
     setFileError(false);
   };
 
-  return { 
-    slipPreview, fileError, inputKey, fileInputRef, 
-    handleBoxClick, onFileChange, resetFile 
+  return {
+    slipPreview,
+    fileError,
+    inputKey,
+    fileInputRef,
+    handleBoxClick,
+    onFileChange,
+    resetFile,
   };
 };

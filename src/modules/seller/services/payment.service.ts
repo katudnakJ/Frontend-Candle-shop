@@ -25,9 +25,10 @@ export const PaymentService = {
     if (!allowedTypes.includes(file.type)) {
       return "รองรับเฉพาะไฟล์รูปภาพ (JPG, JPEG, PNG)";
     }
-    if (file.size > 1024 * 1024) {
-      return "กรุณาใช้ไฟล์ขนาดไม่เกิน 1MB";
+    if (file.size > 2*1024 * 1024) {
+      return "กรุณาใช้ไฟล์ขนาดไม่เกิน 2MB";
     }
     return null;
   },
+  
 };
