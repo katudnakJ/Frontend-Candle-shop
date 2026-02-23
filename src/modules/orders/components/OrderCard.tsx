@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Order } from "../type";
 import { useReceiptPDF } from "../hooks/useReceiptPDF";
 import { ReceiptTemplate } from "./ReceiptTemplate";
@@ -20,6 +20,7 @@ interface OrderCardProps {
 }
 
 export const OrderCard = ({ order }: OrderCardProps) => {
+  const router = useRouter();
   const getStatusDisplay = (status: Order["order_status"]) => {
     switch (status) {
       case "PD":
@@ -61,12 +62,15 @@ export const OrderCard = ({ order }: OrderCardProps) => {
         return { label: status, color: "text-gray-600", bg: "bg-gray-50" };
     }
   };
+const handlepaymentagain = () => {
+  router.push(`/shoppingcart/checkoutcart/paymentcart?orderId=${order.order_no}&mode=repay`);
+};
   const { receiptRef, downloadPDF } = useReceiptPDF(order);
   const statusInfo = getStatusDisplay(order.order_status);
 
   return (
     <div className="bg-white border-2 border-black rounded-[2rem] overflow-hidden  mb-8 transition-all hover:translate-y-[-2px]">
-        <ReceiptTemplate ref={receiptRef} order={order} />
+      <ReceiptTemplate ref={receiptRef} order={order} />
 
       {/*Order Number & Status */}
       <div className="bg-cprojectone p-5 border-b-2 border- flex justify-between items-center ">
@@ -211,12 +215,16 @@ export const OrderCard = ({ order }: OrderCardProps) => {
           </button> */}
 
           {order.order_status === "RJ" && (
-            <button className="flex-1 py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none">
-              ชำระเงินใหม่
+            <button 
+            onClick={handlepaymentagain}
+            className="flex-1 py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none">
+              ชำระเงินใหม่ 
+            
             </button>
           )}
 
           {order.order_status === "TR" && (
+            // ต้องทำตัว hadle api update status ว่า Complete ไป  backend
             <button className="flex-1 py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none">
               ได้รับสินค้าแล้ว
             </button>
