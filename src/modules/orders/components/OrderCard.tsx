@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import { Order } from "../type";
+import { useReceiptPDF } from "../hooks/useReceiptPDF";
+import { ReceiptTemplate } from "./ReceiptTemplate";
 import Image from "next/image";
 import {
   Truck,
@@ -12,53 +14,12 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 interface OrderCardProps {
   order: Order;
 }
 
 export const OrderCard = ({ order }: OrderCardProps) => {
-  const receiptRef = useRef<HTMLDivElement>(null); // สร้าง Ref สำหรับเก็บ Template ใบเสร็จ
-
-  const handleDownloadPDF = async () => {
-    if (!receiptRef.current) return;
-
-    try {
-      const loadingToast = toast.loading("กำลังสร้างใบเสร็จ PDF...");
-
-      const canvas = await html2canvas(receiptRef.current, {
-        scale: 2,
-        useCORS: true,
-
-        backgroundColor: "#ffffff",
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Receipt-${order.order_no}.pdf`);
-
-      toast.dismiss(loadingToast);
-      toast.success("ดาวน์โหลดใบเสร็จเรียบร้อยแล้ว!");
-    } catch (error) {
-      console.error("PDF Generation Error:", error);
-      toast.error("ไม่สามารถสร้าง PDF ได้ในขณะนี้");
-    }
-  };
-
   const getStatusDisplay = (status: Order["order_status"]) => {
     switch (status) {
       case "PD":
@@ -100,148 +61,12 @@ export const OrderCard = ({ order }: OrderCardProps) => {
         return { label: status, color: "text-gray-600", bg: "bg-gray-50" };
     }
   };
-
+  const { receiptRef, downloadPDF } = useReceiptPDF(order);
   const statusInfo = getStatusDisplay(order.order_status);
 
   return (
     <div className="bg-white border-2 border-black rounded-[2rem] overflow-hidden  mb-8 transition-all hover:translate-y-[-2px]">
-      <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
-        <div
-          ref={receiptRef}
-          id="receipt-content"
-          style={{
-            backgroundColor: "#ffffff",
-            color: "#000000",
-            width: "700px",
-            padding: "60px",
-            fontFamily: "var(--font-prompt), sans-serif",
-          }}
-        >
-          {/* Header: ชื่อร้านและที่อยู่ */}
-          <div style={{ textAlign: "center", marginBottom: "40px" }}>
-            <h2
-              style={{
-                fontSize: "24px",
-                fontWeight: "bold",
-                textDecoration: "underline",
-                marginBottom: "8px",
-              }}
-            >
-              ใบแจ้งหนี้ / ใบเสร็จรับเงิน บ้านเทียน
-            </h2>
-            <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-              {"Moji's candle shop"}
-            </p>
-            <p style={{ fontSize: "14px" }}>โทร. 063-975-7396</p>
-          </div>
-
-          {/* Date Section */}
-          <div
-            style={{
-              textAlign: "right",
-              marginBottom: "20px",
-              fontSize: "16px",
-              fontWeight: "bold",
-            }}
-          >
-            {new Date(order.order_created_date).toLocaleDateString("th-TH")}
-          </div>
-
-          {/* Table Header */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 120px 140px 140px",
-              borderBottom: "2px solid #000",
-              paddingBottom: "10px",
-              fontWeight: "bold",
-              fontSize: "16px",
-            }}
-          >
-            <span>รายการ</span>
-            <span style={{ textAlign: "center" }}>จำนวน</span>
-            <span style={{ textAlign: "right" }}>ราคา / หน่วย</span>
-            <span style={{ textAlign: "right" }}>จำนวนเงิน(บาท)</span>
-          </div>
-
-          {/* Table Body (Product Items) */}
-
-          <div style={{ marginTop: "15px", minHeight: "150px" }}>
-            {order.items?.map((item, index) => (
-              <div
-                key={item.order_item_id}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 120px 140px 140px",
-                  marginBottom: "10px",
-                  fontSize: "16px",
-                }}
-              >
-                <span>
-                  {index + 1}. {item.product_name_at_purchase}
-                </span>
-                <span style={{ textAlign: "center" }}>
-                  {item.quantity} กระปุก
-                </span>
-                <span style={{ textAlign: "right" }}>
-                  {item.price_at_purchase.toLocaleString()}.
-                </span>
-                <span style={{ textAlign: "right" }}>
-                  {(order.total_amount).toLocaleString()}.
-                </span>
-              </div>
-            ))}
-
-            {/* Shipping Row */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 120px 140px 140px",
-                marginBottom: "10px",
-                fontSize: "16px",
-              }}
-            >
-              <span> {(order.items?.length || 0) + 1}. ค่าจัดส่ง</span>
-              <span></span>
-              <span></span>
-              <span style={{ textAlign: "right" }}>
-                {(order.shipping_fee || 0).toLocaleString()}.-
-              </span>
-            </div>
-          </div>
-
-          {/* Total Section */}
-          <div
-            style={{
-              marginTop: "30px",
-              paddingTop: "15px",
-              borderTop: "1px solid #eee",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "40px",
-                fontSize: "18px",
-                fontWeight: "bold",
-              }}
-            >
-              <span>ยอดรวมทั้งสิ้น</span>
-              <span style={{ width: "140px", textAlign: "right" }}>
-                {order.net_amount.toLocaleString()}.- บาท
-              </span>
-            </div>
-          </div>
-
-          {/* Footer Note */}
-          <div style={{ marginTop: "80px", fontSize: "12px" }}>
-            <p>
-              หมายเหตุ: ราคาสินค้าดังกล่าวยังไม่รวมภาษี หัก ณ ที่จ่าย และ Vat
-            </p>
-          </div>
-        </div>
-      </div>
+        <ReceiptTemplate ref={receiptRef} order={order} />
 
       {/*Order Number & Status */}
       <div className="bg-cprojectone p-5 border-b-2 border- flex justify-between items-center ">
@@ -344,7 +169,7 @@ export const OrderCard = ({ order }: OrderCardProps) => {
               </div>
             </div>
             <button
-              onClick={handleDownloadPDF}
+              onClick={downloadPDF}
               className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
             >
               <Download size={20} className="text-black" />
