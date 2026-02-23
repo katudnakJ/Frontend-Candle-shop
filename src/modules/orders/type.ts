@@ -1,20 +1,34 @@
+export type OrderStatus = "PD" | "RJ" | "TS" | "TR" | "CM";
+
 export interface OrderItem {
-  order_item_id: number;
-  order_id: string;
-  product_id: string;
+  order_item_id: string; 
+  order_id: string;      
+  product_id: string;    
   product_name_at_purchase: string;
   price_at_purchase: number;
   quantity: number;
+  // Join มาจาก product_images
+  product_img_path?: string; 
 }
 
 export interface Order {
-  order_id: string;
-  customer_id: string;
+  order_id: string;     
+  customer_id: string;  
+  order_no: string;
+  order_status: "PD" | "RJ" | "TS" | "TR" | "CM";
   total_quantity: number;
   total_amount: number;
   net_amount: number;
-  order_status: "PD" | "RJ" | "TS" | "TR" | "CM";
   order_created_date: string;
-  total_amount_purchase: number;
-  order_no :string;
+  
+  // Join มาจาก table payments
+  rejection_reason?: string;
+  
+  // Join มาจาก table shipment
+  tracking_number?: string;
+  carrier?: string;
+  shipping_fee?: number;
+
+  // รายการสินค้า
+  items: OrderItem[];
 }

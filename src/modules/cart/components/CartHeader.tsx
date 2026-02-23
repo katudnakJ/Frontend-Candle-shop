@@ -4,9 +4,11 @@ import Link from "next/link";
 export const CartHeader = ({
   itemCount,
   isCheckout = false,
+
 }: {
   itemCount: number;
   isCheckout?: boolean;
+
 }) => (
   <div className="flex items-center gap-2 mb-6">
     {isCheckout ? (

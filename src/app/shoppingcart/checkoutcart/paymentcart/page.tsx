@@ -3,9 +3,8 @@
 import { useMemo, useEffect, useState } from "react";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
-import { mockSellerData } from "@/modules/seller/mockSellerData";
 import { CircleCheckBig } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import calculateShipping from "@/utils/calculateShipping";
 import { CartHeader } from "@/modules/cart/components/CartHeader";
@@ -14,9 +13,26 @@ import { QRpaymentSkeletonpage } from "@/modules/cart/components/skeletoncart/QR
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
 import { Seller } from "@/modules/seller/types";
 import { PaymentMethodCard } from "@/modules/seller/components/PaymentMethodCard";
+import { Order, OrderItem } from "@/modules/orders/type";
+import { ShoppingCartItem } from "@/modules/cart/types";
+
+import { mockSellerData } from "@/modules/seller/mockSellerData";
+import { mockOrders } from "@/modules/orders/mockOrderData";
+
+interface PaymentData {
+  displayItems: (OrderItem | ShoppingCartItem)[];
+  subtotal: number;
+  shippingFee: number;
+  totalAmount: number;
+  totalQuantity: number;
+}
 
 export default function PaymentPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("orderId");
+  const mode = searchParams.get("mode");
+
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const { items, selectedIds, refreshCart, setSelectedIds } = useCartStore();
@@ -24,36 +40,25 @@ export default function PaymentPage() {
   const [isLoadingSeller, setIsLoadingSeller] = useState(true);
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [showPaymentError, setShowPaymentError] = useState(false);
+  const [repayOrder, setRepayOrder] = useState<Order | null>(null);
 
-  const selectedItems = useMemo(
-    () =>
-      items.filter((item) => selectedIds.includes(item.Shopping_Cart_Item_id)),
-    [items, selectedIds],
-  );
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 800);
+    if (items.length === 0) refreshCart();
 
-    if (items.length === 0) {
-      refreshCart();
-    }
-
-    if (selectedIds.length === 0) {
+    if (selectedIds.length === 0 && !orderId) {
       const saved = sessionStorage.getItem("selected_checkout_ids");
-      if (saved) {
-        setSelectedIds(JSON.parse(saved));
-      }
+      if (saved) setSelectedIds(JSON.parse(saved));
     }
     return () => clearTimeout(timer);
-  }, [items.length, selectedIds.length, refreshCart, setSelectedIds]);
+  }, [items.length, selectedIds.length, refreshCart, setSelectedIds, orderId]);
 
   useEffect(() => {
     const fetchSellerData = async () => {
       try {
         setIsLoadingSeller(true);
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        // ดึงข้อมูลจาก Mock (ในอนาคตเปลี่ยนตรงนี้เป็น fetch('/api/seller'))
-        const data = mockSellerData[0];
-        setSeller(data);
+        setSeller(mockSellerData[0]);
       } catch (error) {
         console.error("Failed to fetch seller:", error);
       } finally {
@@ -63,16 +68,58 @@ export default function PaymentPage() {
     fetchSellerData();
   }, []);
 
-  const subtotal = selectedItems.reduce(
-    (acc, item) => acc + (item.product?.price ?? 0) * item.quantity,
-    0,
-  );
-  const totalQuantity = selectedItems.reduce(
-    (acc, item) => acc + item.quantity,
-    0,
-  );
-  const shippingFee = calculateShipping(totalQuantity);
-  const totalAmount = subtotal + shippingFee;
+  // อีกหน่อยปรับเป็นเรียกจาก api ไม่ก็เก็บใน zunstand และ ต้องเพิ่มกัน เช็คว่า orderID ใช่ของลูกค้าคนนี้ไหม 
+  useEffect(() => {
+    if (mode === "repay" && orderId) {
+      console.log("Fetching order:", orderId);
+      setIsLoadingSeller(true);
+
+      const foundOrder = mockOrders.find((o) => o.order_no === orderId);
+      if (foundOrder) {
+        console.log("พบข้อมูล Order สำหรับชำระใหม่:", foundOrder);
+        setRepayOrder(foundOrder);
+      } else {
+        console.error("ไม่พบข้อมูล Order หมายเลข:", orderId);
+    
+      }
+
+      setIsLoadingSeller(false);
+    }
+  }, [mode, orderId]);
+
+  const paymentData = useMemo<PaymentData>(() => {
+    if (mode === "repay" && repayOrder) {
+      return {
+        displayItems: repayOrder.items || [],
+        subtotal: repayOrder.total_amount,
+        shippingFee: repayOrder.shipping_fee || 0,
+        totalAmount: repayOrder.net_amount,
+        totalQuantity: (repayOrder.items || []).reduce(
+          (acc, item) => acc + item.quantity,
+          0,
+        ),
+      };
+    }
+
+    // โหมดปกติจากตะกร้า
+    const selected = items.filter((item) =>
+      selectedIds.includes(item.Shopping_Cart_Item_id),
+    );
+    const sub = selected.reduce(
+      (acc, item) => acc + (item.product?.price ?? 0) * item.quantity,
+      0,
+    );
+    const qty = selected.reduce((acc, item) => acc + item.quantity, 0);
+    const ship = calculateShipping(qty);
+
+    return {
+      displayItems: selected,
+      subtotal: sub,
+      shippingFee: ship,
+      totalAmount: sub + ship,
+      totalQuantity: qty,
+    };
+  }, [items, selectedIds, mode, repayOrder]);
 
   const handleConfirm = () => {
     setIsOpen(false);
@@ -83,12 +130,8 @@ export default function PaymentPage() {
     if (!slipFile) {
       setShowPaymentError(true);
       window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-
       return;
     }
-
-    
-    console.log("ยืนยันการอัปโหลด ...");
     setIsOpen(true);
   };
 
@@ -108,15 +151,30 @@ export default function PaymentPage() {
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4 space-y-6">
           <div>
-            <CartHeader itemCount={items.length} isCheckout={true} />
+            {mode === "repay" ? (
+              <div className="mb-4">
+                <h1 className="text-2xl font-black">
+                  ชำระเงินใหม่ Order #{orderId}
+                </h1>
+                <p className="text-gray-500 font-bold">
+                  รายการสินค้าจากคำสั่งซื้อเดิม
+                </p>
+              </div>
+            ) : (
+              <CartHeader
+                itemCount={paymentData.displayItems.length}
+                isCheckout={true}
+              />
+            )}
           </div>
-          {selectedItems.length > 0 && (
+
+          {paymentData.displayItems.length > 0 && (
             <section>
               <CartOrderSummaryCard
-                totalQuantity={totalQuantity}
-                subtotal={subtotal}
-                shippingFee={shippingFee}
-                totalAmount={totalAmount}
+                totalQuantity={paymentData.totalQuantity}
+                subtotal={paymentData.subtotal}
+                shippingFee={paymentData.shippingFee}
+                totalAmount={paymentData.totalAmount}
               />
             </section>
           )}
@@ -130,7 +188,7 @@ export default function PaymentPage() {
           ) : (
             <PaymentMethodCard
               seller={seller}
-              totalAmount={totalAmount}
+              totalAmount={paymentData.totalAmount}
               onFileSelect={(file) => {
                 setSlipFile(file);
                 if (file) setShowPaymentError(false);
@@ -145,20 +203,17 @@ export default function PaymentPage() {
                 <div className="mb-4 flex items-center gap-2 text-amber-600 animate-in fade-in slide-in-from-bottom-2">
                   <CircleCheckBig size={18} />
                   <span className="font-bold text-sm">
-                    การชำระเงินต้องรอการยืนยันความถูกต้องจากทางร้านค้าภายใน 24
-                    ชม.
+                    การชำระเงินต้องรอการยืนยันภายใน 24 ชม.
                   </span>
                 </div>
               )}
               <button
                 onClick={handleConfirmOrder}
-                disabled={showPaymentError && !slipFile}
-                className={`w-full py-5 text-2xl font-black rounded-full transition-all mt-6
-        ${
-          !slipFile
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
-            : "bg-black text-white hover:bg-zinc-800 shadow-[8px_8px_0px_0px_rgba(220,38,38,1)]"
-        }`}
+                className={`w-full py-5 text-2xl font-black rounded-full transition-all mt-6 ${
+                  !slipFile
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-black text-white shadow-[8px_8px_0px_0px_rgba(220,38,38,1)]"
+                }`}
               >
                 {slipFile ? "ยืนยันการชำระเงิน" : "กรุณาแนบสลิปก่อนยืนยัน"}
               </button>
@@ -177,7 +232,11 @@ export default function PaymentPage() {
         onClose={() => setIsOpen(false)}
         onConfirm={handleConfirm}
         title="ยืนยันการชำระเงิน"
-        content="คุณต้องการสั่งซื้อสินค้าทั้งหมดในรายการใช่หรือไม่?"
+        content={
+          mode === "repay"
+            ? "ยืนยันการส่งสลิปใหม่สำหรับคำสั่งซื้อนี้?"
+            : "คุณต้องการสั่งซื้อสินค้าทั้งหมดใช่หรือไม่?"
+        }
       />
     </div>
   );

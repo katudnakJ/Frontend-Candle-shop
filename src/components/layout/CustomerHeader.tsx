@@ -93,7 +93,7 @@ const Header = () => {
                 <MenuItem>
                   {({ focus }) => (
                     <Link
-                      href="/customer/orders"
+                      href="/account/orderhistory"
                       className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex items-center px-4 py-2 text-sm`}
                     >
                     <ClipboardList size={18} className="mr-2 " />
