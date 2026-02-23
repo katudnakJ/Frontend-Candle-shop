@@ -77,10 +77,10 @@ export const mockOrders: Order[] = [
   {
     order_id: "uuid-3",
     customer_id: "cus-123",
-    order_no: "CD28120003",
+    order_no: "CD2812000CM001",
     order_status: "TR", // ที่ต้องได้รับ
     total_quantity: 2,
-    total_amount: 300,
+    total_amount: 600,
     net_amount: 650,
     order_created_date: "2026-02-18T09:00:00Z",
     tracking_number: "FD1058412308F", // จาก table shipment ///ต้องมาเพิ่มการ ใส่ tracking number  มากว่า 1 กล่อง
@@ -116,21 +116,21 @@ export const mockOrders: Order[] = [
     customer_id: "cus-123",
     order_no: "CD28120003",
     order_status: "CM", // ที่ต้องได้รับ
-    total_quantity: 1,
-    total_amount: 300,
-    net_amount: 350,
+    total_quantity: 1000,
+    total_amount: 30000,
+    net_amount: 31200,
     order_created_date: "2026-02-18T09:00:00Z",
     tracking_number: "FD1058412308F", // จาก table shipment
     carrier: "Flash Express", // จาก table shipment
-    shipping_fee: 50,
+    shipping_fee: 1200,
     items: [
       {
         order_item_id: "oi-3",
         order_id: "uuid-3",
         product_id: "p-3",
         product_name_at_purchase: "น้ำหอมปรับอากาศ",
-        price_at_purchase: 300,
-        quantity: 1,
+        price_at_purchase: 30000,
+        quantity: 1000,
         product_img_path:
           "https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6",
       },
