@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import LoadingScreen from "@/components/Loading/LoadingScreen";
 import useLiffLogin from "./lineLiffLogin.hook";
-import LoggingOut from "@/components/Loading/Loggingout";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
 
-const lineLiffLogin = () => {
+const LineLiffLogin = () => {
   const { error, logout } = useLiffLogin();
   const {
     isLoading,
@@ -27,10 +27,7 @@ const lineLiffLogin = () => {
             Logout
           </button>
           <div className="text-center">
-            <img
-              src={userData?.pictureUrl}
-              className="mx-auto mb-6 w-32 h-32"
-            />
+            
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Hello คุณ {userData?.displayName}!
             </h1>
@@ -43,4 +40,4 @@ const lineLiffLogin = () => {
   );
 };
 
-export default lineLiffLogin;
+export default LineLiffLogin;

@@ -31,7 +31,6 @@ export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>((set, get) =>
                     'Authorization': `Bearer ${lineToken}`
                 }
             })
-            console.log(response);
             
             set({
                 userData: response.data.lineProfile,
