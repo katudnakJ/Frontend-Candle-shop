@@ -69,18 +69,19 @@ const handlepaymentagain = () => {
   const statusInfo = getStatusDisplay(order.order_status);
 
   return (
-    <div className="bg-white border-2 border-black rounded-[2rem] overflow-hidden  mb-8 transition-all hover:translate-y-[-2px]">
+    <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden  mb-8 transition-all hover:translate-y-[-2px]">
       <ReceiptTemplate ref={receiptRef} order={order} />
 
-      {/*Order Number & Status */}
-      <div className="bg-cprojectone p-5 border-b-2 border- flex justify-between items-center ">
-        <span className="font-black text-lg">Order #{order.order_no}</span>
+      {/*Order Number & Status max-[400px]:*/}
+      <div className=" bg-cprojectone pt-5 pr-5 pl-5 border-b-3 border-0 flex flex-col items-end ">
         <div
-          className={`px-4 py-1 rounded-full border-2  font-bold text-sm ${statusInfo.bg} ${statusInfo.color} ${statusInfo.border}`}
+          className={` self-end  px-4 py-1 rounded-full border-2 font-bold text-sm mb-2 whitespace-nowrap ${statusInfo.bg} ${statusInfo.color} ${statusInfo.border}`}
         >
           {statusInfo.label}
         </div>
+        <span className="w-full font-black text-lg text-center border-3 border-black border-b-white px-4 py-5 rounded-full bg-white translate-y-[17%] ">Order #{order.order_no}</span>
       </div>
+      <div className="h-10"></div>
 
       {/*Product Items */}
       <div className="p-5 space-y-4">
@@ -173,6 +174,7 @@ const handlepaymentagain = () => {
               </div>
             </div>
             <button
+            //เดี๋ยวเปลี่ยนเป็นรับ มาจาก backend แทน
               onClick={downloadPDF}
               className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
             >
