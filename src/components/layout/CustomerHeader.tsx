@@ -1,5 +1,6 @@
 "use client";
 
+import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { Menu, MenuButton, MenuItem, MenuItems, Transition} from "@headlessui/react";
 import { Fragment } from "react";
 import Link from "next/link";
@@ -14,9 +15,11 @@ import {
 
 
 const Header = () => {
+  const totalItems = useCartStore((state) => state.totalItems);
+
   return (
     <header className=" border border-cprojectone top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
-      <div className="max-w-[1200px] mx-auto">
+      <div className="max-w-300 mx-auto">
       <div className=" mx-3 md:mx-10 flex h-20 md:h-24 items-center justify-between px-4 md:px-8">
         <div className="flex items-center">
           <Link
@@ -30,13 +33,15 @@ const Header = () => {
 
         <div className="flex items-center gap-4 md:gap-8">
           <Link
-            href="/customer/myshoppingcart"
+            href="/shoppingcart"
             className="relative p-1  text-black hover:text-yellow-500 transition-colors"
           >
             <ShoppingCart className="w-10 h-10 md:w-11 md:h-11" />
+            {totalItems > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[15px] text-white font-bold">
-              0
+             {totalItems}
             </span>
+            )}
           </Link>
 
           <Menu as="div" className="relative inline-block text-left">
@@ -88,7 +93,7 @@ const Header = () => {
                 <MenuItem>
                   {({ focus }) => (
                     <Link
-                      href="/customer/orders"
+                      href="/account/orderhistory"
                       className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex items-center px-4 py-2 text-sm`}
                     >
                     <ClipboardList size={18} className="mr-2 " />
