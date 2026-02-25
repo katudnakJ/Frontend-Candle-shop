@@ -26,7 +26,7 @@ export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>((set, get) =>
     login : async (lineToken : string) => {
             set({isLoading : true});
             
-            const response = await apiClient.post<UserLoginResponse>("/login",{},{
+            const response = await apiClient.post<UserLoginResponse>("/v1/login",{},{
                 headers: {
                     'Authorization': `Bearer ${lineToken}`
                 }
@@ -40,7 +40,7 @@ export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>((set, get) =>
                 
     },
     logout : async () => {
-        await apiClient.post<Status>("/logout");
+        await apiClient.post<Status>("/v1/logout");
         set({
             userData: null,
             isLoading: false,

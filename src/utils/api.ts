@@ -5,7 +5,7 @@ import { Status } from "@/types/response.type";
 
 
 const apiClient = axios.create({
-    baseURL: appConfig.v1localApiEndpointUrl,
+    baseURL: appConfig.localApiEndpointUrl,
     withCredentials: true,
     headers: {
     'Content-Type': 'application/json',
