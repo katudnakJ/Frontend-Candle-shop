@@ -37,27 +37,27 @@ const SellerHeader = () => {
   return (
     <header className="border-b border-cprojectone  top-0 z-50 w-full bg-cprojectone backdrop-blur-md font-sans">
       <div className="max-w-[1400px] mx-auto">
-        <div className="mx-3 md:mx-10 flex h-20 md:h-24 items-center justify-between px-4 md:px-8">
+        <div className="mx-3 md:mx-10 flex h-20 md:h-24 items-center justify-between px-2 md:px-8">
           <div className="flex items-center">
             <Link
               href="/sellerhome"
               className="flex items-center gap-2 group transition-colors"
             >
-              <Home className="w-10 h-10 md:w-11 md:h-11 text-black group-hover:text-yellow-600" />
+              <Home className="w-8 h-8 md:w-11 md:h-11 text-black group-hover:text-yellow-600" />
             </Link>
           </div>
 
           <div className="text-center">
-            <p className="font-bold text-xl md:text-2xl text-black">
+            <p className="font-bold text-[16px] md:text-2xl text-black ml-8">
               {"Moji's Candle Shop"}
             </p>
-            <span className="text-xs text-gray-500 uppercase tracking-widest">
+            <span className="text-xs text-gray-500 uppercase tracking-widest ml-8">
               Store Management
             </span>
           </div>
 
           <div className="flex items-center gap-4 md:gap-8">
-            <div className="flex flex-col items-end text-black font-medium text-sm md:text-base">
+            <div className="flex flex-col items-end text-black font-medium text-[11px] md:text-base">
               {isMounted ? (
                 <>
                   <div>{formatDate(currentTime)}</div>

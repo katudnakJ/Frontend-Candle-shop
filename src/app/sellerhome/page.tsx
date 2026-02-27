@@ -7,44 +7,32 @@ import Header from "@/components/layout/CustomerHeader";
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import { ListFilter } from "lucide-react";
-import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
+import SellerrWelcome from "@/modules/seller/components/SellerWelcome";
 
 export default function sellerHome() {
-
- 
-
-
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header*/}
       <SellerHeader />
 
       <main className="flex-grow bg-white font-sans">
-        {/* Welcome Customer*/}
-
-        <div className="bg-cprojectone">
-          <section >
-         
-          </section>
+        {/* Welcome seller*/}
+        <SellerrWelcome />
+        <div className="bg-white">
+          <section></section>
         </div>
 
-        <div className="bg-cprojectone w-full min-h-screen">
+        <div className="bg-white w-full min-h-screen">
           <div className="max-w-[1200px] mx-auto p-4 space-y-8 bg-white ">
             {/* สินค้าแนะนำ      */}
 
-            <section>
-        
-            </section>
+            <section></section>
 
             {/* สินค้าทั้งหมด      */}
 
-            <section>
-         
-            </section>
+            <section></section>
 
-                <section>
-         
-            </section>
+            <section></section>
           </div>
         </div>
       </main>
