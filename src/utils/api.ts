@@ -28,9 +28,11 @@ apiClient.interceptors.request.use((config) => {
 // BE -> FE
 apiClient.interceptors.response.use(
     (response) => {
+        console.log("Before Camelize:", response.data);
         if(response.data) {
             response.data = camelizeKeys(response.data);
         }
+        console.log("after Camelize:", response.data);
         return response.data;
     },
     (error) => {

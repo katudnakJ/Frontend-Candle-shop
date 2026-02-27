@@ -2,6 +2,7 @@ import { LineProfileResponse, UserLoginResponse } from "@/modules/auth/userLogin
 import { Status } from "@/types/response.type"
 import { apiClient } from "@/utils/api"
 import { create } from "zustand"
+import { persist, createJSONStorage } from "zustand/middleware"
 
 const initialState = {
     userData : null,
@@ -21,8 +22,10 @@ type UseAuthStoreUserLogin = {
     getUserData : () => LineProfileResponse | null
 }
 
-export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>((set, get) => ({
-    ...initialState,
+export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>() (
+persist(
+    (set, get) => ({
+      ...initialState,
     login : async (lineToken : string) => {
             set({isLoading : true});
             
@@ -30,13 +33,13 @@ export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>((set, get) =>
                 headers: {
                     'Authorization': `Bearer ${lineToken}`
                 }
-            })
+            });
             
             set({
                 userData: response.data.lineProfile,
                 isLoading: false,
                 isLoggedIn: true
-            })
+            });
                 
     },
     logout : async () => {
@@ -45,9 +48,12 @@ export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>((set, get) =>
             userData: null,
             isLoading: false,
             isLoggedIn: false
-        })
+        });
     },
-    getUserData : () => {
-        return get().userData;
-    },
-}))
+    getUserData: () => get().userData,
+}),
+{
+      name: 'auth-storage', // ชื่อ key ใน localStorage
+      storage: createJSONStorage(() => localStorage),
+    }
+));

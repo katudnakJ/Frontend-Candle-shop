@@ -22,13 +22,8 @@ const useLiffLogin = () => {
       if (liff.isLoggedIn()) {
         const token = liff.getAccessToken() || "";
         storeUserLogin(token);
-<<<<<<< HEAD
         console.log("token :", token);
         
-=======
-        console.log(token);
-
->>>>>>> d3f28b3d75a396a83d81f7bbc4b37205b4ca93d1
         router.push(ROUTE.HOME);
       } else {
         liff.login({
