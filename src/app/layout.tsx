@@ -39,7 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} antialiased overflow-x-hidden` }>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} ${k2d.variable} antialiased overflow-x-hidden` }>
         <QueryProvider>
           <Toaster 
           position="top-right"

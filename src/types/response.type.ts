@@ -5,3 +5,8 @@ export interface Status {
   message: string;
   remark?: string;
 }
+
+export interface GenericResponse<T> {
+  data: T;
+  status: Status;
+}
