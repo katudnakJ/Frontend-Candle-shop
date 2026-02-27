@@ -1,4 +1,5 @@
 'use client'
+// API : Get Products (All products)
 
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/utils/api";

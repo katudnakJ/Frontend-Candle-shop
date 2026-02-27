@@ -1,6 +1,6 @@
 "use client";
 
-//import { mockProducts } from "@/modules/products/mockdata";
+
 import { useGetAllProducts } from "@/modules/products/hooks/useGetAllProducts";
 import ProductCard from "@/modules/products/components/ProductCard";
 import Header from "@/components/layout/CustomerHeader";
@@ -27,6 +27,8 @@ export default function Home() {
       </div>
     );
 
+
+// API : Get Products (All products)
   const productData = data?.data || data;
   const recommendedItems = productData?.featuredProduct || [];
   const nonFeaturedItems = productData?.nonFeaturedProduct || [];
