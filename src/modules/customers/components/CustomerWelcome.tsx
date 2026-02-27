@@ -3,34 +3,32 @@
 import { useState, useEffect } from "react";
 import { User } from "lucide-react";
 
-import { Customer } from "@/modules/customers/types";
-import { getCustomerProfile } from "@/modules/customers/services/CusProfile.service";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
 
 export default function CustomerWelcome() {
-  const { userData, isLoading } = useAuthStoreUserLogin();
-  // const [customer, setCustomer] = useState<Customer | null>(null);
-  // const [loading, setLoading] = useState(true);
+  const { userData, isLoading: storeLoading } = useAuthStoreUserLogin();
+  const [showSkeleton, setShowSkeleton] = useState(true);
+  
+  useEffect(() => {
 
-  // useEffect(() => {
-  //   const fetchProfile = async () => {
-  //     try {
-  //       setLoading(true);
+    if (!storeLoading) {
+    const timeoutId = setTimeout(() => {
+        setShowSkeleton(false);
+      }, 0);
+      return () => clearTimeout(timeoutId);
+    }
 
-  //       const res = await getCustomerProfile();
+    
+    const timer = setTimeout(() => {
+      if (showSkeleton) {
+        console.log("Loading timeout: Force showing default customer name");
+        setShowSkeleton(false);
+      }
+    }, 3000);
 
-  //       if (res.success) {
-  //         setCustomer(res.data);
-  //       }
-  //     } catch (error) {
-  //       console.log("Local UI handling: stop loading");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+    return () => clearTimeout(timer); 
+  }, [storeLoading])
 
-  //   fetchProfile();
-  // }, []);
 console.log("displayName: "+userData?.displayName)
   return (
     <div className="bg-cprojectone border border-cprojectone">
@@ -41,7 +39,7 @@ console.log("displayName: "+userData?.displayName)
         </div>
 
         <div>
-          {isLoading ? (
+          {showSkeleton ? (
             <div className="h-8 w-32 bg-gray-200 animate-pulse rounded"></div>
           ) : (
             <h1 className="text-2xl md:text-3xl text-black">

@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-import ProductCard from "@/modules/products/components/ProductCard";
+import ProductCardformock from "@/modules/products/components/ProductCardformock";
 import { mockProducts } from "@/modules/products/mockdata";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
@@ -48,7 +48,7 @@ export default function Home() {
                     key={item.product_id}
                     className="min-w-[180px] w-[180px] md:w-[200px] lg:w-[400px]"
                   >
-                    <ProductCard product={item} isRecommended={true} />
+                    <ProductCardformock product={item} isRecommended={true} />
                   </div>
                 ))}
               </div>
@@ -77,7 +77,7 @@ export default function Home() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {mockProducts.map((item) => (
-                  <ProductCard key={item.product_id} product={item} />
+                  <ProductCardformock key={item.product_id} product={item} />
                 ))}
               </div>
             </section>
