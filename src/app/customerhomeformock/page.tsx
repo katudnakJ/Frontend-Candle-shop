@@ -1,42 +1,25 @@
-"use client";
+import Head from "next/head";
 
-
-import { useGetAllProducts } from "@/modules/products/hooks/useGetAllProducts";
-import ProductCard from "@/modules/products/components/ProductCard";
+import ProductCardformock from "@/modules/products/components/ProductCardformock";
+import { mockProducts } from "@/modules/products/mockdata";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import { ListFilter } from "lucide-react";
 import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
-import { GenericResponse } from "@/types/response.type";
-import { ProductHomeData } from "@/modules/products/homeproduct";
 
 export default function Home() {
-  const { data, isLoading, isError } = useGetAllProducts() as {
-    data: GenericResponse<ProductHomeData>;
-  } & ReturnType<typeof useGetAllProducts>;
-  if (isLoading)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        กำลังโหลดสินค้า...
-      </div>
-    );
-  if (isError || !data)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        เกิดข้อผิดพลาดในการโหลดข้อมูล
-      </div>
-    );
+  {
+    /* ตรวจสอบว่าเป็นสินค้าแนะนำไหม*/
+  }
+  const recommendedItems = mockProducts.filter(
+    (item) => item.is_featured == true,
+  );
 
+  {
+    /* ตรวจสอบว่ามีสินค้าทั้งหมดกี่อย่าง*/
+  }
+  const totalItem = mockProducts.length;
 
-// API : Get Products (All products)
-  const productData = data?.data || data;
-  const recommendedItems = productData?.featuredProduct || [];
-  const nonFeaturedItems = productData?.nonFeaturedProduct || [];
-  const allProducts = [...recommendedItems, ...nonFeaturedItems];
-  const totalItem =
-    (recommendedItems.length || 0) + (productData?.nonFeaturedTotal || 0);
-
-  console.log("Check Structure:", data);
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header*/}
@@ -46,7 +29,7 @@ export default function Home() {
         {/* Welcome Customer*/}
 
         <div className="bg-cprojectone">
-          <section>
+          <section >
             <CustomerWelcome />
           </section>
         </div>
@@ -62,10 +45,10 @@ export default function Home() {
               <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
                 {recommendedItems.map((item) => (
                   <div
-                    key={item.productId}
+                    key={item.product_id}
                     className="min-w-[180px] w-[180px] md:w-[200px] lg:w-[400px]"
                   >
-                    <ProductCard product={item} isRecommended={true} />
+                    <ProductCardformock product={item} isRecommended={true} />
                   </div>
                 ))}
               </div>
@@ -93,8 +76,8 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {allProducts.map((item) => (
-                  <ProductCard key={item.productId} product={item} />
+                {mockProducts.map((item) => (
+                  <ProductCardformock key={item.product_id} product={item} />
                 ))}
               </div>
             </section>

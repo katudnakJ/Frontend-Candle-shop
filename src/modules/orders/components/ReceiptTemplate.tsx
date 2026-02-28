@@ -50,7 +50,7 @@ export const ReceiptTemplate = forwardRef<HTMLDivElement, ReceiptTemplateProps>(
                 <span>{index + 1}. {item.product_name_at_purchase}</span>
                 <span style={{ textAlign: "center" }}>{item.quantity} กระปุก</span>
                 <span style={{ textAlign: "right" }}>{item.price_at_purchase.toLocaleString()}.-</span>
-                <span style={{ textAlign: "right" }}>{(item.price_at_purchase * item.quantity).toLocaleString()}.-</span>
+                <span style={{ textAlign: "right" }}>{order.total_amount.toLocaleString()}.-</span>
               </div>
             ))}
 

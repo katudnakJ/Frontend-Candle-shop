@@ -14,7 +14,7 @@ const useLiffLogin = () => {
   const { login: storeUserLogin, logout: storeUserLogout } =
     useAuthStoreUserLogin();
 
-  let liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
+   const liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
 
   const initializeLiff = async () => {
     try {
@@ -22,8 +22,8 @@ const useLiffLogin = () => {
       if (liff.isLoggedIn()) {
         const token = liff.getAccessToken() || "";
         storeUserLogin(token);
-        console.log(token);
-
+        console.log("token :", token);
+        
         router.push(ROUTE.HOME);
       } else {
         liff.login({
@@ -39,7 +39,9 @@ const useLiffLogin = () => {
   };
 
   useEffect(() => {
-    initializeLiff();
+    (async () => {
+      await initializeLiff();
+    })();
   }, []);
 
   // const login = () => {

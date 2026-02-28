@@ -5,7 +5,7 @@ import { Status } from "@/types/response.type";
 
 
 const apiClient = axios.create({
-    baseURL: appConfig.v1localApiEndpointUrl,
+    baseURL: appConfig.localApiEndpointUrl,
     withCredentials: true,
     headers: {
     'Content-Type': 'application/json',
@@ -28,9 +28,11 @@ apiClient.interceptors.request.use((config) => {
 // BE -> FE
 apiClient.interceptors.response.use(
     (response) => {
+        console.log("Before Camelize:", response.data);
         if(response.data) {
             response.data = camelizeKeys(response.data);
         }
+        console.log("after Camelize:", response.data);
         return response.data;
     },
     (error) => {
