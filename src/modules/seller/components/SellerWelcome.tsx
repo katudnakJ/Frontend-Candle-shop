@@ -1,0 +1,68 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { User, Settings } from "lucide-react";
+import Link from "next/link";
+import { useAuthStoreUserLogin } from "@/store/userLogin";
+
+export default function CustomerWelcome() {
+  const { userData, isLoading: storeLoading } = useAuthStoreUserLogin();
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  useEffect(() => {
+    if (!storeLoading) {
+      const timeoutId = setTimeout(() => {
+        setShowSkeleton(false);
+      }, 0);
+      return () => clearTimeout(timeoutId);
+    }
+
+    const timer = setTimeout(() => {
+      if (showSkeleton) {
+        console.log("Loading timeout: Force showing default customer name");
+        setShowSkeleton(false);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [storeLoading]);
+
+
+  const totalOrderPending = 2;
+  console.log("displayName: " + userData?.displayName);
+  return (
+    <div className="bg-cprojectone border border-cprojectone">
+      <section className="max-w-[1200px] m-10 xl:mx-auto py-6 px-4 md:px-10 bg-white rounded-2xl drop-shadow-md ">
+        <div className="container mx-auto px-4 flex flex-col  items-center gap-4">
+          <Link
+            href="/account/seller/"
+            className="relative p-1  text-black hover:text-yellow-500 transition-colors"
+          >
+            <User size={60} />
+            <div className="absolute -right-3 -bottom-2 ">
+              <Settings size={25} />
+            </div>
+          </Link>
+          <div>
+            {showSkeleton ? (
+              <div className="h-8 w-32 bg-gray-200 animate-pulse rounded"></div>
+            ) : (
+              <h1 className="text-2xl md:text-3xl text-black text-center">
+                สวัสดีค่ะคุณ{" "}
+                <span className="font-bold">
+                  {userData?.displayName ? userData.displayName : "แม่ค้า"}
+                </span>
+              </h1>
+            )}
+          </div>
+          {totalOrderPending > 0 && (
+  <div className="text-center line-clamp-3 text-black">
+    มีลูกค้ารอท่านตรวจสอบการชำระเงินทั้งหมด{" "}
+    <span className="text-[20px] font-bold text-red-500">{totalOrderPending}</span> ท่าน
+  </div>
+)}
+        </div>
+      </section>
+    </div>
+  );
+}
