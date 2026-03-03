@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronLeft, QrCode, X } from "lucide-react";
+import { Plus, ChevronLeft } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
 import { mockSellerAddresses } from "@/modules/account/mockaddressseller";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
@@ -15,6 +15,7 @@ import SellerWelcome from "@/modules/seller/components/SellerWelcome";
 import { usePaymentSlip } from "@/modules/seller/hooks/usepaymentslip";
 import { toast } from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import QRpaymentshop from "@/modules/seller/components/QRpaymentshop";
 
 export default function SellerSettingPage() {
   const router = useRouter();
@@ -71,23 +72,38 @@ export default function SellerSettingPage() {
   } = usePaymentSlip(handleFileSelect);
 
   useEffect(() => {
+    let isMounted = true;
+    let timer: NodeJS.Timeout | undefined = undefined;
     const fetchSellerData = async () => {
       try {
         setIsImageLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => {
+            timer = setTimeout(resolve, 1000);
+    });
+
+        if (!isMounted) return;
+
         const data = mockSellerData[0];
         setSeller(data);
+
         if (data.qr_payment_img_path) {
-          setIsImageLoading(true);
           setSlipPreview(data.qr_payment_img_path);
         } else {
+            if (isMounted) {
           setIsImageLoading(false);
         }
+    }
       } catch (error) {
-        console.error("Failed to fetch seller:", error);
+        if (isMounted) {
+          console.error("Failed to fetch seller:", error);
+        }
       }
     };
     fetchSellerData();
+    return () => {
+      isMounted = false;
+     if(timer){ clearTimeout(timer)};
+    };
   }, [setSlipPreview]);
 
   const handleAdd = () => {
@@ -113,6 +129,7 @@ export default function SellerSettingPage() {
       setAddressToDelete(null);
     }
   };
+
 
   return (
     <div>
@@ -166,95 +183,26 @@ export default function SellerSettingPage() {
                 </div>
               )}
             </div>
+
             <hr className="my-8 border-gray-100" />
 
-            <div className="flex flex-col items-center gap-6 py-6">
-              <h2 className="text-xl font-bold text-black w-full text-left">
-                ข้อมูลการรับชำระเงิน (QR Payment)
-              </h2>
-
-              <input
-                key={inputKey}
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageChange}
-                accept="image/png, image/jpeg, image/jpg"
-                className="hidden"
-              />
-
-              {qrCodeImage ? (
-                <div className="relative group w-full max-w-[600px] animate-in fade-in zoom-in duration-300">
-                  {isImageLoading && !selectedFile && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-zinc-50 border-2 border-black rounded-[2rem] animate-pulse">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-sm font-bold text-black">
-                          กำลังโหลดรูปภาพ...
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  <img
-                    src={qrCodeImage}
-                    alt="PromptPay QR"
-                    onLoad={() => setIsImageLoading(false)}
-                    onError={() => setIsImageLoading(false)}
-                    className={`w-full aspect-[5/4] object-contain border-2 border-black rounded-[2rem] bg-zinc-50 p-2 transition-all duration-500 ${
-                      isImageLoading && !selectedFile
-                        ? "opacity-0 scale-95"
-                        : "opacity-100 scale-100"
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearImage();
-                      setSelectedFile(null);
-                      setIsImageLoading(false);
-                    }}
-                    className="absolute -top-3 -right-3 bg-red-500 text-white p-2 rounded-full shadow-xl hover:bg-red-600 transition-all border-2 border-white active:scale-90"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              ) : (
-                <div
-                  onClick={triggerFileInput}
-                  className="w-full max-w-[600px] aspect-[5/4] border-4 border-dashed border-gray-300 rounded-[2rem] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black hover:bg-zinc-50 transition-all group active:scale-95"
-                >
-                  <div className="p-5 bg-zinc-100 rounded-full group-hover:bg-cprojectone transition-colors">
-                    <QrCode
-                      size={40}
-                      className="text-gray-400 group-hover:text-black"
-                    />
-                  </div>
-                  <span className="font-black text-gray-500 group-hover:text-black text-center px-4">
-                    คลิกเพื่อเพิ่มรูป <br /> QR Code ธนาคาร
-                  </span>
-                </div>
-              )}
-              {qrCodeImage && selectedFile && (
-                <button
-                  onClick={handleConfirm}
-                  disabled={isUploading}
-                  className={`mt-4 bg-black text-white px-10 py-3 rounded-full font-bold transition-all shadow-lg active:scale-95 
-      ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-800"}`}
-                >
-                  {isUploading
-                    ? "กำลังบันทึก..."
-                    : "ยืนยันข้อมูล QR Payment"}{" "}
-                </button>
-              )}
-
-              <p className="text-[13px] md:text-[16px] text-red-400 text-start font-bold">
-                💡 คำแนะนำ
-                <br />
-                1. กรุณาตรวจสอบชื่อบัญชีและหมายเลขบัญชีบนรูปภาพให้ถูกต้อง
-                <br />
-                2. ถ้าต้องการแก้ไขให้ทำการกดกากบาทแล้วกดอัปโหลดอีกครั้ง
-              </p>
-            </div>
+            <QRpaymentshop
+              qrCodeImage={qrCodeImage}
+              selectedFile={selectedFile}
+              isImageLoading={isImageLoading}
+              isUploading={isUploading}
+              inputKey={inputKey}
+              fileInputRef={fileInputRef}
+              onTriggerFileInput={triggerFileInput}
+              onImageChange={handleImageChange}
+              onClearImage={() => {
+                clearImage();
+                setSelectedFile(null);
+                setIsImageLoading(false);
+              }}
+              onConfirm={handleConfirm}
+              setIsImageLoading={setIsImageLoading}
+            />
           </section>
         </main>
         <Footer />
@@ -264,7 +212,7 @@ export default function SellerSettingPage() {
           onConfirm={handleSavePaymentInfo}
           title="ข้อมูลการรับชำระเงิน"
           content="ยืนยันข้อมูล QR Payment?"
-          variant="primary" 
+          variant="primary"
         />
 
         <ConfirmDialog
