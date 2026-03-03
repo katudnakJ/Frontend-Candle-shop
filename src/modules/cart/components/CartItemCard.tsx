@@ -91,6 +91,7 @@ export const CartItemCard = ({
                 <span>คุณแน่ใจใช่ไหมที่จะลบรายการนี้?</span>
               </div>
             }
+            variant="danger"
           />
 
           <div className="flex max-[360px]:flex-col justify-between items-end mt-2">
