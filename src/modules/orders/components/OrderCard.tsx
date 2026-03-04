@@ -14,6 +14,7 @@ import {
   Panda,
   Download,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { VerificationSlip } from "@/modules/payments/components/VerificationSlip";
@@ -24,10 +25,14 @@ interface OrderCardProps {
 }
 
 export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
-  const [expandedItem, setExpandedItem] = useState<string | null>(null);
-  const toggleAccordion = (id: string) => {
-    setExpandedItem(expandedItem === id ? null : id);
-  };
+  const [expandedItem, setExpandedItem] = useState<string[]>([]);
+const toggleAccordion = (id: string) => {
+  setExpandedItem((prev) =>
+    prev.includes(id) 
+      ? prev.filter((itemId) => itemId !== id) // ถ้ามีอยู่แล้ว ให้เอาออก (ปิด)
+      : [...prev, id] // ถ้าไม่มี ให้เพิ่มเข้าไป (เปิดค้างไว้)
+  );
+};
 
   const router = useRouter();
 
@@ -139,7 +144,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
       {/*Product Items */}
       <div className="p-5 space-y-3">
         {order.items?.map((item) => {
-          const isExpanded = expandedItem === item.order_item_id;
+          const isExpanded = expandedItem.includes(item.order_item_id);
 
           return (
             <div
