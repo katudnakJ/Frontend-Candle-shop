@@ -112,7 +112,7 @@ const handlepaymentagain = () => {
 
       {/* 3. Info Section (Tracking / Rejection / Shipping Info) */}
       <div className="px-5 pb-2 space-y-3">
-        {/* กรณี RJ: แสดงหมายเหตุตัวโตๆ */}
+        {/* กรณี RJ*/}
         {order.order_status === "RJ" && (
           <div className="p-4 bg-red-100 border-2 border-red-500 rounded-2xl flex items-start gap-3">
             <AlertCircle className="text-red-600 shrink-0" />
@@ -125,7 +125,7 @@ const handlepaymentagain = () => {
           </div>
         )}
 
-        {/* กรณี TS/TR: แสดงเลขพัสดุถ้ามี */}
+        {/* กรณี TS/TR*/}
         {(order.order_status === "TS" || order.order_status === "TR") &&
           order.tracking_number && (
             <div className="p-4 bg-blue-50 border-2 border-black rounded-2xl flex justify-between items-center">

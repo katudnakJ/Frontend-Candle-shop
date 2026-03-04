@@ -17,10 +17,10 @@ function AddressPageContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  // ดึง ID จาก URL (?id=xxxx)
+ 
   const addressId = searchParams.get("id");
 
-  // หาข้อมูลจาก mock data (ในอนาคตคือ Fetch จาก API)
+  // (ในอนาคตคือ Fetch จาก API)
   const editingAddress = mockAddresses.find(
     (addr) => addr.address_id === addressId,
   );
@@ -34,10 +34,10 @@ function AddressPageContent() {
           <AddressForm
             key={addressId || "new"} 
             initialData={editingAddress}
-            onCancel={() => router.back()} // กดยกเลิกแล้วถอยกลับหน้าเดิม
+            onCancel={() => router.back()} 
             onSubmit={(data) => {
               console.log("บันทึก:", data);
-              router.push("/account/customer"); // กลับไปหน้าหลัก
+              router.push("/account/customer"); 
             }}
           />
         )}

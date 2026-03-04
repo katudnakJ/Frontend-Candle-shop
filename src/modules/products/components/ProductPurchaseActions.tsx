@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Plus, Minus } from "lucide-react";
+import { ShoppingCart} from "lucide-react";
 import LineIcon from "@/components/icon/lineicon";
 import { toast } from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
