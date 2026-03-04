@@ -29,7 +29,7 @@ export const CartSummaryBar = ({
             </span>
           </div>
         )}
-        <div className="flex flex-1 items-center justify-end max-[440px]:justify-between max-[440px]:w-full gap-3 md:gap-6 min-w-0">
+        <div className="flex flex-1 min-[360px]:items-center justify-end max-[360px]:flex-col max-[440px]:justify-between max-[440px]:w-full gap-3 md:gap-6 min-w-0">
           <div className="flex flex-col">
             <span className="whitespace-nowrap text-sm font-bold">
               {isCheckout ? "ยอดคำสั่งซื้อทั้งหมด" : "รวมทั้งหมด"}
@@ -44,11 +44,11 @@ export const CartSummaryBar = ({
             <button
               onClick={onOrderClick}
               disabled={isDisabled} 
-              className={`py-3 px-8 max-[360px]:px-15 md:px-30 rounded-2xl border-4 border-black font-black text-lg transition-all uppercase tracking-wider shrink 
+              className={`py-3 px-8 max-[360px]:px-15 md:px-30 max-[360px]:text-[16px] rounded-2xl border-4 border-black font-black text-lg transition-all uppercase tracking-wider shrink
                 ${
                   isDisabled
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-70 shadow-none" // สไตล์ตอนกดไม่ได้
-                    : "bg-[#FFB0D1] text-black cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none" // สไตล์ปกติ
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-70 shadow-none" 
+                    : "bg-[#FFB0D1] text-black cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none" 
                 }`}
             >
               สั่งชื้อสินค้า

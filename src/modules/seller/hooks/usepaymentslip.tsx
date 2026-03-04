@@ -3,8 +3,11 @@ import { PaymentService } from "../services/payment.service";
 import { toast } from "react-hot-toast";
 import imageCompression from "browser-image-compression";
 
-export const usePaymentSlip = (onFileSelect: (file: File | null) => void) => {
-  const [slipPreview, setSlipPreview] = useState<string | null>(null);
+export const usePaymentSlip = (
+  onFileSelect: (file: File | null) => void,
+  initialPreview: string | null = null,
+) => {
+  const [slipPreview, setSlipPreview] = useState<string | null>(initialPreview);
   const [fileError, setFileError] = useState(false);
   const [inputKey, setInputKey] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,19 +49,18 @@ export const usePaymentSlip = (onFileSelect: (file: File | null) => void) => {
       useWebWorker: true,
     };
     try {
-    
       const compressedFile = await imageCompression(file, options);
 
-   
       onFileSelect(compressedFile);
 
-    
-      if (slipPreview) URL.revokeObjectURL(slipPreview); 
+      if (slipPreview && slipPreview.startsWith("blob:")) {
+        URL.revokeObjectURL(slipPreview);
+      }
       const previewUrl = URL.createObjectURL(compressedFile);
       setSlipPreview(previewUrl);
     } catch (error) {
       console.error("Compression failed:", error);
- 
+
       onFileSelect(file);
       const reader = new FileReader();
       reader.onloadend = () => setSlipPreview(reader.result as string);
@@ -77,6 +79,7 @@ export const usePaymentSlip = (onFileSelect: (file: File | null) => void) => {
     fileError,
     inputKey,
     fileInputRef,
+    setSlipPreview,
     handleBoxClick,
     onFileChange,
     resetFile,

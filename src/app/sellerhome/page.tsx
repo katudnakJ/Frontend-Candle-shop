@@ -15,7 +15,7 @@ export default function sellerHome() {
 
         <div className="bg-white">
           <section>
-            <SellerrWelcome />
+            <SellerrWelcome mode="welcome" />
           </section>
         </div>
 

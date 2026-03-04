@@ -18,6 +18,8 @@ import { ShoppingCartItem } from "@/modules/cart/types";
 
 import { mockSellerData } from "@/modules/seller/mockSellerData";
 import { mockOrders } from "@/modules/orders/mockOrderData";
+import { toast } from "react-hot-toast";
+import { duration } from "@mui/material";
 
 interface PaymentData {
   displayItems: (OrderItem | ShoppingCartItem)[];
@@ -123,7 +125,17 @@ export default function PaymentPage() {
 
   const handleConfirm = () => {
     setIsOpen(false);
-    router.replace("/customerhome");
+    router.replace("/customerhomeformock");
+   toast.success(
+        <div className="flex flex-col justify-center py-1">
+          <span className="leading-tight">ยืนยันการชำระเงินเรียบร้อย</span>
+        </div>,
+        {
+          className:
+            " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
+          duration: 3000,
+        },
+      );
   };
 
   const handleConfirmOrder = () => {

@@ -48,20 +48,20 @@ const SellerHeader = () => {
           </div>
 
           <div className="text-center">
-            <p className="font-bold text-[16px] md:text-2xl text-black ml-8">
+            <p className="font-bold text-[18px] md:text-2xl text-black ml-7">
               {"Moji's Candle Shop"}
             </p>
-            <span className="text-xs text-gray-500 uppercase tracking-widest ml-8">
+            <span className="text-xs text-gray-500 uppercase tracking-widest ml-5">
               Store Management
             </span>
           </div>
 
           <div className="flex items-center gap-4 md:gap-8">
-            <div className="flex flex-col items-end text-black font-medium text-[11px] md:text-base">
+            <div className="flex flex-col items-end text-black font-medium text-[12px] md:text-base">
               {isMounted ? (
                 <>
-                  <div>{formatDate(currentTime)}</div>
                   <div>{formatTime(currentTime)}</div>
+                  <div>{formatDate(currentTime)}</div>
                 </>
               ) : (
                 <div className="h-10 w-20 bg-gray-100 animate-pulse rounded" />

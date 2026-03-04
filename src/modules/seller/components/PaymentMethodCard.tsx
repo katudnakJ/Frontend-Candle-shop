@@ -49,7 +49,7 @@ export const PaymentMethodCard = ({
             <div className="relative group">
               <div className="relative w-full h-[400px] md:h-[500px] flex flex-col items-center p-6 bg-gray-50 rounded-3xl border-2 border-black border-dashed overflow-hidden">
                 <Image
-                  src={seller.bank_QrPayment_img_slug}
+                  src={seller.qr_payment_img_path}
                   alt="QR Payment"
                   className="object-contain p-4 select-all touch-auto"
                   fill
@@ -60,7 +60,7 @@ export const PaymentMethodCard = ({
               <button
                 onClick={() =>
                   PaymentService.downloadQR(
-                    seller.bank_QrPayment_img_slug,
+                    seller.qr_payment_img_path,
                     "QR-Payment.png",
                   )
                 }
@@ -133,7 +133,7 @@ export const PaymentMethodCard = ({
                     <div className="space-y-1 opacity-70 font-bold text-xs uppercase mt-1">
                       <p>รองรับไฟล์ JPG, JPEG, PNG</p>
                       <p className="bg-zinc-200 px-2 py-1 rounded-md inline-block">
-                        ขนาดไม่เกิน 1MB
+                        ขนาดไม่เกิน 2MB
                       </p>
                     </div>
                   </div>
