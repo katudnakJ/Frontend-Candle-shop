@@ -13,6 +13,7 @@ import {
   PackageCheck,
   Panda,
   Download,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { VerificationSlip } from "@/modules/payments/components/VerificationSlip";
@@ -23,7 +24,13 @@ interface OrderCardProps {
 }
 
 export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const toggleAccordion = (id: string) => {
+    setExpandedItem(expandedItem === id ? null : id);
+  };
+
   const router = useRouter();
+
   const getStatusDisplay = (status: Order["order_status"]) => {
     switch (status) {
       case "PD":
@@ -76,13 +83,9 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
 
   const handleConfirmPayment = async () => {
-
     toast.success(
       <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight">
-          {" "}
-         ยืนยันการชำระเงินสำเร็จ!
-        </span>
+        <span className="leading-tight"> ยืนยันการชำระเงินสำเร็จ!</span>
       </div>,
       {
         className:
@@ -90,17 +93,14 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
         duration: 3000,
       },
     );
-    
+
     setIsVerifyOpen(false);
   };
 
   const handleRejectPayment = async (reason: string) => {
-       toast.success(
+    toast.success(
       <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight">
-          {" "}
-        ยืนยันการปฏิเสธสำเร็จแล้ว!
-        </span>
+        <span className="leading-tight"> ยืนยันการปฏิเสธสำเร็จแล้ว!</span>
       </div>,
       {
         className:
@@ -137,30 +137,81 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
       <div className="h-10"></div>
 
       {/*Product Items */}
-      <div className="p-5 space-y-4">
-        {order.items?.map((item) => (
-          <div key={item.order_item_id} className="flex gap-4 items-center">
-            <div className="relative w-20 h-20 border-2 border-black rounded-xl overflow-hidden shrink-0">
-              <Image
-                src={item.product_img_path || "/placeholder-image.svg"}
-                alt={item.product_name_at_purchase}
-                fill
-                className="object-cover"
-              />
+      <div className="p-5 space-y-3">
+        {order.items?.map((item) => {
+          const isExpanded = expandedItem === item.order_item_id;
+
+          return (
+            <div
+              key={item.order_item_id}
+              className="border-2 border-black rounded-2xl overflow-hidden bg-white transition-all"
+            >
+              <button
+                onClick={() => toggleAccordion(item.order_item_id)}
+                className="w-full flex gap-4 items-center p-3 hover:bg-gray-50 transition-colors text-left"
+              >
+                <div className="relative w-14 h-14 border-2 border-black rounded-lg overflow-hidden shrink-0">
+                  <Image
+                    src={item.product_img_path || "/placeholder-image.svg"}
+                    alt={item.product_name_at_purchase}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                <div className="flex-grow">
+                  <h4 className="font-bold text-sm line-clamp-1">
+                    {item.product_name_at_purchase}
+                  </h4>
+                </div>
+
+                <div className="flex flex-col items-end gap-1">
+                  <ChevronDown
+                    size={18}
+                    className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                  />
+                </div>
+              </button>
+
+              <div
+                className={`grid transition-all duration-300 ease-in-out ${
+                  isExpanded
+                    ? "grid-rows-[1fr] opacity-100 p-4 border-t-2 border-dashed border-black bg-gray-50"
+                    : "grid-rows-[0fr] opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 font-bold">รหัสสินค้า:</span>
+                    <span className="font-mono font-bold">
+                      {item.product_id || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 font-bold">
+                      ราคาสินค้า/ชิ้น:
+                    </span>
+                    <span className="font-black text-base">
+                      {item.price_at_purchase.toLocaleString()} บาท
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 font-bold">จำนวน:</span>
+                    <span className="font-black text-base">
+                      {item.quantity} ชิ้น
+                    </span>
+                  </div>
+                  <div className="pt-2">
+                    <p className="text-xs text-gray-500 font-bold leading-relaxed">
+                      รายละเอียดเพิ่มเติมเกี่ยวกับรายการสินค้านี้
+                      สามารถติดต่อผู้ขายโดยตรง
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex-grow">
-              <h4 className="font-bold text-base line-clamp-1">
-                {item.product_name_at_purchase}
-              </h4>
-              <p className="text-gray-500 font-bold text-sm">
-                จำนวน: {item.quantity}
-              </p>
-              <p className="font-black text-lg">
-                ฿{item.price_at_purchase.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* 3. Info Section (Tracking / Rejection / Shipping Info) */}
