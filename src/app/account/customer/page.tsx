@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ChevronLeft } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
-import { mockAddresses } from "@/modules/account/mockaddress"; // Import ข้อมูลจำลอง
+import { mockAddresses } from "@/modules/account/mockaddress"; 
 import { Addresses } from "@/modules/account/addresses";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
@@ -17,9 +17,10 @@ export default function CustomerAccountPage() {
   const [addresses, setAddresses] = useState<Addresses[]>(mockAddresses);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
+  
 
   const handleAdd = () => {
-    router.push("/account/address"); // ไปหน้าฟอร์มแบบไม่มี ID (แปลว่าเพิ่มใหม่)
+    router.push("/account/address");
   };
 
   const handleEdit = (id: string) => {
@@ -58,7 +59,7 @@ export default function CustomerAccountPage() {
             </span>
           </div>
 
-          {/* 1. Profile Section - ส่วนต้อนรับ */}
+          {/* 1. Profile Section  */}
           <section className="">
             <CustomerWelcome />
           </section>

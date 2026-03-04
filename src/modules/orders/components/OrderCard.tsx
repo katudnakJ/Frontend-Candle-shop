@@ -198,7 +198,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                   navigator.clipboard.writeText(order.tracking_number!);
                   toast.success("คัดลอกเลขพัสดุแล้ว");
                 }}
-                className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black"
+                className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer"
               >
                 <Copy size={16} />
               </button>
@@ -231,7 +231,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
             <button
               //เดี๋ยวเปลี่ยนเป็นรับ มาจาก backend แทน
               onClick={downloadPDF}
-              className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
             >
               <Download size={20} className="text-black" />
             </button>
@@ -274,7 +274,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
           {order.order_status === "RJ" && (
             <button
               onClick={handlepaymentagain}
-              className="flex-1 py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none"
+              className="flex-1 py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
             >
               ชำระเงินใหม่
             </button>
@@ -282,7 +282,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
 
           {order.order_status === "TR" && (
             // ต้องทำตัว hadle api update status ว่า Complete ไป  backend
-            <button className="flex-1 py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none">
+            <button className="flex-1 py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
               ได้รับสินค้าแล้ว
             </button>
           )}

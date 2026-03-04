@@ -34,7 +34,7 @@ export default function OrderHistoryPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as OrderStatus)}
-                  className={`flex-1 py-4 text-sm font-black transition-all ${
+                  className={`flex-1 py-4 text-sm font-black transition-all cursor-pointer ${
                     activeTab === tab.key
                       ? "bg-cprojectone text-black"
                       : "bg-white text-black hover:bg-gray-100"
