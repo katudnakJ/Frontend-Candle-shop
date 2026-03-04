@@ -17,7 +17,7 @@ export default function OrderHistoryPage() {
     { key: "PD", label: "รอตรวจสอบ" },
     { key: "TS", label: "ที่ต้องจัดส่ง" },
     { key: "TR", label: "ที่ต้องได้รับ" },
-    { key: "CM", label: "สำเร็จแล้ว" },
+    { key: "CP", label: "สำเร็จแล้ว" },
   ];
 
 
@@ -38,7 +38,7 @@ export default function OrderHistoryPage() {
                     activeTab === tab.key
                       ? "bg-cprojectone text-black"
                       : "bg-white text-black hover:bg-gray-100"
-                  } ${tab.key !== "CM" ? "border-r-2 border-black" : ""}`}
+                  } ${tab.key !== "CP" ? "border-r-2 border-black" : ""}`}
                 >
                   {tab.label}
                 </button>

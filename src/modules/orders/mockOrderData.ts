@@ -36,7 +36,9 @@ export const mockOrders: Order[] = [
     order_created_date: "2026-02-20T10:30:00Z",
     rejection_reason: "", // จาก table payments
     carrier: "Flash Express",
-    shipping_fee: 240, // จาก table shipment
+    shipping_fee: 240,
+    slipURL:"https://goerhyygukxfkphuyrnw.supabase.co/storage/v1/object/sign/payment-proofs/c0a80212-9c4f-190a-819c-4fe930870001/c0a80212-9c89-160e-819c-897ada100009/REC20260223-0002.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTg4ZDc2MS05YWMzLTQ2OGMtODAxZi01N2E2Nzk1ZmRlMjAiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwYXltZW50LXByb29mcy9jMGE4MDIxMi05YzRmLTE5MGEtODE5Yy00ZmU5MzA4NzAwMDEvYzBhODAyMTItOWM4OS0xNjBlLTgxOWMtODk3YWRhMTAwMDA5L1JFQzIwMjYwMjIzLTAwMDIuanBlZyIsImlhdCI6MTc3MjYxODIyMywiZXhwIjoxNzcyNzA0NjIzfQ.0hmxFANSspxK0gNS4tPjloFbn4ZVZtbrfkOv6xbJ6DQ",
+     // จาก table shipment
     items: [
       {
         order_item_id: "oi-1",
@@ -115,7 +117,7 @@ export const mockOrders: Order[] = [
     order_id: "uuid-5",
     customer_id: "cus-123",
     order_no: "CD28120003",
-    order_status: "CM", // ที่ต้องได้รับ
+    order_status: "CP", // ที่ต้องได้รับ
     total_quantity: 1000,
     total_amount: 30000,
     net_amount: 31200,

@@ -3,7 +3,7 @@ export interface Payment {
   order_id: string;
   seller_id: string;
   slip_image_url: string;
-  payment_status: 'PD' | 'TS' | 'RJ' | 'CM';
+  payment_status: 'PD' | 'TS' | 'RJ' | 'CP' | 'AP';
   admin_comment?: string;
   payment_request_Date: string;
   approve_date?: string;

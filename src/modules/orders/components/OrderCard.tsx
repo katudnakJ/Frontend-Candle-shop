@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Order } from "../type";
 import { useReceiptPDF } from "../hooks/useReceiptPDF";
@@ -14,12 +15,14 @@ import {
   Download,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { VerificationSlip } from "@/modules/payments/components/VerificationSlip";
 
 interface OrderCardProps {
   order: Order;
+  mode?: "Customer" | "Seller";
 }
 
-export const OrderCard = ({ order }: OrderCardProps) => {
+export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
   const router = useRouter();
   const getStatusDisplay = (status: Order["order_status"]) => {
     switch (status) {
@@ -51,7 +54,7 @@ export const OrderCard = ({ order }: OrderCardProps) => {
           bg: "text-amber-50",
           border: "border-amber-600",
         };
-      case "CM":
+      case "CP":
         return {
           label: "สำเร็จแล้ว",
           color: "text-green-600",
@@ -62,14 +65,62 @@ export const OrderCard = ({ order }: OrderCardProps) => {
         return { label: status, color: "text-gray-600", bg: "bg-gray-50" };
     }
   };
-const handlepaymentagain = () => {
-  router.push(`/shoppingcart/checkoutcart/paymentcart?orderId=${order.order_no}&mode=repay`);
-};
+  const handlepaymentagain = () => {
+    router.push(
+      `/shoppingcart/checkoutcart/paymentcart?orderId=${order.order_no}&mode=repay`,
+    );
+  };
   const { receiptRef, downloadPDF } = useReceiptPDF(order);
   const statusInfo = getStatusDisplay(order.order_status);
 
+  const [isVerifyOpen, setIsVerifyOpen] = useState(false);
+
+  const handleConfirmPayment = async () => {
+
+    toast.success(
+      <div className="flex flex-col justify-center py-1">
+        <span className="leading-tight">
+          {" "}
+         ยืนยันการชำระเงินสำเร็จ!
+        </span>
+      </div>,
+      {
+        className:
+          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
+        duration: 3000,
+      },
+    );
+    
+    setIsVerifyOpen(false);
+  };
+
+  const handleRejectPayment = async (reason: string) => {
+       toast.success(
+      <div className="flex flex-col justify-center py-1">
+        <span className="leading-tight">
+          {" "}
+        ยืนยันการปฏิเสธสำเร็จแล้ว!
+        </span>
+      </div>,
+      {
+        className:
+          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
+        duration: 3000,
+      },
+    );
+    setIsVerifyOpen(false);
+  };
+
+  const pulseStyle = `
+  @keyframes pulse-green-simple {
+    0%, 100% { background-color: #f3f4f6; border-color: #e5e7eb; color: #9ca3af; }
+    50% { background-color: #f0fdf4; border-color: #22c55e; color: #16a34a; }
+  }
+`;
+
   return (
     <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden  mb-8 transition-all hover:translate-y-[-2px]">
+      <style>{pulseStyle}</style>
       <ReceiptTemplate ref={receiptRef} order={order} />
 
       {/*Order Number & Status max-[400px]:*/}
@@ -79,7 +130,9 @@ const handlepaymentagain = () => {
         >
           {statusInfo.label}
         </div>
-        <span className="w-full font-black text-lg text-center border-3 border-black border-b-white px-4 py-5 rounded-full bg-white translate-y-[17%] ">Order #{order.order_no}</span>
+        <span className="w-full font-black text-lg text-center border-3 border-black border-b-white px-4 py-5 rounded-full bg-white translate-y-[17%] ">
+          Order #{order.order_no}
+        </span>
       </div>
       <div className="h-10"></div>
 
@@ -126,7 +179,9 @@ const handlepaymentagain = () => {
         )}
 
         {/* กรณี TS/TR*/}
-        {(order.order_status === "TS" || order.order_status === "TR") &&
+        {(order.order_status === "TS" ||
+          order.order_status === "TR" ||
+          order.order_status === "CP") &&
           order.tracking_number && (
             <div className="p-4 bg-blue-50 border-2 border-black rounded-2xl flex justify-between items-center">
               <div className="flex items-center gap-3">
@@ -158,7 +213,7 @@ const handlepaymentagain = () => {
           </div>
         )}
 
-        {order.order_status === "CM" && (
+        {order.order_status === "CP" && (
           <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
@@ -174,7 +229,7 @@ const handlepaymentagain = () => {
               </div>
             </div>
             <button
-            //เดี๋ยวเปลี่ยนเป็นรับ มาจาก backend แทน
+              //เดี๋ยวเปลี่ยนเป็นรับ มาจาก backend แทน
               onClick={downloadPDF}
               className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
             >
@@ -217,11 +272,11 @@ const handlepaymentagain = () => {
           </button> */}
 
           {order.order_status === "RJ" && (
-            <button 
-            onClick={handlepaymentagain}
-            className="flex-1 py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none">
-              ชำระเงินใหม่ 
-            
+            <button
+              onClick={handlepaymentagain}
+              className="flex-1 py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none"
+            >
+              ชำระเงินใหม่
             </button>
           )}
 
@@ -232,31 +287,43 @@ const handlepaymentagain = () => {
             </button>
           )}
 
-          {/* {order.order_status === "CM" && (
+          {/* {order.order_status === "CP" && (
              <button className="flex-1 py-3 bg-green-500 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-green-600 transition-all active:translate-y-1 active:shadow-none">
                 รีวิวสินค้า
              </button>
           )} */}
 
           {order.order_status === "PD" && (
-            <button
-              disabled
-              style={{
-                animation: "pulse-green-simple 2s infinite",
-              }}
-              className="flex-1 py-3 border-4 rounded-full font-black cursor-not-allowed"
-            >
-              <style>{`
-                        @keyframes pulse-green-simple {
-                            0%, 100% { background-color: #f3f4f6; border-color: #e5e7eb; color: #9ca3af; }
-                            50% { background-color: #f0fdf4; border-color: #22c55e; color: #16a34a; }
-                        }
-            `}</style>
-              ร้านค้ากำลังทำการตรวจสอบ
-            </button>
+            <>
+              {mode === "Seller" ? (
+                <button
+                  onClick={() => setIsVerifyOpen(true)}
+                  className="flex-1 py-3 border-4 rounded-full font-black cursor-pointer transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-none"
+                  style={{ animation: "pulse-green-simple 2s infinite" }}
+                >
+                  ทำการตรวจสอบ
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="flex-1 py-3 border-4 rounded-full font-black cursor-not-allowed"
+                  style={{ animation: "pulse-green-simple 2s infinite" }}
+                >
+                  ร้านค้ากำลังทำการตรวจสอบ
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
+      {isVerifyOpen && (
+        <VerificationSlip
+          order={order}
+          onClose={() => setIsVerifyOpen(false)}
+          onConfirm={handleConfirmPayment}
+          onReject={handleRejectPayment}
+        />
+      )}
     </div>
   );
 };

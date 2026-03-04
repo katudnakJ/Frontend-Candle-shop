@@ -1,7 +1,7 @@
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import { ClipboardList, LayoutGrid, BarChart3 } from "lucide-react";
-import SellerrWelcome from "@/modules/seller/components/SellerWelcome";
+import SellerWelcome from "@/modules/seller/components/SellerWelcome";
 import Link from "next/link";
 
 export default function SellerHome() {
@@ -15,13 +15,13 @@ export default function SellerHome() {
 
         <div className="bg-white">
           <section>
-            <SellerrWelcome mode="welcome" />
+            <SellerWelcome mode="welcome" />
           </section>
         </div>
 
         <div className="bg-white w-full min-h-screen">
           <div className="max-w-[1200px] mx-auto p-4 space-y-8 bg-white ">
-            <section className="flex flex-col gap-20 py-4">
+            <section className="flex flex-col gap-10 py-4">
               <section>
                 <Link
                   href="/seller/sellerorders"

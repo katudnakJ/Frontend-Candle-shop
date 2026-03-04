@@ -1,30 +1,23 @@
-
 "use client";
+
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
-import { ClipboardList, LayoutGrid, BarChart3 } from "lucide-react";
-import SellerrWelcome from "@/modules/seller/components/SellerWelcome";
-import Link from "next/link";
-
-
-
-
 import { Loader2 } from "lucide-react";
 import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
-import { useOrderHistory } from "@/modules/orders/hooks/useOrderHistory";
+import { useSellerOrders } from "@/modules/orders/hooks/useSellerOrders";
 
 export default function Sellerorders (){
 
   const { activeTab, setActiveTab, filteredOrders, isLoading } =
-    useOrderHistory();
+    useSellerOrders();
 
   const tabs = [
-    { key: "PD", label: "รอตรวจสอบ" },
+    { key: "PD", label: "รอยืนยันชำระเงิน" },
     { key: "TS", label: "ที่ต้องจัดส่ง" },
-    { key: "TR", label: "ที่ต้องได้รับ" },
-    { key: "CM", label: "สำเร็จแล้ว" },
+    // { key: "TR", label: "ที่ต้องได้รับ" },
+    { key: "CP", label: "การชำระเงินได้รับการอนุมัติเรียบร้อย" },
   ];
 
 
@@ -45,7 +38,7 @@ export default function Sellerorders (){
                     activeTab === tab.key
                       ? "bg-cprojectone text-black"
                       : "bg-white text-black hover:bg-gray-100"
-                  } ${tab.key !== "CM" ? "border-r-2 border-black" : ""}`}
+                  } ${tab.key !== "CP" ? "border-r-2 border-black" : ""}`}
                 >
                   {tab.label}
                 </button>
@@ -62,7 +55,7 @@ export default function Sellerorders (){
               <div className="space-y-2">
                 {filteredOrders.length > 0 ? (
                   filteredOrders.map((order) => (
-                    <OrderCard key={order.order_id} order={order} />
+                    <OrderCard key={order.order_id} order={order} mode="Seller" />
                   ))
                 ) : (
                   /* กรณีไม่มีข้อมูลใน Tab นั้น */
