@@ -4,7 +4,7 @@ import { ClipboardList, LayoutGrid, BarChart3 } from "lucide-react";
 import SellerrWelcome from "@/modules/seller/components/SellerWelcome";
 import Link from "next/link";
 
-export default function sellerHome() {
+export default function SellerHome() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header*/}
@@ -24,7 +24,7 @@ export default function sellerHome() {
             <section className="flex flex-col gap-20 py-4">
               <section>
                 <Link
-                  href="/seller/orders"
+                  href="/seller/sellerorders"
                   className="flex items-center justify-center gap-4 bg-[#FDF8F1] border border-black rounded-2xl p-8 
              hover:bg-yellow-50 hover:-translate-y-1 hover:shadow-xl 
              transition-all duration-300 shadow-sm group active:scale-95"
