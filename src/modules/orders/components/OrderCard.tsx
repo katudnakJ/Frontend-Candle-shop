@@ -14,10 +14,10 @@ import {
   Panda,
   Download,
   ChevronDown,
-  Loader2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { VerificationSlip } from "@/modules/payments/components/VerificationSlip";
+import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 
 interface OrderCardProps {
   order: Order;
@@ -25,14 +25,20 @@ interface OrderCardProps {
 }
 
 export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
+  const trackingList = order.tracking_number?.split(/[,\s]+/).filter(Boolean);
+  const [showTrackkingnoInput, setShowTrackkingnoInput] = useState(false);
+  const [isConfirmTrackingNoopen, setisConfirmTrackingNoopen] = useState(false);
+  const [trackkingno, settrackkingno] = useState("");
+  const [cleanTrackingList, setCleanTrackingList] = useState<string[]>([]);
   const [expandedItem, setExpandedItem] = useState<string[]>([]);
-const toggleAccordion = (id: string) => {
-  setExpandedItem((prev) =>
-    prev.includes(id) 
-      ? prev.filter((itemId) => itemId !== id) // ถ้ามีอยู่แล้ว ให้เอาออก (ปิด)
-      : [...prev, id] // ถ้าไม่มี ให้เพิ่มเข้าไป (เปิดค้างไว้)
-  );
-};
+  const toggleAccordion = (id: string) => {
+    setExpandedItem(
+      (prev) =>
+        prev.includes(id)
+          ? prev.filter((itemId) => itemId !== id) // ถ้ามีอยู่แล้ว ให้เอาออก (ปิด)
+          : [...prev, id], // ถ้าไม่มี ให้เพิ่มเข้าไป (เปิดค้างไว้)
+    );
+  };
 
   const router = useRouter();
 
@@ -114,6 +120,12 @@ const toggleAccordion = (id: string) => {
       },
     );
     setIsVerifyOpen(false);
+  };
+
+  const handleConfirmTracking = (finalList: string[]) => {
+    const finalPayload = finalList.join(",");
+    console.log("ส่งไป Backend:", finalPayload);
+    // ต้องมาทำตัว finalPayload ส่งไปให้ API
   };
 
   const pulseStyle = `
@@ -243,30 +255,114 @@ const toggleAccordion = (id: string) => {
               <div className="flex items-center gap-3">
                 <Truck className="text-blue-600" size={20} />
                 <div>
-                  <p className="text-[10px] font-black text-gray-500 uppercase leading-none">
+                  <p className="text-[10px] font-black text-gray-500 uppercase leading-none mb-3">
                     {order.carrier || "พัสดุ"}
                   </p>
-                  <p className="font-black text-sm">{order.tracking_number}</p>
+
+                  <div className="flex flex-col gap-2">
+                    {trackingList?.map((no, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-blue-50 p-3 rounded-xl border border-blue-200 w-full"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-blue-500 font-bold">
+                            เลขพัสดุที่ {index + 1}
+                          </span>
+                          <span className="font-bold text-sm break-all">
+                            {no}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(no!);
+                            toast.success("คัดลอกเลขพัสดุแล้ว");
+                          }}
+                          className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer"
+                        >
+                          <Copy size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <button
+              {/* <button
+                disabled
                 onClick={() => {
                   navigator.clipboard.writeText(order.tracking_number!);
                   toast.success("คัดลอกเลขพัสดุแล้ว");
                 }}
-                className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer"
+                className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer hidden"
               >
                 <Copy size={16} />
-              </button>
+              </button> */}
             </div>
           )}
 
         {/* สำหรับ TS ที่ยังไม่มีเลขพัสดุ */}
         {order.order_status === "TS" && !order.tracking_number && (
-          <div className="flex items-center gap-2 text-blue-600 font-bold text-sm px-2">
-            <PackageCheck size={18} />
-            <span>กำลังเตรียมจัดส่งพัสดุของคุณ...</span>
-          </div>
+          <>
+            {mode === "Seller" ? (
+              <div className="flex flex-col gap-3 p-4 bg-blue-50 border-2 border-black rounded-[2rem]">
+                <div className="flex items-center gap-2 text-blue-700 font-black text-xs px-2 uppercase">
+                  <Truck size={16} />
+                  <span>ระบุหมายเลขพัสดุ (Tracking Number)</span>
+                </div>
+
+                <div className="relative">
+                  <textarea
+                    placeholder="ระบุเลขพัสดุ (หากมีหลายกล่อง ให้คั่นด้วยเครื่องหมาย , หรือขึ้นบรรทัดใหม่)"
+                    className="w-full p-4 border-2 border-black rounded-2xl font-bold text-[11px] focus:outline-none focus:ring-2 ring-blue-500 min-h-[100px] resize-none"
+                    // maxLength={}
+                    value={trackkingno}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const cleanValue = value.replace(
+                        /[^a-zA-Z0-9ก-๙,\s]/g,
+                        "",
+                      );
+                      settrackkingno(cleanValue);
+                    }}
+                  />
+                </div>
+                <div className="flex flex-row items-center justify-end gap-4 px-2">
+                  <button
+                    onClick={() => {
+                      const cleaned = trackkingno
+                        .split(/[,\n\s]+/)
+                        .map((item) => item.trim())
+                        .filter(Boolean);
+                      if (cleaned.length === 0) {
+                        toast.error("กรุณาระบุเลขพัสดุอย่างน้อย 1 รายการ");
+                        return;
+                      }
+                      setCleanTrackingList(cleaned);
+                      setisConfirmTrackingNoopen(true);
+                    }}
+                    disabled={!trackkingno.trim()}
+                    className="px-2 py-1 bg-blue-600 text-[12px] text-white border-2 border-black rounded-full font-black disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all"
+                  >
+                    ยืนยันเลข Tracking No.
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowTrackkingnoInput(false);
+                      settrackkingno("");
+                    }}
+                    className="flex font-bold text-[12px] underline cursor-pointer"
+                  >
+                    ยกเลิก
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-blue-600 font-bold text-sm px-2">
+                <PackageCheck size={18} />
+                <span>กำลังเตรียมจัดส่งพัสดุของคุณ...</span>
+              </div>
+            )}
+          </>
         )}
 
         {order.order_status === "CP" && (
@@ -380,6 +476,40 @@ const toggleAccordion = (id: string) => {
           onReject={handleRejectPayment}
         />
       )}
+      <ConfirmDialog
+        open={isConfirmTrackingNoopen}
+        onClose={() => setisConfirmTrackingNoopen(false)}
+        onConfirm={() => {
+          setisConfirmTrackingNoopen(false);
+          handleConfirmTracking(cleanTrackingList);
+        }}
+        title="ยืนยันหมายเลข Tracking No."
+        content={
+          <div className="flex flex-col gap-2">
+            <p>หมายเลขพัสดุที่คุณระบุคือ:</p>
+            <div className="bg-gray-100 p-2 rounded-lg border border-dashed border-black">
+              <div className="font-mono font-bold text-blue-600 break-all">
+                {cleanTrackingList.map((no, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center bg-white p-1 px-2 rounded border border-gray-200 text-xs"
+                  >
+                    <span className="text-gray-400">#{index + 1}</span>
+                    <span className="font-mono font-bold text-blue-600">
+                      {no}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">
+              ข้อมูลนี้จะถูกส่งไปยังระบบและแจ้งลูกค้าทันที
+              หมายเลขถูกต้องใช่หรือไม่?
+            </p>
+          </div>
+        }
+        variant="primary"
+      />
     </div>
   );
 };

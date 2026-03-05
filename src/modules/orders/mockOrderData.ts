@@ -87,7 +87,7 @@ export const mockOrders: Order[] = [
     total_amount: 600,
     net_amount: 650,
     order_created_date: "2026-02-18T09:00:00Z",
-    tracking_number: "FD1058412308F", // จาก table shipment ///ต้องมาเพิ่มการ ใส่ tracking number  มากว่า 1 กล่อง
+    tracking_number: "FD1058412308F,,   FD1058412308D,FD1058412308S", // จาก table shipment ///ต้องมาเพิ่มการ ใส่ tracking number  มากว่า 1 กล่อง
     carrier: "Flash Express", // จาก table shipment
     shipping_fee: 50,
     items: [
@@ -124,7 +124,7 @@ export const mockOrders: Order[] = [
     total_amount: 30000,
     net_amount: 31200,
     order_created_date: "2026-02-18T09:00:00Z",
-    tracking_number: "FD1058412308F", // จาก table shipment
+    tracking_number: "TH123456789TH987654321TH123456789                     TH000000000", // จาก table shipment
     carrier: "Flash Express", // จาก table shipment
     shipping_fee: 1200,
     items: [
