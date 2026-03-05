@@ -124,7 +124,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
 
   const handleConfirmTracking = (finalList: string[]) => {
     const finalPayload = finalList.join(",");
-    console.log("ส่งไป Backend:", finalPayload);
+    console.log("ส่งไป Backend =>",finalPayload);
     // ต้องมาทำตัว finalPayload ส่งไปให้ API
   };
 
@@ -253,9 +253,10 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
           order.tracking_number && (
             <div className="p-4 bg-blue-50 border-2 border-black rounded-2xl flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <Truck className="text-blue-600" size={20} />
+                {/* <Truck className="text-blue-600" size={20} /> */}
                 <div>
                   <p className="text-[10px] font-black text-gray-500 uppercase leading-none mb-3">
+                    <Truck className="text-blue-600" size={20} />
                     {order.carrier || "พัสดุ"}
                   </p>
 
@@ -297,6 +298,9 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
               >
                 <Copy size={16} />
               </button> */}
+                <p className="mt-auto py-2 text-[10px] font-black text-red-500 uppercase leading-none ">
+                    กรณีหมายเลข tracking no ผิดพลาด โปรดติดต่อร้านค้า!
+                  </p>
             </div>
           )}
 
