@@ -35,6 +35,8 @@ export default function ConfirmDialog({
       className="font-sans"
       open={open}
       onClose={onClose}
+      // hideBackdrop={true}
+      sx={{ zIndex: 10001 }}
       slotProps={{
         paper: {
           sx: {

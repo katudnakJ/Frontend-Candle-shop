@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronLeft } from "lucide-react";
+import { Plus, ChevronLeft, Eye, EyeOff } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
 import { mockSellerAddresses } from "@/modules/account/mockaddressseller";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
@@ -28,6 +28,9 @@ export default function SellerSettingPage() {
   const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isShowQR, setIsShowQR] = useState(false);
+  const [originalQR, setOriginalQR] = useState<string | null>(null);
+
 
   const handleFileSelect = (file: File | null) => {
     setSelectedFile(file);
@@ -78,8 +81,8 @@ export default function SellerSettingPage() {
       try {
         setIsImageLoading(true);
         await new Promise((resolve) => {
-            timer = setTimeout(resolve, 1000);
-    });
+          timer = setTimeout(resolve, 1000);
+        });
 
         if (!isMounted) return;
 
@@ -88,11 +91,12 @@ export default function SellerSettingPage() {
 
         if (data.qr_payment_img_path) {
           setSlipPreview(data.qr_payment_img_path);
+          setOriginalQR(data.qr_payment_img_path);
         } else {
-            if (isMounted) {
-          setIsImageLoading(false);
+          if (isMounted) {
+            setIsImageLoading(false);
+          }
         }
-    }
       } catch (error) {
         if (isMounted) {
           console.error("Failed to fetch seller:", error);
@@ -102,7 +106,9 @@ export default function SellerSettingPage() {
     fetchSellerData();
     return () => {
       isMounted = false;
-     if(timer){ clearTimeout(timer)};
+      if (timer) {
+        clearTimeout(timer);
+      }
     };
   }, [setSlipPreview]);
 
@@ -130,6 +136,13 @@ export default function SellerSettingPage() {
     }
   };
 
+  const handleUndoImage = () => {
+  if (originalQR) {
+    setSlipPreview(originalQR); // คืนค่ารูปใน Preview
+    setSelectedFile(null);      // ล้างไฟล์ที่อาจจะเลือกค้างไว้
+    toast.success("คืนค่ารูปเดิมเรียบร้อย");
+  }
+};
 
   return (
     <div>
@@ -186,23 +199,57 @@ export default function SellerSettingPage() {
 
             <hr className="my-8 border-gray-100" />
 
-            <QRpaymentshop
-              qrCodeImage={qrCodeImage}
-              selectedFile={selectedFile}
-              isImageLoading={isImageLoading}
-              isUploading={isUploading}
-              inputKey={inputKey}
-              fileInputRef={fileInputRef}
-              onTriggerFileInput={triggerFileInput}
-              onImageChange={handleImageChange}
-              onClearImage={() => {
-                clearImage();
-                setSelectedFile(null);
-                setIsImageLoading(false);
-              }}
-              onConfirm={handleConfirm}
-              setIsImageLoading={setIsImageLoading}
-            />
+
+              
+            {!qrCodeImage || isShowQR ? (
+              <div className="animate-in fade-in zoom-in-90 ">
+                <QRpaymentshop
+                  qrCodeImage={qrCodeImage}
+                  selectedFile={selectedFile}
+                  isImageLoading={isImageLoading}
+                  isUploading={isUploading}
+                  inputKey={inputKey}
+                  fileInputRef={fileInputRef}
+                  onTriggerFileInput={triggerFileInput}
+                  onImageChange={handleImageChange}
+                  onClearImage={() => {
+                    clearImage();
+                    setSelectedFile(null);
+                    setIsImageLoading(false);
+                  }}
+                  onUndoImage={handleUndoImage}
+                  onConfirm={handleConfirm}
+                  setIsImageLoading={setIsImageLoading}
+                />
+                {qrCodeImage && (
+                  <button
+                    onClick={() => setIsShowQR(false)}
+                    className="mt-4 text-xl font-bold text-gray-500 underline hover:text-black w-full text-center"
+                  >
+                    ซ่อนการแสดง QR
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="p-6 border-2  rounded-[2rem] bg-white  flex justify-between items-center  hover:-translate-y-1 transition-transform  duration-300 ">
+                <div className="space-y-1">
+                  <h2 className="text-xl font-black text-black">
+                    QR สำหรับรับชำระเงิน
+                  </h2>
+                  <p className="text-sm text-gray-500 font-bold">
+                    คลิกที่ไอคอนดวงตาเพื่อดูหรือแก้ไข QR Code
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setIsShowQR(true)}
+                  className="p-4 bg-cprojectone hover:bg-yellow-300 rounded-2xl border-2 border-black text-black  active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all cursor-pointer"
+                  title="คลิกเพื่อดู QR Code"
+                >
+                  <EyeOff size={16} strokeWidth={2} />
+                </button>
+              </div>
+            )}
           </section>
         </main>
         <Footer />

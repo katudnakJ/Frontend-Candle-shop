@@ -19,7 +19,7 @@ export const PaymentMethodCard = ({
   onFileSelect,
   showError,
 }: PaymentMethodCardProps) => {
-  // ดึง Logic ออกมาจาก Hook
+
   const {
     slipPreview,
     fileError,
@@ -30,7 +30,7 @@ export const PaymentMethodCard = ({
     resetFile,
   } = usePaymentSlip(onFileSelect);
 
-  // ตรวจสอบสถานะความผิดพลาด
+
   const isInvalid = (showError && !slipPreview) || fileError;
 
   if (!seller) return null;

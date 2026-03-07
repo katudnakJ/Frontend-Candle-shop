@@ -12,6 +12,7 @@ interface QRpaymentshopProps {
   onTriggerFileInput: () => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClearImage: () => void;
+  onUndoImage: () => void;
   onConfirm: () => void;
   setIsImageLoading: (loading: boolean) => void;
 }
@@ -26,6 +27,7 @@ export default function QRpaymentshop({
   onTriggerFileInput,
   onImageChange,
   onClearImage,
+  onUndoImage,
   onConfirm,
   setIsImageLoading,
 }: QRpaymentshopProps) {
@@ -50,7 +52,9 @@ export default function QRpaymentshop({
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-zinc-50 border-2 border-black rounded-[2rem] animate-pulse">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm font-bold text-black">กำลังโหลดรูปภาพ...</p>
+                <p className="text-sm font-bold text-black">
+                  กำลังโหลดรูปภาพ...
+                </p>
               </div>
             </div>
           )}
@@ -61,7 +65,9 @@ export default function QRpaymentshop({
             onLoad={() => setIsImageLoading(false)}
             onError={() => setIsImageLoading(false)}
             className={`w-full aspect-[5/4] object-contain border-2 border-black rounded-[2rem] bg-zinc-50 p-2 transition-all duration-500 ${
-              isImageLoading && !selectedFile ? "opacity-0 scale-95" : "opacity-100 scale-100"
+              isImageLoading && !selectedFile
+                ? "opacity-0 scale-95"
+                : "opacity-100 scale-100"
             }`}
           />
           <button
@@ -78,7 +84,10 @@ export default function QRpaymentshop({
           className="w-full max-w-[600px] aspect-[5/4] border-4 border-dashed border-gray-300 rounded-[2rem] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black hover:bg-zinc-50 transition-all group active:scale-95"
         >
           <div className="p-5 bg-zinc-100 rounded-full group-hover:bg-cprojectone transition-colors">
-            <QrCode size={40} className="text-gray-400 group-hover:text-black" />
+            <QrCode
+              size={40}
+              className="text-gray-400 group-hover:text-black"
+            />
           </div>
           <span className="font-black text-gray-500 group-hover:text-black text-center px-4">
             คลิกเพื่อเพิ่มรูป <br /> QR Code ธนาคาร
@@ -97,13 +106,26 @@ export default function QRpaymentshop({
         </button>
       )}
 
-      <p className="text-[13px] md:text-[16px] text-red-400 text-start font-bold">
-        💡 คำแนะนำ
-        <br />
-        1. กรุณาตรวจสอบชื่อบัญชีและหมายเลขบัญชีบนรูปภาพให้ถูกต้อง
-        <br />
-        2. ถ้าต้องการแก้ไขให้ทำการกดกากบาทแล้วกดอัปโหลดอีกครั้ง
-      </p>
+      <div className="bg-blue-50 border-2 border-blue-200 p-4 rounded-2xl space-y-2">
+        <p className="font-bold text-xl text-blue-700  mb-2">
+          💡 คำแนะนำการใช้งาน:
+        </p>
+        <ul className="text-[14px] text-blue-600 font-medium space-y-1 list-decimal pl-4">
+          <li>ตรวจสอบชื่อและหมายเลขบัญชีบนรูปภาพให้ถูกต้อง</li>
+          <li>หากต้องการแก้ไข ให้กดปุ่ม (X) และอัปโหลดรูปใหม่อีกครั้ง</li>
+          <li >
+          <span className="flex items-center gap-2">
+          หากเผลอลบและต้องการรูปเดิม
+            <button
+              onClick={onUndoImage}
+              className="px-2 py-0.5 bg-orange-200 hover:bg-orange-300 text-orange-800 rounded-lg font-bold transition-colors underline"
+            >
+              คลิกที่นี่เพื่อคืนค่า
+            </button>
+            </span>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

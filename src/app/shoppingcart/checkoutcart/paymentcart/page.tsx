@@ -19,7 +19,6 @@ import { ShoppingCartItem } from "@/modules/cart/types";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
 import { mockOrders } from "@/modules/orders/mockOrderData";
 import { toast } from "react-hot-toast";
-import { duration } from "@mui/material";
 
 interface PaymentData {
   displayItems: (OrderItem | ShoppingCartItem)[];
@@ -125,7 +124,7 @@ export default function PaymentPage() {
 
   const handleConfirm = () => {
     setIsOpen(false);
-    router.replace("/customerhomeformock");
+    router.replace("/account/orderhistory");
    toast.success(
         <div className="flex flex-col justify-center py-1">
           <span className="leading-tight">ยืนยันการชำระเงินเรียบร้อย</span>

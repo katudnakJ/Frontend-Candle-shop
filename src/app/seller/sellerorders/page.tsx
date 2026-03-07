@@ -1,32 +1,32 @@
 "use client";
 
-import Header from "@/components/layout/CustomerHeader";
+import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
-
 import { Loader2 } from "lucide-react";
 import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
-import { useOrderHistory } from "@/modules/orders/hooks/useOrderHistory";
+import { useSellerOrders } from "@/modules/orders/hooks/useSellerOrders";
 
-export default function OrderHistoryPage() {
+export default function Sellerorders (){
+
   const { activeTab, setActiveTab, filteredOrders, isLoading } =
-    useOrderHistory();
+    useSellerOrders();
 
   const tabs = [
     { key: "PD", label: "รอตรวจสอบ" },
     { key: "TS", label: "ที่ต้องจัดส่ง" },
-    { key: "TR", label: "ที่ต้องได้รับ" },
+    // { key: "TR", label: "ที่ต้องได้รับ" },
     { key: "CP", label: "สำเร็จแล้ว" },
   ];
 
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-white">
-      <Header />
+      <SellerHeader/>
       <main className="grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
-          <OrderHeader />
+          <OrderHeader mode="sellerorders" />
 
           <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-6">
             <div className="flex bg-white border-4 border-black rounded-2xl overflow-hidden  mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  ">
@@ -55,7 +55,7 @@ export default function OrderHistoryPage() {
               <div className="space-y-2">
                 {filteredOrders.length > 0 ? (
                   filteredOrders.map((order) => (
-                    <OrderCard key={order.order_id} order={order} />
+                    <OrderCard key={order.order_id} order={order} mode="Seller" />
                   ))
                 ) : (
                   /* กรณีไม่มีข้อมูลใน Tab นั้น */

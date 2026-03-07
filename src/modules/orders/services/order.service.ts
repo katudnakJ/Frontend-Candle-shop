@@ -35,7 +35,7 @@ export const OrderService = {
   },
 
   /**
-   * ยืนยันการได้รับสินค้า (เปลี่ยนสถานะจาก TR เป็น CM)
+   * ยืนยันการได้รับสินค้า (เปลี่ยนสถานะจาก TR เป็น CP)
    */
   confirmOrderReceipt: async (orderId: string): Promise<void> => {
     try {

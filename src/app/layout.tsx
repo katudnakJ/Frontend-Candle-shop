@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono,Prompt} from "next/font/google";
+import { Geist, Geist_Mono, Prompt } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
-import { Toaster } from "react-hot-toast";
+import { ToastProvider } from "@/providers/ToastProvider";
 import { K2D } from "next/font/google";
 
 const geistSans = Geist({
@@ -39,13 +39,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} ${k2d.variable} antialiased overflow-x-hidden` }>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} ${k2d.variable} antialiased overflow-x-hidden`}
+      >
         <QueryProvider>
-          <Toaster 
-          position="top-right"
-          containerClassName="mt-4 sm:mt-0"
-          toastOptions={{className: '', }}/>
+          {/* <Toaster
+            position={toastPosition}
+            toastOptions={{
+            
+              className: "font-bold border-2 border-black rounded-xl shadow-lg",
+              duration: 3000,
+             
+              success: {
+                className: "bg-white border-cprojectone text-black h-20 px-6",
+              },
+            }}
+          /> */}
           {children}
+          <ToastProvider />
         </QueryProvider>
       </body>
     </html>

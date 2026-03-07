@@ -1,4 +1,4 @@
-export type OrderStatus = "PD" | "RJ" | "TS" | "TR" | "CM";
+export type OrderStatus = "PD" | "RJ" | "TS" | "TR" | "CP" | "AP";
 
 export interface OrderItem {
   order_item_id: string; 
@@ -15,7 +15,7 @@ export interface Order {
   order_id: string;     
   customer_id: string;  
   order_no: string;
-  order_status: "PD" | "RJ" | "TS" | "TR" | "CM";
+  order_status: "PD" | "RJ" | "TS" | "TR" | "CP" |"AP";
   total_quantity: number;
   total_amount: number;
   net_amount: number;
@@ -31,4 +31,5 @@ export interface Order {
 
   // รายการสินค้า
   items: OrderItem[];
+  slipURL?:string;
 }
