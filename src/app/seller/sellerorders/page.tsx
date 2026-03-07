@@ -14,17 +14,17 @@ export default function Sellerorders (){
     useSellerOrders();
 
   const tabs = [
-    { key: "PD", label: "รอยืนยันชำระเงิน" },
+    { key: "PD", label: "รอตรวจสอบ" },
     { key: "TS", label: "ที่ต้องจัดส่ง" },
     // { key: "TR", label: "ที่ต้องได้รับ" },
-    { key: "CP", label: "การชำระเงินได้รับการอนุมัติเรียบร้อย" },
+    { key: "CP", label: "สำเร็จแล้ว" },
   ];
 
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="flex flex-col w-full min-h-screen bg-white">
       <SellerHeader/>
-      <main className="flex-grow bg-white">
+      <main className="grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
           <OrderHeader mode="sellerorders" />
 

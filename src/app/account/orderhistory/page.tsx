@@ -22,9 +22,9 @@ export default function OrderHistoryPage() {
 
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="flex flex-col w-full min-h-screen bg-white">
       <Header />
-      <main className="flex-grow bg-white">
+      <main className="grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
           <OrderHeader />
 
