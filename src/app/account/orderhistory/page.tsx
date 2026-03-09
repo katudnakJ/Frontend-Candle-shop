@@ -26,7 +26,7 @@ export default function OrderHistoryPage() {
       <Header />
       <main className="grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
-          <OrderHeader />
+          <OrderHeader namemode="ประวัติคำสั่งซื้อ"/>
 
           <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-6">
             <div className="flex bg-white border-4 border-black rounded-2xl overflow-hidden  mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  ">

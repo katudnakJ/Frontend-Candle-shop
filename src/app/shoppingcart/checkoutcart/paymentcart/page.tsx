@@ -164,6 +164,10 @@ export default function PaymentPage() {
           <div>
             {mode === "repay" ? (
               <div className="mb-4">
+                <CartHeader
+                itemCount={paymentData.displayItems.length}
+                isRepay={true}
+              />
                 <h1 className="text-2xl font-black">
                   ชำระเงินใหม่ Order #{orderId}
                 </h1>
