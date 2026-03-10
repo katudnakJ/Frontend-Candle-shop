@@ -138,8 +138,8 @@ export default function SellerSettingPage() {
 
   const handleUndoImage = () => {
   if (originalQR) {
-    setSlipPreview(originalQR); // คืนค่ารูปใน Preview
-    setSelectedFile(null);      // ล้างไฟล์ที่อาจจะเลือกค้างไว้
+    setSlipPreview(originalQR);
+    setSelectedFile(null);     
     toast.success("คืนค่ารูปเดิมเรียบร้อย");
   }
 };

@@ -7,10 +7,12 @@ import ShopProductList from "@/modules/products/components/ShopProductList";
 import { useShopProductStore } from "@/modules/products/hooks/useShopProductStore";
 import { useShopProducts } from "@/modules/products/hooks/useShopProducts";
 import { Plus, Search } from "lucide-react";
+import Link from "next/link";
 
 export default function SellerProducts() {
   const { searchQuery, setSearchQuery } = useShopProductStore();
   const { totalAll, isLoading } = useShopProducts();
+
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-white">
@@ -41,20 +43,22 @@ export default function SellerProducts() {
                   <h1 className="text-[12px] md:text-[16px] font-black font-prompt">
                     จำนวนสินค้า {totalAll} รายการ
                   </h1>
-                  <button className="flex items-center gap-2">
-                    <span className="text-[12px] md:text-[16px]">
-                      เพิ่มสินค้า
-                    </span>
-                    <div
-                      className="bg-cprojectone text-black border-2 border-black w-10 h-10 md:w-12 md:h-12 
+                  <Link href="/seller/sellerproducts/addproducts">
+                    <button className="flex items-center gap-2">
+                      <span className="text-[12px] md:text-[16px]">
+                        เพิ่มสินค้า
+                      </span>
+                      <div
+                        className="bg-cprojectone text-black border-2 border-black w-10 h-10 md:w-12 md:h-12 
                   flex items-center justify-center
                   rounded-xl 
                   group-active:shadow-none group-active:translate-x-[2px] group-active:translate-y-[2px] 
                   transition-all cursor-pointer"
-                    >
-                      <Plus size={24} strokeWidth={3} />
-                    </div>
-                  </button>
+                      >
+                        <Plus size={24} strokeWidth={3} />
+                      </div>
+                    </button>
+                  </Link>
                 </>
               )}
             </div>
