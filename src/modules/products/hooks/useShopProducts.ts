@@ -4,10 +4,12 @@ import {
   getShopProducts,
   deleteProduct,
 } from "@/modules/products/services/ShopProductService";
+import { useShopProductStore } from "@/modules/products/hooks/useShopProductStore";
 import { toast } from "react-hot-toast";
 
 export const useShopProducts = () => {
   const queryClient = useQueryClient();
+  const searchQuery = useShopProductStore((state) => state.searchQuery);
 
   const {
     data,
@@ -17,9 +19,20 @@ export const useShopProducts = () => {
     queryKey: ["shop-products"],
     queryFn: getShopProducts,
   });
-  const featuredCount = data?.featuredProduct?.length || 0;
-  const nonFeaturedCount = data?.nonFeaturedProduct?.length || 0;
-  const totalAll = featuredCount + nonFeaturedCount;
+
+  //const featuredCount = data?.featuredProduct?.length || 0;
+
+  const filteredFeatured = (data?.featuredProduct || []).filter((product) =>
+    product.productName.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+ // const nonFeaturedCount = data?.nonFeaturedProduct?.length || 0;
+
+  const filteredNonFeatured = (data?.nonFeaturedProduct || []).filter(
+    (product) =>
+      product.productName.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+  const totalAll = filteredFeatured.length + filteredNonFeatured.length;
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
@@ -42,8 +55,8 @@ export const useShopProducts = () => {
   const isLoading =
     isFetching || deleteMutation.isPending || editMutation.isPending;
   return {
-    featuredProducts: data?.featuredProduct || [],
-    nonFeaturedProducts: data?.nonFeaturedProduct || [],
+    featuredProducts: filteredFeatured, 
+    nonFeaturedProducts: filteredNonFeatured,
     totalCount: data?.nonFeaturedTotal || 0,
     totalAll,
     isLoading,

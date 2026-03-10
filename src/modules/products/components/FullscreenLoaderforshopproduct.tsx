@@ -1,6 +1,6 @@
 
 
-import { Loader2, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 interface FullscreenLoaderProps {
   message?: string;
