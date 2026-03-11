@@ -73,7 +73,7 @@ export default function ShopProductCard({
         
           <div className="flex gap-2">
             <button
-              onClick={() => onEdit(product.productId)}
+              onClick={() => onEdit(product.productSlug)}
               className="p-2 text-blue-600 bg-blue-50 rounded-lg"
             >
               <Pencil size={18} />

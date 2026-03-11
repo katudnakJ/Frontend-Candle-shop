@@ -4,7 +4,7 @@ import Link from "next/link";
 interface ProductHeaderProps {
   mode?: "customerproducts" | "sellerproducs";
   namemode?: string;
-  isAddProduct?: boolean;
+  isAddEditProduct?: boolean;
   issellerProduct?:boolean;
 }
 
@@ -12,7 +12,7 @@ export function ProductHeader({
   mode = "customerproducts",
   namemode,
   issellerProduct= false,
-  isAddProduct = false,
+  isAddEditProduct = false,
 }: ProductHeaderProps) {
   const clickback = mode === "sellerproducs" ? "/sellerhome" : "/customerhome";
 
@@ -25,7 +25,7 @@ export function ProductHeader({
         </Link>
         }
 
-         {isAddProduct &&
+         {isAddEditProduct &&
         <Link href="/seller/sellerproducts">
           <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
         </Link>

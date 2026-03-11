@@ -7,6 +7,7 @@ export const useProductImages = (maxFiles = 3) => {
   const [inputKey, setInputKey] = useState(0);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
 
   const handleBoxClick = () => {
     if (fileInputRef.current) {
@@ -16,10 +17,18 @@ export const useProductImages = (maxFiles = 3) => {
   };
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+    const selectedFiles = Array.from(e.target.files || []);
+    const hasOversizedFile = selectedFiles.some(file => file.size > 2 * 1024 * 1024);
 
-    if (images.length + files.length > maxFiles) {
+    if (hasOversizedFile) {
+    toast.error("บางไฟล์มีขนาดเกิน 2MB กรุณาเลือกใหม่");
+    e.target.value = ""; 
+    return; 
+  }
+
+    if (selectedFiles.length === 0) return;
+
+    if (images.length + selectedFiles.length > maxFiles) {
       toast.error(`ลงรูปได้สูงสุด ${maxFiles} รูปครับ`, {
         className:
           "font-bold rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
@@ -36,7 +45,7 @@ export const useProductImages = (maxFiles = 3) => {
 
     try {
       const processedImages = await Promise.all(
-        files.map(async (file) => {
+        selectedFiles.map(async (file) => {
           const compressedFile = await imageCompression(
             file,
             compressionOptions,
@@ -73,7 +82,7 @@ export const useProductImages = (maxFiles = 3) => {
     setImages((prevImages) => {
 
         if(prevImages.length === 0)return[];
-        
+
       prevImages.forEach((img) => {
         if (img.preview.startsWith("blob:")) {
           console.log(
@@ -118,5 +127,6 @@ export const useProductImages = (maxFiles = 3) => {
     onFileChange,
     removeImage,
     resetAll,
+    setImages,
   };
 };

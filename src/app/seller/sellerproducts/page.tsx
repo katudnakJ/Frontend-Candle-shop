@@ -43,7 +43,7 @@ export default function SellerProducts() {
                   <h1 className="text-[12px] md:text-[16px] font-black font-prompt">
                     จำนวนสินค้า {totalAll} รายการ
                   </h1>
-                  <Link href="/seller/sellerproducts/addproducts">
+                  <Link href="/seller/sellerproducts/manageproducts/add">
                     <button className="flex items-center gap-2">
                       <span className="text-[12px] md:text-[16px]">
                         เพิ่มสินค้า

@@ -1,14 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useState, useEffect, useMemo } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon, Plus, X } from "lucide-react";
 import {
   productSchema,
   ProductFormValues,
-} from "@/modules/products/schemas/productSchema"; // เช็ค Path ให้ถูกนะครับ
+} from "@/modules/products/schemas/productSchema";
+
+import {
+  TextField,
+  Autocomplete,
+  Switch,
+  FormControlLabel,
+  Typography,
+} from "@mui/material";
 import { useProductImages } from "@/modules/products/hooks/useProductImages";
 import { toast } from "react-hot-toast";
 import SellerHeader from "@/components/layout/SellerHeader";
@@ -16,12 +24,20 @@ import Footer from "@/components/layout/Footer";
 import { ProductHeader } from "@/modules/products/components/ProductHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 
-export default function AddProductPage() {
+export default function ManageProductsPage() {
+  const router = useRouter();
+  const params = useParams();
+
+  const productSlug = params.slug;
+  const isEditMode = useMemo(
+    () => productSlug && productSlug !== "add",
+    [productSlug],
+  );
+
   const [isOpen, setIsOpen] = useState(false);
   const [tempData, setTempData] = useState<ProductFormValues | null>(null);
-
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(isEditMode);
 
   const {
     images,
@@ -32,11 +48,14 @@ export default function AddProductPage() {
     inputKey,
     isCompressing,
     resetAll,
+    setImages,
   } = useProductImages(3);
 
   const {
     register,
     handleSubmit,
+    reset,
+    control,
     formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -49,6 +68,61 @@ export default function AddProductPage() {
     },
   });
 
+  // ====================================================================
+  //   : ตรงนี้ รอเปลี่ยนไปใช้ Services API กับ  Interface ของ Product Detail
+  //   : Mock อันนี้ ใช้จำลองว่าเปลี่ยนหน้าไป  แก้ไขได้ก่อน
+  //   : ต้องมีช่อง กรอก slug ไหม
+  //   : อาจมีการกลับมาแก้ไข กรณีว่า กดแก้ไข แต่รูปไม่ได้แก้ไข จะต้องส่งกลับไปยังไงได้บ้าง
+  //      กรณีที่ 1: ส่ง Path URL เดิมกลับไปเลย
+  //      กรณีที่ 2: ไม่ส่งฟิลด์นี้กลับไปเลย
+  //      กรณีที่ 3: วิธี "ส่ง ImageID"
+  //      กรณีที่ 4: การใช้ Flag "Delete List"
+  // ====================================================================
+
+  useEffect(() => {
+    if (isEditMode && productSlug) {
+      const fetchInitialData = async () => {
+        if (!isEditMode) {
+          setIsLoadingData(false);
+          return;
+        }
+        try {
+          const mockData = {
+            productName: "สินค้าเดิมจากระบบ",
+            description: "รายละเอียดเดิม...",
+            weight: "1.5",
+            price: "500",
+            images: ["https://example.com/photo1.jpg"], // URL รูปเดิม
+          };
+
+          // ยัดข้อมูลใส่ฟอร์ม
+          reset({
+            productName: mockData.productName,
+            description: mockData.description,
+            weight: mockData.weight,
+            price: mockData.price,
+            isActive: true,
+          });
+
+          // ยัดรูปเดิมเข้า useProductImages Hook
+          if (mockData.images) {
+            const prevImages = mockData.images.map((url) => ({
+              file: new File([], "existing-file"), // สร้าง File หลอกไว้
+              preview: url,
+            }));
+            setImages(prevImages);
+          }
+        } catch (error) {
+          toast.error("ไม่สามารถโหลดข้อมูลสินค้าได้");
+          router.push("/seller/sellerproducts");
+        } finally {
+          setIsLoadingData(false);
+        }
+      };
+      fetchInitialData();
+    }
+  }, [isEditMode, productSlug, reset, setImages, router]);
+
   useEffect(() => {
     return () => resetAll();
   }, [resetAll]);
@@ -58,6 +132,13 @@ export default function AddProductPage() {
       toast.error("กรุณารอประมวลผลรูปภาพสักครู่");
       return;
     }
+
+    // images.forEach((imgObj) => {
+    //   if (imgObj.file.size > 2 * 1024 * 1024) {
+    //     return "กรุณาใช้ไฟล์ขนาดไม่เกิน 2MB";
+    //   }
+    // });
+
     if (images.length === 0) {
       toast.error("ต้องอัปโหลดรูปภาพสินค้าอย่างน้อย 1 รูป");
       return;
@@ -80,8 +161,16 @@ export default function AddProductPage() {
       });
 
       images.forEach((imgObj) => {
-        formData.append("images", imgObj.file);
+        if (imgObj.file.size > 0) {
+          formData.append("images", imgObj.file);
+        }
       });
+
+      const existingImages = images
+        .filter((img) => img.file.size === 0)
+        .map((img) => img.preview);
+
+      formData.append("existingImages", JSON.stringify(existingImages));
 
       console.log("🚀 ส่งข้อมูลสินค้าพร้อมรูปภาพ", images.length, "รูป");
 
@@ -98,7 +187,12 @@ export default function AddProductPage() {
       //   console.log("FormData as Object:", formProps);
       // await productService.create(formData);
 
-      toast.success("เพิ่มสินค้าสำเร็จ!");
+      if (isEditMode) {
+        toast.success("แก้ไขสินค้าสำเร็จ!");
+      } else {
+        toast.success("เพิ่มสินค้าสำเร็จ!");
+      }
+
       router.push("/seller/sellerproducts/");
       router.refresh();
     } catch (error) {
@@ -108,6 +202,15 @@ export default function AddProductPage() {
     }
   };
 
+  if (isLoadingData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        <p className="mt-4 font-bold">กำลังเตรียมข้อมูลสินค้า...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full min-h-screen bg-white">
       <SellerHeader />
@@ -115,8 +218,12 @@ export default function AddProductPage() {
         <div className="max-w-[1200px] mx-auto p-4">
           <ProductHeader
             mode="sellerproducs"
-            namemode="จัดการสินค้า / เพิ่มสินค้า"
-            isAddProduct={true}
+            namemode={
+              isEditMode
+                ? "จัดการสินค้า / แก้ไขสินค้า"
+                : "จัดการสินค้า / เพิ่มสินค้า"
+            }
+            isAddEditProduct={true}
           />
 
           <div className="max-w-md mx-auto pb-24">
@@ -163,8 +270,10 @@ export default function AddProductPage() {
                       className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-all"
                     >
                       <Plus size={24} className="text-gray-400" />
-                      <span className="text-[10px] font-bold text-gray-400 mt-1">
+                      <span className="text-[10px] font-bold text-gray-400 mt-1 text-center">
                         เพิ่มรูป
+                        <br />
+                        ขนาดไม่เกิน 2 MB
                       </span>
                     </div>
                   )}
@@ -174,7 +283,7 @@ export default function AddProductPage() {
                   type="file"
                   ref={fileInputRef}
                   onChange={onFileChange}
-                  accept="image/*"
+                  accept="image/png, image/jpeg, image/jpg"
                   multiple
                   className="hidden"
                 />
@@ -275,6 +384,49 @@ export default function AddProductPage() {
                 </div>
               </div>
 
+              {isEditMode && (
+                <div className="flex items-center gap-3 py-4 px-1 bg-gray-50 rounded-2xl mb-4">
+                  <Controller
+                    name="isActive"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <FormControlLabel
+                        className="ml-0"
+                        control={
+                          <Switch
+                            checked={value}
+                            onChange={(e) => onChange(e.target.checked)}
+                            color="success"
+                            sx={{
+                              "& .MuiSwitch-switchBase.Mui-checked": {
+                                color: "#4ADE80",
+                              },
+                              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                                {
+                                  backgroundColor: "#4ADE80",
+                                },
+                            }}
+                          />
+                        }
+                        label={
+                          <div className="flex flex-col ml-2">
+                            <Typography className="font-black text-sm font-prompt">
+                              สถานะการขาย:{" "}
+                              {value ? "เปิดใช้งาน" : "ปิดชั่วคราว"}
+                            </Typography>
+                            <Typography className="text-[10px] text-gray-500 font-prompt">
+                              {value
+                                ? "สินค้าจะแสดงบนหน้าร้านค้าตามปกติ"
+                                : "ลูกค้าจะไม่สามารถกดสั่งซื้อสินค้านี้ได้"}
+                            </Typography>
+                          </div>
+                        }
+                      />
+                    )}
+                  />
+                </div>
+              )}
+
               <div className=" bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 flex gap-10 max-w-md mx-auto">
                 <button
                   type="button"
@@ -290,8 +442,8 @@ export default function AddProductPage() {
                 >
                   {isSubmitting
                     ? "กำลังบันทึก..."
-                    : isCompressing
-                      ? "กำลังประมวลผลรูป..."
+                    : isEditMode
+                      ? "บันทึกการแก้ไข"
                       : "เพิ่มสินค้า"}
                 </button>
               </div>
@@ -304,10 +456,12 @@ export default function AddProductPage() {
         open={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={onSubmit}
-        title="ยืนยันการเพิ่มสินค้า"
+        title={isEditMode ? "ยืนยันการแก้ไขสินค้า" : "ยืนยันการเพิ่มสินค้า"}
         content={
           <div className="text-center space-y-2 py-2">
-            <p className="text-sm text-gray-500">คุณต้องการเพิ่มสินค้า</p>
+            <p className="text-sm text-gray-500">
+              คุณต้องการ{isEditMode ? "แก้ไข" : "เพิ่ม"}สินค้า
+            </p>
             <p className="text-xl font-black text-cprojectthree break-words px-4">
               {tempData?.productName}
             </p>
