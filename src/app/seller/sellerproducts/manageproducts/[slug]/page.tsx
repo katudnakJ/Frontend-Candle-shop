@@ -1,5 +1,8 @@
 "use client";
 
+import { ImageUploadSection } from "@/modules/products/components/ImageUploadForSellerSection";
+import { ProductFormFields } from "@/modules/products/components/ProductFormFieldsforseller";
+
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
@@ -35,9 +38,13 @@ export default function ManageProductsPage() {
   );
 
   const [isOpen, setIsOpen] = useState(false);
-  const [tempData, setTempData] = useState<ProductFormValues | null>(null);
+  const [isRMOpen, setIsRMOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(isEditMode);
+  const [tempData, setTempData] = useState<ProductFormValues | null>(null);
+  const [imageIndexToDelete, setImageIndexToDelete] = useState<number | null>(
+    null,
+  );
 
   const {
     images,
@@ -127,17 +134,11 @@ export default function ManageProductsPage() {
     return () => resetAll();
   }, [resetAll]);
 
-  const handleConfirm = (data: ProductFormValues) => {
+  const handleConfirmDetailForm = (data: ProductFormValues) => {
     if (isCompressing) {
       toast.error("กรุณารอประมวลผลรูปภาพสักครู่");
       return;
     }
-
-    // images.forEach((imgObj) => {
-    //   if (imgObj.file.size > 2 * 1024 * 1024) {
-    //     return "กรุณาใช้ไฟล์ขนาดไม่เกิน 2MB";
-    //   }
-    // });
 
     if (images.length === 0) {
       toast.error("ต้องอัปโหลดรูปภาพสินค้าอย่างน้อย 1 รูป");
@@ -146,6 +147,19 @@ export default function ManageProductsPage() {
     setTempData(data);
     setIsOpen(true);
   };
+
+  const handleAskRemove = (ID: number) => {
+    setImageIndexToDelete(ID);
+    setIsRMOpen(true);
+  };
+  const handleConfirmRemove = () => {
+    if (imageIndexToDelete != null) {
+      removeImage(imageIndexToDelete);
+      setImageIndexToDelete(null);
+    }
+    setIsRMOpen(false);
+  };
+
   const onSubmit = async () => {
     if (!tempData) return;
 
@@ -228,204 +242,28 @@ export default function ManageProductsPage() {
 
           <div className="max-w-md mx-auto pb-24">
             <form
-              onSubmit={handleSubmit(handleConfirm)}
+              onSubmit={handleSubmit(handleConfirmDetailForm)}
               className="p-6 space-y-8"
             >
-              <div className="space-y-3">
-                <label className="text-sm font-bold ml-1 text-black">
-                  รูปภาพสินค้า ({images.length}/3){" "}
-                  <span className="text-red-500">*</span>
-                </label>
-
-                <div className="grid grid-cols-3 gap-3">
-                  {/* แสดงรูปที่เลือกแล้ว */}
-                  {images.map((img, index) => (
-                    <div
-                      key={index}
-                      className="relative aspect-square rounded-2xl border-2 border-black overflow-hidden group"
-                    >
-                      <img
-                        src={img.preview}
-                        alt="preview"
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full border border-white shadow-lg"
-                      >
-                        <X size={14} />
-                      </button>
-                      {index === 0 && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] py-0.5 text-center font-bold">
-                          รูปหลัก
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {images.length < 3 && (
-                    <div
-                      onClick={handleBoxClick}
-                      className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-all"
-                    >
-                      <Plus size={24} className="text-gray-400" />
-                      <span className="text-[10px] font-bold text-gray-400 mt-1 text-center">
-                        เพิ่มรูป
-                        <br />
-                        ขนาดไม่เกิน 2 MB
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <input
-                  key={inputKey}
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={onFileChange}
-                  accept="image/png, image/jpeg, image/jpg"
-                  multiple
-                  className="hidden"
+              <section>
+                <ImageUploadSection
+                  images={images}
+                  onFileChange={onFileChange}
+                  removeImage={handleAskRemove}
+                  handleBoxClick={handleBoxClick}
+                  fileInputRef={fileInputRef}
+                  inputKey={inputKey}
                 />
-              </div>
+              </section>
 
-              <div className="space-y-5">
-                <div className="flex flex-col">
-                  <label className="text-sm font-bold ml-1 mb-1">
-                    ชื่อสินค้า
-                  </label>
-                  <input
-                    {...register("productName")}
-                    placeholder="เช่น เทียนหอม Soy Wax"
-                    className={`w-full p-3 border-2 rounded-xl outline-none transition-all ${
-                      errors.productName
-                        ? "border-red-500 bg-red-50"
-                        : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"
-                    }`}
-                  />
-                  {errors.productName && (
-                    <p className="text-red-500 text-xs mt-1 ml-1 font-medium">
-                      {errors.productName.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="text-sm font-bold ml-1 mb-1">
-                    รายละเอียดสินค้า
-                  </label>
-                  <textarea
-                    {...register("description")}
-                    rows={4}
-                    placeholder="คำอธิบายสินค้า เช่น ช่วยทำให้ผ่อนคลาย..."
-                    className={`w-full p-3 border-2 rounded-xl outline-none transition-all ${
-                      errors.description
-                        ? "border-red-500 bg-red-50"
-                        : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"
-                    }`}
-                  />
-                  {errors.description && (
-                    <p className="text-red-500 text-xs mt-1 ml-1 font-medium">
-                      {errors.description.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col">
-                    <label className="text-sm font-bold ml-1 mb-1">
-                      น้ำหนัก
-                    </label>
-                    <div className="relative">
-                      <input
-                        {...register("weight")}
-                        placeholder="0"
-                        className={`w-full p-3 border-2 rounded-xl pr-10 outline-none transition-all ${
-                          errors.weight
-                            ? "border-red-500 bg-red-50"
-                            : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"
-                        }`}
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xs pointer-events-none">
-                        Kg
-                      </span>
-                    </div>
-                    {errors.weight && (
-                      <p className="text-red-500 text-xs mt-1 ml-1 font-medium">
-                        {errors.weight.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label className="text-sm font-bold ml-1 mb-1">
-                      ราคา/ชิ้น
-                    </label>
-                    <div className="relative">
-                      <input
-                        {...register("price")}
-                        placeholder="0"
-                        className={`w-full p-3 border-2 rounded-xl pr-10 outline-none transition-all ${
-                          errors.price
-                            ? "border-red-500 bg-red-50"
-                            : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"
-                        }`}
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xs pointer-events-none">
-                        บาท
-                      </span>
-                    </div>
-                    {errors.price && (
-                      <p className="text-red-500 text-xs mt-1 ml-1 font-medium">
-                        {errors.price.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {isEditMode && (
-                <div className="flex items-center gap-3 py-4 px-1 bg-gray-50 rounded-2xl mb-4">
-                  <Controller
-                    name="isActive"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <FormControlLabel
-                        className="ml-0"
-                        control={
-                          <Switch
-                            checked={value}
-                            onChange={(e) => onChange(e.target.checked)}
-                            color="success"
-                            sx={{
-                              "& .MuiSwitch-switchBase.Mui-checked": {
-                                color: "#4ADE80",
-                              },
-                              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                {
-                                  backgroundColor: "#4ADE80",
-                                },
-                            }}
-                          />
-                        }
-                        label={
-                          <div className="flex flex-col ml-2">
-                            <Typography className="font-black text-sm font-prompt">
-                              สถานะการขาย:{" "}
-                              {value ? "เปิดใช้งาน" : "ปิดชั่วคราว"}
-                            </Typography>
-                            <Typography className="text-[10px] text-gray-500 font-prompt">
-                              {value
-                                ? "สินค้าจะแสดงบนหน้าร้านค้าตามปกติ"
-                                : "ลูกค้าจะไม่สามารถกดสั่งซื้อสินค้านี้ได้"}
-                            </Typography>
-                          </div>
-                        }
-                      />
-                    )}
-                  />
-                </div>
-              )}
+              <section>
+                <ProductFormFields
+                  register={register}
+                  errors={errors}
+                  control={control}
+                  isEditMode={!!isEditMode}
+                />
+              </section>
 
               <div className=" bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 flex gap-10 max-w-md mx-auto">
                 <button
@@ -471,6 +309,20 @@ export default function ManageProductsPage() {
           </div>
         }
         variant="primary"
+      />
+      <ConfirmDialog
+        open={isRMOpen}
+        onClose={() => setIsRMOpen(false)}
+        onConfirm={handleConfirmRemove}
+        title={"ยืนยันการลบรูปภาพสินค้า"}
+        content={
+          <div className="text-center space-y-2 py-2">
+            <p className="text-sm text-gray-500">คุณต้องการลบรูปภาพสินค้า</p>
+
+            <p className="text-sm text-gray-500">ใช่หรือไม่?</p>
+          </div>
+        }
+        variant="danger"
       />
     </div>
   );

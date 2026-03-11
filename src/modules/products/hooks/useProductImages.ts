@@ -102,6 +102,8 @@ export const useProductImages = (maxFiles = 3) => {
     setImages((prev) => {
 
       if (index < 0 || index >= prev.length) return prev;
+      
+        
 
       const targetImage = prev[index];
       const updated = [...prev];
