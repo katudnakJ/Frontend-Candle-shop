@@ -57,7 +57,7 @@ export default function ShoppingCartPage() {
 
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
-          <CartHeader itemCount={items.length} />
+          <CartHeader itemCount={items.length} isShopingcart={true}/>
 
           {items.length > 0 && (
             <div className="mb-4 flex items-center gap-2 px-2">

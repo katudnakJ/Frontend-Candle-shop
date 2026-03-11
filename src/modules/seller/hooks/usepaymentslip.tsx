@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { PaymentService } from "../services/payment.service";
 import { toast } from "react-hot-toast";
 import imageCompression from "browser-image-compression";
@@ -11,6 +11,21 @@ export const usePaymentSlip = (
   const [fileError, setFileError] = useState(false);
   const [inputKey, setInputKey] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const revokePreview = useCallback((url: string | null) => {
+    if (url && url.startsWith("blob:")) {
+      console.log(
+        `%c[RAM Released] %cRevoking Slip: ${url}`,
+        "color: red; font-weight: bold;",
+        "color: inherit;",
+      );
+      URL.revokeObjectURL(url);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => revokePreview(slipPreview);
+  }, [slipPreview, revokePreview]);
 
   const handleBoxClick = () => {
     if (fileInputRef.current) {
@@ -37,8 +52,7 @@ export const usePaymentSlip = (
         },
       );
       setFileError(true);
-      setSlipPreview(null);
-      onFileSelect(null);
+      resetFile();
       return;
     }
 
@@ -50,13 +64,20 @@ export const usePaymentSlip = (
     };
     try {
       const compressedFile = await imageCompression(file, options);
+      const finalFile = new File([compressedFile], file.name, {
+        type: file.type,
+      });
 
-      onFileSelect(compressedFile);
+      onFileSelect(finalFile);
 
-      if (slipPreview && slipPreview.startsWith("blob:")) {
-        URL.revokeObjectURL(slipPreview);
-      }
-      const previewUrl = URL.createObjectURL(compressedFile);
+      revokePreview(slipPreview);
+
+      const previewUrl = URL.createObjectURL(finalFile);
+      console.log(
+        `%c[RAM Allocated] %cCreated Slip Preview: ${file.name}`,
+        "color: green; font-weight: bold;",
+        "color: inherit;",
+      );
       setSlipPreview(previewUrl);
     } catch (error) {
       console.error("Compression failed:", error);
@@ -68,11 +89,14 @@ export const usePaymentSlip = (
     }
   };
 
-  const resetFile = () => {
-    setSlipPreview(null);
+const resetFile = useCallback(() => {
+    setSlipPreview((prev) => {
+      revokePreview(prev); // ล้างค่าจาก state ล่าสุดตรงนี้เลย
+      return null;
+    });
     onFileSelect(null);
     setFileError(false);
-  };
+  }, [onFileSelect, revokePreview]);
 
   return {
     slipPreview,

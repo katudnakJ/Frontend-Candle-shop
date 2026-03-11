@@ -1,6 +1,7 @@
 "use client";
 
 //import { Product } from "@/modules/products/types";
+
 import { useState } from "react";
 import { ProductHomeItem } from "@/modules/products/homeproduct";
 import { ShoppingCart } from "lucide-react";

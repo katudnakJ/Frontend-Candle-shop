@@ -3,12 +3,12 @@ import Link from "next/link";
 
 interface OrderHeaderProps {
   mode?: "customerorders" | "sellerorders";
+  namemode?:string
 }
 
-export function OrderHeader ({ mode = "customerorders" }: OrderHeaderProps) {
+export function OrderHeader ({ mode = "customerorders" , namemode}: OrderHeaderProps) {
   const clickback = mode === "sellerorders" ? "/sellerhome" : "/customerhome"
-   const primarylabel = mode === "sellerorders" ? "จัดการคำสั่งซื้อ" : "ประวัติคำสั่งซื้อ"
-
+   
    return(
   <div className="flex items-center gap-2 mb-6">
     <div className="flex items-center">
@@ -17,7 +17,7 @@ export function OrderHeader ({ mode = "customerorders" }: OrderHeaderProps) {
       </Link>
       <span>
         <p className="text-xl md:text-2xl font-black text-black">
-          {primarylabel}
+          {namemode}
         </p>
       </span>
     </div>

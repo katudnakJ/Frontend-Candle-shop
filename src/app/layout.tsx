@@ -43,18 +43,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} ${k2d.variable} antialiased overflow-x-hidden`}
       >
         <QueryProvider>
-          {/* <Toaster
-            position={toastPosition}
-            toastOptions={{
-            
-              className: "font-bold border-2 border-black rounded-xl shadow-lg",
-              duration: 3000,
-             
-              success: {
-                className: "bg-white border-cprojectone text-black h-20 px-6",
-              },
-            }}
-          /> */}
           {children}
           <ToastProvider />
         </QueryProvider>

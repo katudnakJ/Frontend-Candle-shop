@@ -10,7 +10,7 @@ export const ToastProvider = () => {
     <Toaster
       position={toastPosition}
       toastOptions={{
-        // ใส่สไตล์ที่คุณต้องการให้เป็นค่าเริ่มต้นทุกตัวที่นี่
+       
         className: "bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
         duration: 3000,
       }}

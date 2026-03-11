@@ -42,7 +42,7 @@ export default function SellerHome() {
 
               <section>
             <Link
-                  href="/seller/products"
+                  href="/seller/sellerproducts"
                   className="flex items-center justify-center gap-4 bg-[#FDF8F1] border border-black rounded-2xl p-8 
              hover:bg-yellow-50 hover:-translate-y-1 hover:shadow-xl 
              transition-all duration-300 shadow-sm group active:scale-95"
