@@ -1,6 +1,7 @@
 // components/seller/ProductList.tsx
 "use client";
 
+import { useState } from "react";
 import { Package, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useShopProducts } from "@/modules/products/hooks/useShopProducts";
@@ -8,20 +9,39 @@ import { useShopProductStore } from "@/modules/products/hooks/useShopProductStor
 import { Skeleton } from "@mui/material";
 import ShopProductCard from "./ShopProductCard";
 import FullscreenLoader from "@/modules/products/components/FullscreenLoaderforshopproduct";
+import toast from "react-hot-toast";
+import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 
 export default function ShopProductList() {
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+
   const router = useRouter();
-  const {
-    featuredProducts,
-    nonFeaturedProducts,
-    isLoading,
-    deleteProduct,
-  } = useShopProducts();
+  const { featuredProducts, nonFeaturedProducts, isLoading, deleteProduct } =
+    useShopProducts();
 
   const searchQuery = useShopProductStore((state) => state.searchQuery);
 
   const handleEditRedirect = (productSlug: string) => {
-   router.push(`/seller/sellerproducts/manageproducts/${productSlug}`)
+    router.push(`/seller/sellerproducts/manageproducts/${productSlug}`);
+  };
+
+  const handleDelete = (id: string) => {
+    setProductToDelete(id);
+    setIsDeleteOpen(true);
+  };
+  const confirmDeleteProduct = async () => {
+    if (productToDelete) {
+      try {
+        await deleteProduct(productToDelete); // เรียกใช้ deleteProduct จาก hook
+       console.log("ลบสินค้าสำเร็จ");
+      } catch (error) {
+        toast.error("ไม่สามารถลบสินค้าได้");
+      } finally {
+        setIsDeleteOpen(false);
+        setProductToDelete(null);
+      }
+    }
   };
 
   if (isLoading) {
@@ -69,11 +89,7 @@ export default function ShopProductList() {
                   key={product.productId}
                   product={product}
                   isFeatured={true} //
-                  onDelete={(id) => {
-                    if (window.confirm("คุณแน่ใจหรือไม่ที่จะลบสินค้านี้?")) {
-                      deleteProduct(id);
-                    }
-                  }}
+                  onDelete={(id) => handleDelete(id)}
                   onEdit={(slug) => handleEditRedirect(slug)}
                 />
               ))}
@@ -90,11 +106,7 @@ export default function ShopProductList() {
               <ShopProductCard
                 key={product.productId}
                 product={product}
-                onDelete={(id) => {
-                  if (window.confirm("คุณแน่ใจหรือไม่ที่จะลบสินค้านี้?")) {
-                    deleteProduct(id);
-                  }
-                }}
+                onDelete={(id) => handleDelete(id)}
                 onEdit={(id) => handleEditRedirect(id)}
               />
             ))}
@@ -116,6 +128,23 @@ export default function ShopProductList() {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={confirmDeleteProduct}
+        title="ยืนยันการลบสินค้า"
+        content={
+          <div className="text-center py-2">
+            <p className="text-sm text-gray-500">
+              คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?
+            </p>
+            <p className="text-xs text-red-400 mt-1">
+              *การดำเนินการนี้ไม่สามารถย้อนกลับได้
+            </p>
+          </div>
+        }
+        variant="danger"
+      />
     </>
   );
 }

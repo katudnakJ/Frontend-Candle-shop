@@ -28,7 +28,7 @@ export const ProductFormFields = ({
           <input
             {...register("productName")}
             placeholder="เช่น เทียนหอม Soy Wax"
-            className={`w-full p-3 border-2 rounded-xl outline-none transition-all ${
+            className={`w-full p-3 max-[440px]:text-[12px] border-2 rounded-xl outline-none transition-all ${
               errors.productName
                 ? "border-red-500 bg-red-50"
                 : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"
@@ -42,14 +42,14 @@ export const ProductFormFields = ({
         </div>
 
         <div className="flex flex-col">
-          <label className="text-sm font-bold ml-1 mb-1">
+          <label className="text-sm  font-bold ml-1 mb-1">
             รายละเอียดสินค้า
           </label>
           <textarea
             {...register("description")}
             rows={4}
             placeholder="คำอธิบายสินค้า เช่น ช่วยทำให้ผ่อนคลาย..."
-            className={`w-full p-3 border-2 rounded-xl outline-none transition-all ${
+            className={`w-full p-3 max-[440px]:text-[12px] border-2 rounded-xl outline-none transition-all ${
               errors.description
                 ? "border-red-500 bg-red-50"
                 : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"
@@ -69,7 +69,7 @@ export const ProductFormFields = ({
               <input
                 {...register("weight")}
                 placeholder="0"
-                className={`w-full p-3 border-2 rounded-xl pr-10 outline-none transition-all ${
+                className={`w-full p-3 max-[440px]:text-[12px] border-2 rounded-xl pr-10 outline-none transition-all ${
                   errors.weight
                     ? "border-red-500 bg-red-50"
                     : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"
@@ -92,7 +92,7 @@ export const ProductFormFields = ({
               <input
                 {...register("price")}
                 placeholder="0"
-                className={`w-full p-3 border-2 rounded-xl pr-10 outline-none transition-all ${
+                className={`w-full p-3 max-[440px]:text-[12px] border-2 rounded-xl pr-10 outline-none transition-all ${
                   errors.price
                     ? "border-red-500 bg-red-50"
                     : "border-black focus:bg-cprojecttwo focus:ring-2 focus:ring-black/5"

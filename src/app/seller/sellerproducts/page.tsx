@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import { ProductHeader } from "@/modules/products/components/ProductHeader";
@@ -12,6 +13,7 @@ import Link from "next/link";
 export default function SellerProducts() {
   const { searchQuery, setSearchQuery } = useShopProductStore();
   const { totalAll, isLoading } = useShopProducts();
+
 
 
   return (

@@ -60,7 +60,7 @@ export const ImageUploadSection = ({
             className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-all"
           >
             <Plus size={24} className="text-gray-400" />
-            <span className="text-[10px] font-bold text-gray-400 mt-1 text-center">
+            <span className="text-[10px] max-[440px]:text-[9px] font-bold text-gray-400 mt-1 text-center">
               เพิ่มรูป <br /> ขนาดไม่เกิน 2 MB
             </span>
           </div>

@@ -61,7 +61,7 @@ export const useShopProducts = () => {
     totalAll,
     isLoading,
     isError,
-    deleteProduct: deleteMutation.mutate,
+    deleteProduct: deleteMutation.mutateAsync,
     editProduct: editMutation.mutate,
     isDeleting: deleteMutation.isPending,
     isEditing: editMutation.isPending,
