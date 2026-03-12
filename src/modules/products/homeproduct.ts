@@ -10,7 +10,7 @@ export interface ProductHomeItem {
 }
 
 export interface ProductHomeData {
-  featuredProduct: ProductHomeItem[];
-  nonFeaturedProduct: ProductHomeItem[];
-  nonFeaturedTotal: number;
+  allProducts: ProductHomeItem[];     
+  featuredProducts: ProductHomeItem[];
+  totalProducts: number;              
 }

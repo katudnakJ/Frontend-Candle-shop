@@ -1,7 +1,7 @@
 import { ProductHomeData } from "@/modules/products/homeproduct";
 export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
  
-  featuredProduct: [
+  featuredProducts: [
     {
       productId: "prod-001",
       productName: "เทียนหอมกลิ่น Vanilla Dream",
@@ -25,7 +25,7 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
   ],
 
   // สินค้าทั่วไป (Non-Featured)
-  nonFeaturedProduct: [
+  allProducts: [
     {
       productId: "prod-003",
       productName: "เทียนหอมกลิ่น  Jasmine",
@@ -67,5 +67,5 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
       productSlug: "waterproof-backpack-20l"
     }
   ],
-  nonFeaturedTotal: 4 
+  totalProducts: 4 
 };

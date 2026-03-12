@@ -22,17 +22,17 @@ export const useShopProducts = () => {
 
   //const featuredCount = data?.featuredProduct?.length || 0;
 
-  const filteredFeatured = (data?.featuredProduct || []).filter((product) =>
+  const filteredFeatured = (data?.featuredProducts || []).filter((product) =>
     product.productName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
  // const nonFeaturedCount = data?.nonFeaturedProduct?.length || 0;
 
-  const filteredNonFeatured = (data?.nonFeaturedProduct || []).filter(
+  const filteredallproduct = (data?.allProducts|| []).filter(
     (product) =>
       product.productName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  const totalAll = filteredFeatured.length + filteredNonFeatured.length;
+  const totalAll = filteredFeatured.length + filteredallproduct.length;
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
@@ -56,8 +56,8 @@ export const useShopProducts = () => {
     isFetching || deleteMutation.isPending || editMutation.isPending;
   return {
     featuredProducts: filteredFeatured, 
-    nonFeaturedProducts: filteredNonFeatured,
-    totalCount: data?.nonFeaturedTotal || 0,
+    nonFeaturedProducts: filteredallproduct,
+    totalCount: data?.totalProducts || 0,
     totalAll,
     isLoading,
     isError,
