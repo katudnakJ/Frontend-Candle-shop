@@ -12,6 +12,7 @@ import { ProductHomeData } from "@/modules/products/homeproduct";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(0);
+  const [sortBy, setSortBy] = useState<string>("default");
   const productSectionRef = useRef<HTMLDivElement>(null);
   const pageSize = 4;
   const { data, isLoading, isError } = useGetAllProducts(
@@ -24,35 +25,36 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // ถ้ามีการเปลี่ยนหน้า และเรามีตำแหน่งอ้างอิง
+  
     if (productSectionRef.current) {
       productSectionRef.current.scrollIntoView({
-        behavior: "smooth", // เลื่อนแบบนุ่มนวล
-        block: "start", // ให้ขอบบนของโซนนี้อยู่บนสุดของจอ
+        behavior: "smooth",
+        block: "start", 
       });
     }
   }, [currentPage]);
 
-   const ProductSkeleton = () => (
-  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-pulse">
-    {[...Array(4)].map((_, i) => (
-      <div key={i} className="space-y-3">
-        <div className="bg-gray-200 h-48 w-full rounded-2xl"></div>
-        <div className="bg-gray-200 h-4 w-3/4 rounded"></div>
-        <div className="bg-gray-200 h-4 w-1/2 rounded"></div>
-      </div>
-    ))}
-  </div>
-);
   // API : Get Products (All products)
   const productData = data?.data || data;
   const allProducts = (productData as ProductHomeData)?.allProducts || [];
-  const recommendedItems = (productData as ProductHomeData)?.featuredProducts || [];
-  const totalItem = (productData as ProductHomeData)?.totalProducts
+  const recommendedItems =
+    (productData as ProductHomeData)?.featuredProducts || [];
+  const totalItem = (productData as ProductHomeData)?.totalProducts;
   const totalPages = totalItem > 0 ? Math.ceil(totalItem / pageSize) : 1;
 
   //const allProducts = [...recommendedItems, ...nonFeaturedItems];
   //(recommendedItems.length || 0) + (productData?.nonFeaturedTotal || 0);
+
+  const sortedProducts = [...allProducts].sort((a, b) => {
+    if (sortBy === "priceLowHigh") return a.price - b.price;
+    if (sortBy === "priceHighLow") return b.price - a.price;
+    if (sortBy === "newest")
+      return (
+        new Date(b.productCreatedDate).getTime() -
+        new Date(a.productCreatedDate).getTime()
+      );
+    return 0; 
+  });
 
   console.log("Check Structure:", data);
   console.log("Check productDat:", productData);
@@ -126,18 +128,26 @@ export default function Home() {
                       จำนวนทั้งหมด {totalItem} ชิ้น
                     </p>
                     <button
-                      className=" p-2 border bg-cprojectone border-black rounded-xl 
-              cursor-pointer 
-              hover:translate-y-1 
-              transition-all duration-300
-              "
+                     
                     >
-                      <ListFilter size={14} className="text-black" />
+                      <div className="flex items-center gap-2">
+                        
+                        <select
+                          value={sortBy}
+                          onChange={(e) => setSortBy(e.target.value)}
+                          className="p-2 border-2 border-black rounded-xl bg-cprojectone text-sm cursor-pointer outline-none hover:translate-y-1 transition-all duration-300"
+                        >
+                          <option value="default">ค่าเริ่มต้น</option>
+                          <option value="priceLowHigh">ราคา: น้อยไปมาก</option>
+                          <option value="priceHighLow">ราคา: มากไปน้อย</option>
+                          <option value="newest">ใหม่ล่าสุด</option>
+                        </select>
+                      </div>
                     </button>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {allProducts.map((item) => (
+                    {sortedProducts.map((item) => (
                       <ProductCard key={item.productId} product={item} />
                     ))}
                   </div>
