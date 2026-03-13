@@ -39,6 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} ${k2d.variable} antialiased overflow-x-hidden`}
       >

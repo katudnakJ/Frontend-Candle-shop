@@ -11,9 +11,10 @@ import Link from "next/link";
 interface ProductCardProps {
   product: ProductHomeItem;
   isRecommended?: boolean;
+  priority?: boolean;
 }
 
-const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
+const ProductCard = ({ product, isRecommended = false, priority = false }: ProductCardProps) => {
   //const displayImage =
 
   //   product.images?.find((img) => img.is_primary)?.product_img_slug ||
@@ -35,8 +36,8 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
       ? product.productImgPath
       : "/placeholder-image.svg";
   const imgSrc = isError ? "/placeholder-image.svg" : initialImage;
-  console.log("PICProductPath: " + product.productImgPath);
-  console.log("Full Product Object:", product);
+  //console.log("PICProductPath: " + product.productImgPath);
+ // console.log("Full Product Object:", product);
   return (
     <Link href={`/product/${product.productSlug}`}>
       <div
@@ -55,7 +56,7 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
               unoptimized
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
-              priority={isRecommended}
+              priority={priority}
               onError={() => setIsError(true)}
             />
           </div>
