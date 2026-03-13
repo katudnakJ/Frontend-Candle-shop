@@ -17,11 +17,11 @@ export const getShopProducts = async (): Promise<ProductHomeData> => {
 export const deleteProduct = async (productId: string) => {
   console.log(`Deleting product: ${productId}`);
   localMockData = {
-    ...localMockData, // แตกค่าเดิมออกมา
-    featuredProduct: localMockData.featuredProduct.filter(
+    ...localMockData, 
+    featuredProducts: localMockData.featuredProducts.filter(
       (p) => p.productId !== productId,
     ),
-    nonFeaturedProduct: localMockData.nonFeaturedProduct.filter(
+    allProducts: localMockData.allProducts.filter(
       (p) => p.productId !== productId,
     ),
   };

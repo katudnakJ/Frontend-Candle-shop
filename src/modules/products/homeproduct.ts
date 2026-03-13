@@ -10,7 +10,12 @@ export interface ProductHomeItem {
 }
 
 export interface ProductHomeData {
-  featuredProduct: ProductHomeItem[];
-  nonFeaturedProduct: ProductHomeItem[];
-  nonFeaturedTotal: number;
+  allProducts: ProductHomeItem[];
+  endAt: number;
+  featuredProducts: ProductHomeItem[];
+  hasNext: boolean;
+  page: number;
+  size: number;
+  startAt: number;
+  totalProducts: number;
 }

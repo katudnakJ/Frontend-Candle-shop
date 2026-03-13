@@ -2,7 +2,7 @@
 
 //import { Product } from "@/modules/products/types";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { ProductHomeItem } from "@/modules/products/homeproduct";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
@@ -11,9 +11,10 @@ import Link from "next/link";
 interface ProductCardProps {
   product: ProductHomeItem;
   isRecommended?: boolean;
+  priority?: boolean;
 }
 
-const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
+const ProductCard = ({ product, isRecommended = false, priority = false }: ProductCardProps) => {
   //const displayImage =
 
   //   product.images?.find((img) => img.is_primary)?.product_img_slug ||
@@ -29,11 +30,14 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
   //   }
   //   return slug;
   // };
-  const initialImage = product.productImgPath || "/placeholder-image.svg";
   const [isError, setIsError] = useState(false);
+  const initialImage =
+    product.productImgPath && product.productImgPath.trim() !== ""
+      ? product.productImgPath
+      : "/placeholder-image.svg";
   const imgSrc = isError ? "/placeholder-image.svg" : initialImage;
-  console.log("PICProductPath: " + product.productImgPath);
-  console.log("Full Product Object:", product)
+  //console.log("PICProductPath: " + product.productImgPath);
+ // console.log("Full Product Object:", product);
   return (
     <Link href={`/product/${product.productSlug}`}>
       <div
@@ -47,12 +51,12 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
           <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-50">
             <Image
               src={imgSrc}
-              alt={product.productName}
+              alt={product.productName || "Product Image"}
               fill
               unoptimized
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
-              priority={isRecommended}
+              priority={priority}
               onError={() => setIsError(true)}
             />
           </div>
@@ -72,10 +76,16 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
               </p>
             </div>
             {!isRecommended && (
-              <button className="p-2 border border-black rounded-lg hover:bg-gray-50 transition-colors">
+              <button
+                className="p-2 border border-black rounded-lg hover:bg-black hover:text-white transition-all group/btn"
+                onClick={(e) => {
+                  e.preventDefault(); 
+                  // ใส่ Logic Add to Cart ตรงนี้
+                }}
+              >
                 <ShoppingCart
                   size={18}
-                  className="text-black hover:text-yellow-500 transition-colors"
+                  className="text-black group-hover/btn:text-white transition-colors"
                 />
               </button>
             )}
@@ -86,4 +96,4 @@ const ProductCard = ({ product, isRecommended = false }: ProductCardProps) => {
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard);

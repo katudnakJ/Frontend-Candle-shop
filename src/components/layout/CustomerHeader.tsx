@@ -24,6 +24,7 @@ const Header = () => {
         <div className="flex items-center">
           <Link
             href="/customerhome"
+            
             className="flex items-center gap-2 text-base font-medium text-black hover:text-yellow-500 transition-colors"
           >
             <Home className="w-10 h-10 md:w-11 md:h-11 text-black" />
