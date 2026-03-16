@@ -69,7 +69,7 @@ export default function PaymentPage() {
     fetchSellerData();
   }, []);
 
-  // อีกหน่อยปรับเป็นเรียกจาก api ไม่ก็เก็บใน zunstand และ ต้องเพิ่มกัน เช็คว่า orderID ใช่ของลูกค้าคนนี้ไหม 
+  // อีกหน่อยปรับเป็นเรียกจาก api ไม่ก็เก็บใน zustand และ ต้องเพิ่มกัน เช็คว่า orderID ใช่ของลูกค้าคนนี้ไหม 
   useEffect(() => {
     if (mode === "repay" && orderId) {
       console.log("Fetching order:", orderId);

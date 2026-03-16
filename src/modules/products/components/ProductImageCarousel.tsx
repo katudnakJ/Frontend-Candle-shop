@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useState} from "react";
-import { ProductImage } from "@/modules/products/types";
+import { ProductDetailImage } from "@/modules/products/detailproduct";
 
 
-function CarouselImage({ img, index }: { img: ProductImage; index: number }) {
-  const [imgSrc, setImgSrc] = useState(img.product_img_slug || "/placeholder-image.svg");
+function CarouselImage({ img, index }: { img: ProductDetailImage ; index: number }) {
+  const [imgSrc, setImgSrc] = useState(img.productImgPath || "/placeholder-image.svg");
 
   return (
     <div className="relative w-full h-full flex-shrink-0 snap-center">
@@ -23,10 +23,10 @@ function CarouselImage({ img, index }: { img: ProductImage; index: number }) {
 }
 
 
-export default function ProductImageCarousel({ images }: { images: ProductImage[] }) {
+export default function ProductImageCarousel({ images }: { images: ProductDetailImage[] }) {
   const sortedImages = [...images].sort((a, b) => {
-    if (a.is_primary && !b.is_primary) return -1;
-    if (!a.is_primary && b.is_primary) return 1;
+    if (a.isPrimary && !b.isPrimary) return -1;
+    if (!a.isPrimary && b.isPrimary) return 1;
     return 0;
   });
 
@@ -36,7 +36,7 @@ export default function ProductImageCarousel({ images }: { images: ProductImage[
         <div className="flex w-full h-full overflow-x-auto snap-x snap-mandatory custom-scrollbar">
           {sortedImages.map((img, index) => (
             
-            <CarouselImage key={img.product_img_id || index} img={img} index={index} />
+            <CarouselImage key={img.productImgId|| index} img={img} index={index} />
           ))}
         </div>
         

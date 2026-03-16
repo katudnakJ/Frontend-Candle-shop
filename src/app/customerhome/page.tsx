@@ -1,19 +1,21 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useGetAllProducts } from "@/modules/products/hooks/useGetAllProducts";
-import ProductCard from "@/modules/products/components/ProductCard";
-import Header from "@/components/layout/CustomerHeader";
-import Footer from "@/components/layout/Footer";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ListFilter, ChevronLeft, ChevronRight } from "lucide-react";
-import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
+
 import { GenericResponse } from "@/types/response.type";
 import { ProductHomeData } from "@/modules/products/homeproduct";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useGetAllProducts, usePrefetchHomeProducts } from "@/modules/products/hooks/useGetAllProducts";
 
-import { usePrefetchHomeProducts } from "@/modules/products/hooks/usePrefetchHomeProducts";
 import { AllProductSkeleton } from "@/modules/products/components/AllProductSkeleton";
 import { RecommendedProductSkeleton } from "@/modules/products/components/RecommendedProductSkeleton";
+
+import Header from "@/components/layout/CustomerHeader";
+import Footer from "@/components/layout/Footer";
+import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
+import ProductCard from "@/modules/products/components/ProductCard";
+
 
 export default function Home() {
   const router = useRouter();
