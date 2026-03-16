@@ -4,7 +4,7 @@ export interface ProductHomeItem {
   price: number;
   isActive: boolean;
   productCreatedDate: string;
-  totalSelled: number;
+  totalSold: number;
   productImgPath: string;
   productSlug: string;
 }

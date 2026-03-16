@@ -74,7 +74,7 @@ const ProductCard = ({ product, isRecommended = false, priority = false }: Produ
               <p className="text-red-500 font-bold text-lg">฿{product.price}</p>
 
               <p className="text-gray-400 text-xs mt-1">
-                ขายแล้ว {product.totalSelled}
+                ขายแล้ว {product.totalSold || 0 } 
               </p>
             </div>
             {!isRecommended && (

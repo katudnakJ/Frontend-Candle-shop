@@ -1,4 +1,5 @@
 import { ProductHomeData } from "@/modules/products/homeproduct";
+
 export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
   featuredProducts: [
     {
@@ -7,7 +8,7 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
       price: 350,
       isActive: true,
       productCreatedDate: "2026-01-15T08:30:00Z",
-      totalSelled: 1540,
+      totalSold: 1540,
       productImgPath:
         "https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6",
       productSlug: "vanilla-dream",
@@ -18,7 +19,7 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
       price: 1290,
       isActive: true,
       productCreatedDate: "2026-02-01T10:00:00Z",
-      totalSelled: 850,
+      totalSold: 850,
       productImgPath:
         "https://images.unsplash.com/photo-1596433809252-260c2745dfdd",
       productSlug: "midnight-jasmine",
@@ -33,7 +34,7 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
       price: 199,
       isActive: true,
       productCreatedDate: "2026-02-10T14:20:00Z",
-      totalSelled: 320,
+      totalSold: 320,
       productImgPath:
         "https://images.unsplash.com/photo-1605651202774-7d573fd3f12d",
       productSlug: "jasmine",
@@ -44,7 +45,7 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
       price: 150,
       isActive: true,
       productCreatedDate: "2026-02-12T09:15:00Z",
-      totalSelled: 2100,
+      totalSold: 2100,
       productImgPath: "", // เคสไม่มีรูปเพื่อทดสอบ Placeholder
       productSlug: "no-show-socks-pack-3",
     },
@@ -54,7 +55,7 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
       price: 450,
       isActive: false, // เคสสินค้าปิดการใช้งาน หรือซ่อนอยู่
       productCreatedDate: "2025-12-20T11:45:00Z",
-      totalSelled: 45,
+      totalSold: 45,
       productImgPath:
         "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500",
       productSlug: "plaid-short-sleeve-shirt",
@@ -65,7 +66,7 @@ export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
       price: 890,
       isActive: true,
       productCreatedDate: "2026-03-01T16:00:00Z",
-      totalSelled: 120,
+      totalSold: 120,
       productImgPath:
         "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500",
       productSlug: "waterproof-backpack-20l",
