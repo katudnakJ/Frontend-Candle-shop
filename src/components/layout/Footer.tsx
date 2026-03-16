@@ -23,7 +23,7 @@ const Footer = () => {
 
             <div className="flex items-center gap-2 mr-auto">
               <p className="text-black  text-xs md:text-sm ">
-                <Link href="https://www.facebook.com/" target="_blank">
+                <Link href="https://www.facebook.com/candlemoji" target="_blank">
                   Facebook: {shopname}
                 </Link>
               </p>

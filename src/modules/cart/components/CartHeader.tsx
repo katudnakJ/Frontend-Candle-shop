@@ -9,11 +9,13 @@ export const CartHeader = ({
   isShopingcart = false,
   isCheckout = false,
   isRepay = false,
+  isDetailProduct = false,
 }: {
-  itemCount: number;
+  itemCount?: number;
   isShopingcart?: boolean;
   isCheckout?: boolean;
   isRepay?: boolean;
+  isDetailProduct?: boolean;
 }) => {
   const [backUrl, setBackUrl] = useState("/customerhome");
 
@@ -64,6 +66,18 @@ export const CartHeader = ({
           </Link>
           <h1 className="text-xl md:text-2xl font-black text-black truncate max-w-[200px] md:max-w-none">
             รถเข็นของฉัน ({itemCount})
+          </h1>
+        </div>
+      )}
+
+
+      {isDetailProduct && (
+        <div className="flex items-center">
+          <Link href={backUrl}>
+            <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
+          </Link>
+          <h1 className="text-xl md:text-2xl font-black text-black truncate max-w-[200px] md:max-w-none">
+           รายละเอียดสินค้า
           </h1>
         </div>
       )}

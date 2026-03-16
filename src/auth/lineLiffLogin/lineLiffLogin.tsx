@@ -4,19 +4,33 @@ import Image from "next/image";
 import LoadingScreen from "@/components/Loading/LoadingScreen";
 import useLiffLogin from "./lineLiffLogin.hook";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
+import { useEffect } from "react"; 
+import { useRouter, } from "next/navigation"; 
 
 const LineLiffLogin = () => {
   const { error, logout } = useLiffLogin();
+  const router = useRouter();
+
+  
   const {
     isLoading,
     isLoggedIn,
     userData,
   } = useAuthStoreUserLogin();
 
+
+  useEffect(() => {
+    if (isLoggedIn && !isLoading) {
+    
+        
+        router.push("/customerhome");
+      }
+  }, [isLoggedIn, isLoading, router]);
+
+  console.log("Check Error:", error)
   return (
     <>
-      {isLoading ? 
-      (
+      {isLoading ? (
         <LoadingScreen />
       ) : isLoggedIn && (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -27,15 +41,17 @@ const LineLiffLogin = () => {
             Logout
           </button>
           <div className="text-center">
-            
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Hello คุณ {userData?.displayName}!
             </h1>
             <p className="text-lg text-gray-600">
+               กำลังพากลับไปยังหน้าเดิม...
             </p>
           </div>
         </div>
       )}
+
+      {error && <div className="text-red-500 text-center">{error.message}</div>}
     </>
   );
 };

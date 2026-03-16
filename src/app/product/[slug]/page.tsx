@@ -1,37 +1,48 @@
-// app/product/[id]/page.tsx
-import { mockProducts } from "@/modules/products/mockdata";
+"use client";
+
+import { use } from "react";
+import { useSearchParams } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
+
+import { GenericResponse } from "@/types/response.type";
+import { ProductDetailData } from "@/modules/products/detailproduct";
+import { useGetProductDetail } from "@/modules/products/hooks/useGetProductDetail";
 
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import ProductImageCarousel from "@/modules/products/components/ProductImageCarousel";
 import ProductPurchaseActions from "@/modules/products/components/ProductPurchaseActions";
-import { ChevronLeft} from "lucide-react";
-import Link from "next/link";
+import { CartHeader } from "@/modules/cart/components/CartHeader";
 
-export default async function ProductDetailPage({
+export default function ProductDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
-  const product = mockProducts.find((p) => String(p.slug) === slug);
+  const { slug } = use(params);
+  const searchParams = useSearchParams();
+
+  const productId = searchParams.get("id");
+  const { data, isLoading, isError } = useGetProductDetail(productId);
+
+  if (isLoading)
+    return <div className="p-10 text-center">กำลังโหลดข้อมูล...</div>;
+  if (isError || !data)
+    return <div className="p-10 text-center">ไม่พบข้อมูลสินค้า</div>;
+
+  const { product, productImages } = data?.data || data;;
 
   if (!product)
-    return <div className="p-10 text-white">ไม่พบสินค้า (Name: {slug})</div>;
+    return <div className="p-10 text-black">ไม่พบสินค้า (Name: {slug})</div>;
 
   return (
-    <div >
+    <div>
       <div className="flex flex-col min-h-screen bg-white ">
-      
         <Header />
         <main className="grow bg-white pb-20">
           <div className="max-w-[1200px] mx-auto p-4 flex items-center">
-            <Link href="/customerhome">
-              <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
-            </Link>
-            <span>
-              <p className="text-xl md:text-2xl font-black text-black">รายละเอียดสินค้า</p>
-            </span>
+        <CartHeader  isDetailProduct={true}/>
           </div>
 
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">
@@ -49,13 +60,13 @@ export default async function ProductDetailPage({
                 className="object-cover"
               /> */}
               {/* แสดงรูปแบบเลื่อนได้ */}
-              <ProductImageCarousel images={product.images || []} />
+              <ProductImageCarousel images={productImages || []} />
             </div>
           </div>
 
           <div className="flex flex-col items-center text-center px-6 space-y-4 mb-10">
             <h1 className="text-2xl sm:text-3xl font-bold text-black leading-tight">
-              {product.product_name}
+              {product.productName}
             </h1>
 
             <div className="max-w-[400px] w-full">
@@ -86,15 +97,13 @@ export default async function ProductDetailPage({
               </div>
             </div>
           </div>
-          
-            <div className="max-w-[1200px] mx-auto px-4 md:px-6">
-              <ProductPurchaseActions price={product.price} />
-            </div>
-         
+
+          <div className="max-w-[1200px] mx-auto px-4 md:px-6">
+            <ProductPurchaseActions price={product.price} />
+          </div>
         </main>
         <Footer />
       </div>
-      
     </div>
   );
 }

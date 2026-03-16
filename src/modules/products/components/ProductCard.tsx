@@ -39,7 +39,9 @@ const ProductCard = ({ product, isRecommended = false, priority = false }: Produ
   //console.log("PICProductPath: " + product.productImgPath);
  // console.log("Full Product Object:", product);
   return (
-    <Link href={`/product/${product.productSlug}`}>
+    <Link 
+    key={product.productId}
+    href={`/product/${product.productSlug}?id=${product.productId}`}>
       <div
         className="group
       bg-cprojecttwo border border-gray-200 rounded-2xl overflow-hidden shadow-sm
