@@ -5,6 +5,8 @@ import LineIcon from "@/components/icon/lineicon";
 
 import { useState } from "react";
 import { useAddCart } from "@/modules/cart/hooks/useAddCart";
+import { useCartStore } from "@/modules/cart/hooks/useCartstore";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 import Link from "next/link";
@@ -22,32 +24,53 @@ export default function ProductPurchaseActions({
   productId,
   productName,
 }: DetailProductProps) {
+  const router = useRouter();
+  const { refreshCart } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [actionType, setActionType] = useState<"ADD" | "BUY" | null>(null);
   const { mutate: addToCart, isPending } = useAddCart();
 
-  const handleConfirmAddToCart = () => {
+  const handleConfirm = () => {
     addToCart(
       { productId, quantity },
       {
-        onSuccess: () => {
-          toast.success(
-            <div className="flex flex-col justify-center py-1">
-              <span className="leading-tight">
-                เพิ่มสินค้า {quantity} ชิ้นลงรถเข็นแล้ว!
-              </span>
-            </div>,
-            {
+
+        onSuccess: async (response) => {
+          console.log("AXIOS RESPONSE:", response);
+          const itemdata = response?.data?.data || response?.data
+          if (actionType === "BUY") {
+            const shoppingCartItemId = itemdata.id
+            console.log("Extracted ID:", shoppingCartItemId)
+            if (shoppingCartItemId) {
+              sessionStorage.setItem(
+                "selected_checkout_ids",
+                JSON.stringify([shoppingCartItemId]),
+              );
+            }
+            await refreshCart();
+            router.push("/shoppingcart/checkoutcart");
+          } else {
+            toast.success(`เพิ่มสินค้า ${quantity} ชิ้นลงรถเข็นแล้ว!`, {
               className:
-                " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
+                "border-2 border-cprojectone rounded-xl font-bold shadow-2xl",
               duration: 3000,
-            },
-          );
-          setOpenConfirm(false);
+            });
+            setOpenConfirm(false);
+          }
+        },
+        onError: () => {
+          toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
         },
       },
     );
   };
+
+  const triggerAction = (type: "ADD" | "BUY") => {
+    setActionType(type);
+    setOpenConfirm(true);
+  };
+
 
   return (
     <>
@@ -69,7 +92,7 @@ export default function ProductPurchaseActions({
         </Link>
 
         <button
-          onClick={() => setOpenConfirm(true)}
+          onClick={() => triggerAction("ADD")}
           disabled={isPending}
           className="col-span-4 flex flex-col items-center justify-center border border-black bg-cprojectfive hover:bg-[#e1e095] transition-colors cursor-pointer"
         >
@@ -78,15 +101,34 @@ export default function ProductPurchaseActions({
             {isPending ? "กำลังเพิ่มสินค้าลงรถเข็น..." : "เพิ่มสินค้าลงรถเข็น"}
           </span>
         </button>
+
+        <button
+          onClick={() => triggerAction("BUY")}
+          disabled={isPending}
+          className="col-span-4 flex flex-col items-center justify-center border border-black bg-cprojectfive text-white hover:bg-[#e1e095] transition-colors py-2 cursor-pointer"
+        >
+          <span className="text-[10px] md:text-sm text-black font-bold text-center">
+            {isPending ? "กำลังเพิ่มข้อมูลการสั่งซื้อ..." : "ซื้อสินค้าทันที"}
+          </span>
+          <span className="text-md md:text-xl text-red-500 font-extrabold mt-1">
+            ฿{(price * quantity).toLocaleString()}
+          </span>
+        </button>
         <ConfirmDialog
           open={openConfirm}
           onClose={() => setOpenConfirm(false)}
-          onConfirm={handleConfirmAddToCart}
-          title="ยืนยันการเพิ่มสินค้า"
+          onConfirm={handleConfirm}
+          title={
+            actionType === "BUY"
+              ? "ยืนยันการสั่งซื้อด่วน"
+              : "ยืนยันการเพิ่มสินค้า"
+          }
           content={
             <div className="flex flex-col items-center w-full">
               <span className="mb-4 text-gray-600">
-                คุณต้องการเพิ่มสินค้าลงรถเข็นใช่หรือไม่?
+                {actionType === "BUY"
+                  ? "คุณต้องการสั่งซื้อสินค้านี้ทันทีใช่หรือไม่?"
+                  : "คุณต้องการเพิ่มสินค้าลงรถเข็นใช่หรือไม่?"}
               </span>
 
               <div className="flex flex-col space-y-2 w-full max-w-[300px]">
@@ -107,19 +149,20 @@ export default function ProductPurchaseActions({
                     {quantity} <span className="text-black">ชิ้น</span>
                   </span>
                 </div>
+                {actionType === "BUY" && (
+                  <div className="flex justify-between items-center border-t pt-2 mt-2">
+                    <span className="text-xl font-bold text-black">
+                      ยอดรวม:
+                    </span>
+                    <span className="text-xl font-bold text-red-500">
+                      ฿{(price * quantity).toLocaleString()}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           }
         />
-
-        <button className="col-span-4 flex flex-col items-center justify-center border border-black bg-cprojectfive text-white hover:bg-[#e1e095] transition-colors py-2 cursor-pointer">
-          <span className="text-[10px] md:text-sm text-black font-bold text-center">
-            ซื้อสินค้าทันที
-          </span>
-          <span className="text-md md:text-xl text-red-500 font-extrabold mt-1">
-            ฿{(price * quantity).toLocaleString()}
-          </span>
-        </button>
       </div>
     </>
   );

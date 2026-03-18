@@ -1,20 +1,31 @@
 import { create } from "zustand";
-import { cartService } from "@/modules/cart/services/cartService";
-import { ShoppingCartItem } from "@/modules/cart/types";
+import {
+  deleteShoppingCartItem,
+  fetchShoppingCart,
+  updateShoppingCartItem,
+} from "@/modules/cart/services/ShoppingCartService";
+
+import {
+  AddShoppingCartItemReq,
+  CartItem,
+  ShoppingCartData,
+  AddCartResData,
+} from "../shoppingcartInterface";
+import toast from "react-hot-toast";
 
 interface CartState {
-  items: ShoppingCartItem[];
+  items: CartItem[];
   totalItems: number;
   selectedIds: string[];
   setTotalItems: (count: number) => void;
   setSelectedIds: (ids: string[]) => void;
-  setItems: (items: ShoppingCartItem[]) => void;
+  setItems: (items: CartItem[]) => void;
   refreshCart: () => Promise<void>;
   updateItem: (itemId: string, newQty: number) => Promise<void>;
-  getPrimaryImage: (item: ShoppingCartItem) => string;
+  getPrimaryImage: (item: CartItem) => string;
 }
 
-export const useCartStore = create<CartState>((set) => ({
+export const useCartStore = create<CartState>((set, get) => ({
   totalItems: 0,
   items: [],
   selectedIds: [],
@@ -27,26 +38,23 @@ export const useCartStore = create<CartState>((set) => ({
       totalItems: newItems.length,
     }),
 
-  getPrimaryImage: (item) => {
-    const images = item.product?.images;
-    if (Array.isArray(images)) {
-      const primary = images.find((img) => img.is_primary);
-      return (
-        primary?.product_img_slug ||
-        images[0]?.product_img_slug ||
-        "/placeholder-image.svg"
-      );
-    }
-    return "/placeholder-image.svg";
-  },
+  getPrimaryImage: (item : CartItem) => {
+if (item?.productImgPath) {
+    return item.productImgPath;
+  }
+  return "/placeholder-image.svg";
+},
 
   refreshCart: async () => {
     try {
-      const latestCart = await cartService.getCart();
-      const newItems = latestCart.items || [];
+      const latestCart = await fetchShoppingCart(0, 100);
+      const checkoutdata = latestCart?.data || latestCart
+     console.log("latestCart "+latestCart)
+      const newItems = checkoutdata.cartItems || [];
+       console.log("Refresh Cart - New Items:", newItems);
       set((state) => {
         const validSelectedIds = state.selectedIds.filter((id) =>
-          newItems.some((item) => item.Shopping_Cart_Item_id === id),
+          newItems.some((item) => item.shoppingCartItemId === id),
         );
         return {
           items: newItems,
@@ -59,24 +67,35 @@ export const useCartStore = create<CartState>((set) => ({
     }
   },
 
-  updateItem: async (itemId, newQty) => {
+  updateItem: async (itemId: string, newQty: number) => {
     try {
-      await cartService.updateItemQuantity(itemId, newQty);
+      const item = get().items.find((i) => i.shoppingCartItemId === itemId);
 
-      const latestCart = await cartService.getCart();
-      const newItems = latestCart.items || [];
-      set((state) => {
-        const validSelectedIds = state.selectedIds.filter((id) =>
-          newItems.some((item) => item.Shopping_Cart_Item_id === id),
-        );
-        return {
-          items: newItems,
-          totalItems: newItems.length,
-          selectedIds: validSelectedIds,
-        };
+      if (!item?.productId) {
+        console.error("Product ID not found for this item");
+        return;
+      }
+      await updateShoppingCartItem({
+        productId: item.productId,
+        quantity: newQty,
       });
+      await get().refreshCart();
     } catch (error) {
-      console.error("Failed to update item:", error);
+      console.error("Failed to update item via API:", error);
+      toast.error("ไม่สามารถเปลี่ยนจำนวนได้");
+    }
+  },
+
+  removeItem: async (shoppingCartId: string, itemId: string) => {
+    try {
+      await deleteShoppingCartItem({
+        shoppingCartId,
+        shoppingCartItemId: itemId,
+      });
+      await get().refreshCart();
+      toast.success("ลบสินค้าเรียบร้อย");
+    } catch (error) {
+      toast.error("ลบสินค้าไม่สำเร็จ");
     }
   },
 }));

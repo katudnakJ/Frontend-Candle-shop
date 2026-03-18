@@ -1,13 +1,14 @@
 "use client";
 
 import { Trash2, Plus, Minus } from "lucide-react";
-import { ShoppingCartItem } from "@/modules/cart/types";
+
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { useState } from "react";
 import Image from "next/image";
+import { CartItem } from "../shoppingcartInterface";
 
 interface CartItemProps {
-  item: ShoppingCartItem;
+  item: CartItem;
   isSelected: boolean;
   isCheckout?: boolean;
   onToggle: (id: string) => void;
@@ -28,12 +29,12 @@ export const CartItemCard = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleRemoveClick = () => {
-    setIsDialogOpen(true); 
+    setIsDialogOpen(true);
   };
 
   const handleConfirmRemove = () => {
-    onRemove(item.Shopping_Cart_Item_id); 
-    setIsDialogOpen(false); 
+    onRemove(item.shoppingCartItemId);
+    setIsDialogOpen(false);
   };
 
   return (
@@ -47,7 +48,7 @@ export const CartItemCard = ({
             <input
               type="checkbox"
               checked={isSelected}
-              onChange={() => onToggle(item.Shopping_Cart_Item_id)}
+              onChange={() => onToggle(item.shoppingCartItemId)}
               className="w-5 h-5 accent-green-600 cursor-pointer"
             />
           </div>
@@ -55,8 +56,8 @@ export const CartItemCard = ({
 
         <div className="relative w-24 h-24 md:w-32 md:h-32 border-2 border-black rounded-2xl overflow-hidden bg-gray-50 shrink-0">
           <Image
-            src={image}
-            alt={item.product?.product_name || "Product Image"}
+            src={image || "/placeholder-image.svg"}
+            alt={item.productName || "Product Image"}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 96px, 128px"
@@ -67,7 +68,7 @@ export const CartItemCard = ({
         <div className="flex flex-col justify-between flex-1 min-w-0">
           <div className="flex max-[360px]:flex-col justify-between items-start gap-2">
             <h3 className="font-black text-sm md:text-lg min-[360px]:truncate">
-              {item.product?.product_name}
+              {item.productName}
             </h3>
             {!isCheckout && (
               <button
@@ -86,7 +87,7 @@ export const CartItemCard = ({
             content={
               <div className="flex flex-col items-center gap-2">
                 <span className="font-bold text-red-400 ">
-                  {`" ${item.product?.product_name} "`}
+                  {`" ${item.productName} "`}
                 </span>
                 <span>คุณแน่ใจใช่ไหมที่จะลบรายการนี้?</span>
               </div>
@@ -95,9 +96,7 @@ export const CartItemCard = ({
           />
 
           <div className="flex max-[360px]:flex-col justify-between items-end mt-2">
-            <p className="font-black text-lg md:text-xl">
-              ฿{item.product?.price}
-            </p>
+            <p className="font-black text-lg md:text-xl">฿{item.price}</p>
             <div className="text-right">
               {isCheckout ? (
                 <div className="space-y-1">
@@ -108,10 +107,7 @@ export const CartItemCard = ({
                   <p className="font-black text-lg">
                     รวมทั้งหมด{" "}
                     <span className="text-red-500 ml-2">
-                      ฿
-                      {(
-                        (item.product?.price ?? 0) * item.quantity
-                      ).toLocaleString()}
+                      ฿{((item.price ?? 0) * item.quantity).toLocaleString()}
                     </span>
                   </p>
                 </div>
@@ -119,9 +115,7 @@ export const CartItemCard = ({
                 /* ปุ่มเพิ่ม/ลดจำนวนเดิม สำหรับหน้า Cart */
                 <div className="flex items-center border-2 border-black rounded-xl overflow-hidden bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                   <button
-                    onClick={() =>
-                      onUpdateQty?.(item.Shopping_Cart_Item_id, -1)
-                    }
+                    onClick={() => onUpdateQty?.(item.shoppingCartItemId, -1)}
                     className="px-2 py-1 hover:bg-black hover:text-white transition-colors"
                   >
                     <Minus className="w-4 h-4 cursor-pointer" />
@@ -130,7 +124,7 @@ export const CartItemCard = ({
                     {item.quantity}
                   </span>
                   <button
-                    onClick={() => onUpdateQty?.(item.Shopping_Cart_Item_id, 1)}
+                    onClick={() => onUpdateQty?.(item.shoppingCartItemId, 1)}
                     className="px-2 py-1 hover:bg-black hover:text-white transition-colors"
                   >
                     <Plus className="w-4 h-4 cursor-pointer" />

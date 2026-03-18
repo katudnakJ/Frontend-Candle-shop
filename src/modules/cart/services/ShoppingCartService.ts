@@ -6,10 +6,7 @@ import {
   AddCartResData,
 } from "../shoppingcartInterface";
 
-export const fetchShoppingCart = async (
-  page: number = 0,
-  size: number = 10,
-) => {
+export const fetchShoppingCart = async (page: number, size: number) => {
   const response = await apiClient.get<GenericResponse<ShoppingCartData>>(
     "/v1/cart",
     { params: { page, size } },
@@ -19,10 +16,11 @@ export const fetchShoppingCart = async (
     throw new Error("No Shopping Cart Data received from API");
   }
 
+  console.log("fetchshoppingcartdata: " , response.data);
   return response.data;
 };
 
-export const addShoppingCartItem = async (payload: AddShoppingCartItemReq) => {
+const processShoppingCartItem = async (payload: AddShoppingCartItemReq) => {
   const response = await apiClient.post<GenericResponse<AddCartResData>>(
     "/v1/cart",
     payload,
@@ -31,8 +29,10 @@ export const addShoppingCartItem = async (payload: AddShoppingCartItemReq) => {
     throw new Error("Failed to add item to shopping cart");
   }
 
-  return response.data;
+  return response;
 };
+export const addShoppingCartItem = processShoppingCartItem;
+export const updateShoppingCartItem = processShoppingCartItem;
 
 export interface DeleteShoppingCartItemReq {
   shoppingCartId: string;
@@ -45,7 +45,7 @@ export const deleteShoppingCartItem = async (
   const response = await apiClient.delete<GenericResponse<null>>("/v1/cart", {
     data: payload,
   });
-  
+
   if (!response || !response.data) {
     throw new Error("Failed to delete item from shopping cart");
   }

@@ -29,7 +29,7 @@ export default function CheckoutPage() {
 
   const selectedItems = useMemo(
     () =>
-      items.filter((item) => selectedIds.includes(item.Shopping_Cart_Item_id)),
+      items.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
     [items, selectedIds],
   );
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function CheckoutPage() {
   }, [items.length, selectedIds.length, refreshCart, setSelectedIds]);
 
   const subtotal = selectedItems.reduce(
-    (acc, item) => acc + (item.product?.price ?? 0) * item.quantity,
+    (acc, item) => acc + (item.price ?? 0) * item.quantity,
     0,
   );
   const totalQuantity = selectedItems.reduce(
@@ -73,7 +73,9 @@ export default function CheckoutPage() {
       </div>
     );
   }
-
+console.log("All Items in Store:", items);
+console.log("Selected IDs from Session:", selectedIds);
+console.log("Filtered Selected Items:", selectedItems);
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
@@ -110,7 +112,7 @@ export default function CheckoutPage() {
                 {selectedItems.length > 0 ? (
                   selectedItems.map((item) => (
                     <CartItemCard
-                      key={item.Shopping_Cart_Item_id}
+                      key={item.shoppingCartItemId}
                       item={item}
                       image={getPrimaryImage(item)}
                       isCheckout={true}

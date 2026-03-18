@@ -6,18 +6,18 @@ export interface AddShoppingCartItemReq {
 
 // สำหรับข้อมูลที่ได้รับจาก GET cart
 export interface CartItem {
-  cartItemId: string;
-  productId: string;
-  productName: string;
   price: number;
+  productId: string;
+  productImgPath?: string;
+  productName: string;
+  productSlug:string;
   quantity: number;
-  imageUrl?: string;
+  shoppingCartItemId:string;
 }
 
 export interface ShoppingCartData {
   shoppingCartId: string;
-  items: CartItem[];
-  grandTotal: number;
+  cartItems: CartItem[];
 }
 
 // สำหรับตอนแอดสำเร็จ
