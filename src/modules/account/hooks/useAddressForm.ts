@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { addressService } from "../services/addressService";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/utils/api";
-import { GenericResponse } from "@/types/response.type";
+import { GenericResponse, Status } from "@/types/response.type";
 import { Addresses } from "../addresses";
 
 export const useAddressForm = (initialData?: Addresses) => {
@@ -109,8 +109,8 @@ export const useAddressForm = (initialData?: Addresses) => {
           await queryClient.invalidateQueries({ queryKey: ["getAddressDetail", formData.addressId] });
           setErrors({});
         },
-        onError: (error : GenericResponse<{ id: string }>) => {
-          setErrors({ apiError: error.status.message ?? "เกิดข้อผิดพลาดในการเพิ่มที่อยู่ กรุณาลองใหม่อีกครั้ง" });
+        onError: (error : Status) => {
+          setErrors({ apiError: error.message ?? "เกิดข้อผิดพลาดในการเพิ่มที่อยู่ กรุณาลองใหม่อีกครั้ง" });
         }
       })
 
@@ -124,9 +124,8 @@ export const useAddressForm = (initialData?: Addresses) => {
       await queryClient.invalidateQueries({ queryKey: ["getAddressDetail", formData.addressId] });
       setErrors({});
     },
-    onError: (error : GenericResponse<{id: string}>) => {
-      console.error("Error updating address:", error);
-      setErrors({ apiError: "เกิดข้อผิดพลาดในการอัปเดตที่อยู่ กรุณาลองใหม่อีกครั้ง" });
+    onError: (error : Status) => {
+      setErrors({ apiError: error.message ?? "เกิดข้อผิดพลาดในการแก้ไขที่อยู่ กรุณาลองใหม่อีกครั้ง" });
     }
 })
 
@@ -140,8 +139,9 @@ export const useAddressForm = (initialData?: Addresses) => {
       await queryClient.invalidateQueries({ queryKey: ["getAddressDetail", formData.addressId] });
       setErrors({});
     },
-    onError: (error : GenericResponse<{id: string}>) => {
-      setErrors({ apiError: "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง" });
+    onError: (error : Status) => {
+      const err = error.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง";      
+      setErrors({ apiError: err});
     }
     })
 

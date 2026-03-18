@@ -26,7 +26,6 @@ const LineLiffLogin = () => {
       }
   }, [isLoggedIn, isLoading, router]);
 
-  console.log("Check Error:", error)
   return (
     <>
       {isLoading ? (

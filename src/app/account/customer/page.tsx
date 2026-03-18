@@ -11,7 +11,7 @@ import { toast } from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { useGetAddressesList } from "@/modules/account/services/useAddressesQuery";
 import { useAddressForm } from "@/modules/account/hooks/useAddressForm";
-import { GenericResponse } from "@/types/response.type";
+import { GenericResponse, Status } from "@/types/response.type";
 
 export default function CustomerAccountPage() {
   const router = useRouter();
@@ -37,10 +37,8 @@ export default function CustomerAccountPage() {
     await deleteAddress.mutateAsync(id);
     toast.success("ลบที่อยู่สำเร็จ");
   } catch (error) {
-    const err = error as GenericResponse<{ id: string }>;
-    toast.error(
-      err?.status?.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง"
-    );
+    const err = error as Status;
+    toast.error(err.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง");
   }
     setIsDeleteOpen(false);
 
