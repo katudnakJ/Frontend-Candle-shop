@@ -1,7 +1,7 @@
 "use client";
 
-import { Addresses } from "@/modules/account/addresses";
-import { Edit2, Trash2, MapPin } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
+import { Addresses } from "../addresses";
 
 interface AddressCardProps {
   address: Addresses;
@@ -27,10 +27,11 @@ export default function AddressCard({
   onDelete,
   showActions = false,
 }: AddressCardProps) {
+
   return (
     <div
       className={`p-5 border-2 rounded-2xl transition-all ${
-        address.is_default
+        address.isDefault
           ? "border-black bg-white shadow-md"
           : "border-gray-500 bg-gray-100/50 opacity-80"
       }`}
@@ -39,35 +40,35 @@ export default function AddressCard({
         <div className="flex items-center gap-2 min-w-0">
           {/* ใช้ address_label :'บ้าน' หรือ 'ที่ทำงาน' หรือ คอนโด หรือ อื่นๆ */}
           <span
-            className={`font-bold text-lg text-black truncate ${address.is_default ? "text-black" : "text-gray-500"}`}
+            className={`font-bold text-lg text-black truncate ${address.isDefault ? "text-black" : "text-gray-500"}`}
           >
-            {address.address_label || "ที่อยู่ของฉัน"}
+            {address.addressLabel || "ที่อยู่ของฉัน"}
           </span>
         </div>
       </div>
 
       <div
-        className={`space-y-1 text-sm text-gray-700 font-sans ${address.is_default ? "text-gray-700" : "text-gray-500"}`}
+        className={`space-y-1 text-sm text-gray-700 font-sans ${address.isDefault ? "text-gray-700" : "text-gray-500"}`}
       >
         {/* ชื่อผู้รับ */}
         <div className="flex max-[400px]:flex-col justify-between">
           <p
-            className={`text-xl font-bold truncate  ${address.is_default ? "text-black" : "text-gray-500"}`}
+            className={`text-xl font-bold truncate  ${address.isDefault ? "text-black" : "text-gray-500"}`}
           >
-            {address.recipient_first_name} {address.recipient_last_name}
+            {address.recipientFirstName} {address.recipientLastName}
           </p>
           {/* เบอร์โทรศัพท์ */}
-          <p className="text-[16px] truncate flex-shrink-1">{formatPhone(address.recipient_phone)}</p>
+          <p className="text-[16px] truncate flex-shrink-1">{formatPhone(address.recipientPhone)}</p>
         </div>
         {/* รายละเอียดที่อยู่แบบรวมร่าง */}
         <p className="leading-relaxed  max-[320px]:truncate ">
-          {address.delivery_address} {address.sub_district} {address.district}{address.province} {address.postcode}
+          {address.deliveryAddress} {address.subDistrict} {address.district}{address.province} {address.postcode}
           
         </p>
       </div>
 
       <div className="flex items-center mt-2 ">
-        {address.is_default && (
+        {address.isDefault && (
           <span className="text-[14px] bg-green-500 text-white px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0">
             ค่าเริ่มต้น
           </span>
@@ -76,13 +77,13 @@ export default function AddressCard({
         {showActions && (
           <div className="flex gap-1 ml-auto">
             <button
-              onClick={() => onEdit?.(address.address_id)}
+              onClick={() => onEdit?.(address.addressId)}
               className="bg-cprojectfive p-2 hover:bg-yellow-200 rounded-[10px] border-2 border-black text-black hover:translate-y-1 transition-all duration-400 cursor-pointer"
             >
               <Edit2 size={16} />
             </button>
             <button
-              onClick={() => onDelete?.(address.address_id)}
+              onClick={() => onDelete?.(address.addressId)}
               className="bg-red-100 p-2 hover:bg-red-400 rounded-[10px] border-2 border-black text-black hover:translate-y-1 transition-all duration-400 cursor-pointer "
             >
               <Trash2 size={16} className="group-hover:text-red-500" />

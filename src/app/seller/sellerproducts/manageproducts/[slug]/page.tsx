@@ -186,7 +186,6 @@ export default function ManageProductsPage() {
 
       formData.append("existingImages", JSON.stringify(existingImages));
 
-      console.log("🚀 ส่งข้อมูลสินค้าพร้อมรูปภาพ", images.length, "รูป");
 
       //   console.log("=== Check FormData Content ===");
       //   formData.forEach((value, key) => {

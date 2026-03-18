@@ -4,45 +4,47 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ChevronLeft } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
-import { mockAddresses } from "@/modules/account/mockaddress"; 
-import { Addresses } from "@/modules/account/addresses";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
 import { toast } from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import { useGetAddressesList } from "@/modules/account/services/useAddressesQuery";
+import { useAddressForm } from "@/modules/account/hooks/useAddressForm";
+import { GenericResponse } from "@/types/response.type";
 
 export default function CustomerAccountPage() {
   const router = useRouter();
-  const [addresses, setAddresses] = useState<Addresses[]>(mockAddresses);
+  const {data : addressesData} = useGetAddressesList();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
-  
+  const [delAddressId, setDelAddressId] = useState<string | null>(null);
+
+  const { deleteAddress } = useAddressForm();
 
   const handleAdd = () => {
     router.push("/account/address");
   };
 
   const handleEdit = (id: string) => {
-    console.log("แก้ไขที่อยู่ ID:", id);
     router.push(`/account/address?id=${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    setAddressToDelete(id);
-    setIsDeleteOpen(true);
-  };
-  const confirmDeleteAddress = () => {
-    if (addressToDelete) {
-      setAddresses((prev) =>
-        prev.filter((addr) => addr.address_id !== addressToDelete),
-      );
-      toast.success("ลบที่อยู่สำเร็จ");
-      setIsDeleteOpen(false);
-      setAddressToDelete(null);
-    }
-  };
+  const confirmDeleteAddress = async (id: string) => {
+  
+  if (!id) return;
 
+  try {
+    await deleteAddress.mutateAsync(id);
+    toast.success("ลบที่อยู่สำเร็จ");
+  } catch (error) {
+    const err = error as GenericResponse<{ id: string }>;
+    toast.error(
+      err?.status?.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง"
+    );
+  }
+    setIsDeleteOpen(false);
+
+};
   return (
     <div>
       <div className="flex flex-col min-h-screen bg-white">
@@ -68,7 +70,7 @@ export default function CustomerAccountPage() {
           <section className=" max-w-[1200px] mx-auto px-6 mt-4">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-black">ที่อยู่จัดส่ง</h2>
-              {addresses.length < 3 && (
+              {addressesData && addressesData.length < 5  && (
                 <Link
                   href={`/account/address`}
                   className="flex items-center gap-2 bg-cprojectone border-2 border-black text-black px-4 py-2 rounded-xl hover:bg-yellow-200 hover:translate-y-1  duration-400  transition-all cursor-pointer text-sm"
@@ -82,13 +84,16 @@ export default function CustomerAccountPage() {
 
             {/* รายการที่อยู่ */}
             <div className="grid grid-cols-1 gap-4 mx-auto ">
-              {addresses.length > 0 ? (
-                addresses.map((addr) => (
+              {addressesData && addressesData.length > 0 ? (
+                addressesData.map((addr) => (
                   <AddressCard
-                    key={addr.address_id}
+                    key={addr.addressId}
                     address={addr}
                     onEdit={handleEdit}
-                    onDelete={handleDelete}
+                    onDelete={(id) => {
+                      setDelAddressId(id);
+                      setIsDeleteOpen(true);
+                    }}
                     showActions={true}
                   />
                 ))
@@ -104,7 +109,7 @@ export default function CustomerAccountPage() {
          <ConfirmDialog
                   open={isDeleteOpen}
                   onClose={() => setIsDeleteOpen(false)}
-                  onConfirm={confirmDeleteAddress}
+                  onConfirm={() =>confirmDeleteAddress(delAddressId as string)}
                   title="ยืนยันการลบ"
                   content={
                     <>
@@ -114,7 +119,7 @@ export default function CustomerAccountPage() {
                     </>
                   }
                   variant="danger"
-                />
+          />
       </div>
     </div>
   );

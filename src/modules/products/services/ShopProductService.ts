@@ -1,7 +1,5 @@
 // services/product.service.ts
-import axios from "axios";
 import {
-  ProductHomeItem,
   ProductHomeData,
 } from "@/modules/products/homeproduct";
 import { MOCK_PRODUCT_SHOP_DATA } from "../mockShopProductData";
