@@ -5,7 +5,7 @@ import { MOCK_CART_DATA } from "../mockcart";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const cartService = {
-  // 1. ดึงข้อมูลตะกร้าทั้งหมด
+  // 1. ดึงข้อมูลรถเข็นทั้งหมด
   async getCart(): Promise<ShoppingCart> {
     await delay(500); // จำลองเน็ตช้าเล็กน้อย
     return { ...MOCK_CART_DATA };
@@ -18,7 +18,7 @@ export const cartService = {
     // ในอนาคต: await axios.patch(`/cart/items/${itemId}`, { quantity });
   },
 
-  // 3. ลบสินค้าออกจากตะกร้า
+  // 3. ลบสินค้าออกจากรถเข็น
   async deleteItem(itemId: string): Promise<void> {
     await delay(300);
     console.log(`[API Delete]: Item ${itemId} removed`);

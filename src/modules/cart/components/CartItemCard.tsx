@@ -82,7 +82,7 @@ export const CartItemCard = ({
             open={isDialogOpen}
             onClose={() => setIsDialogOpen(false)}
             onConfirm={handleConfirmRemove}
-            title="ลบสินค้าออกจากตะกร้า?"
+            title="ลบสินค้าออกจากรถเข็น?"
             content={
               <div className="flex flex-col items-center gap-2">
                 <span className="font-bold text-red-400 ">

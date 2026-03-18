@@ -102,7 +102,7 @@ export default function PaymentPage() {
       };
     }
 
-    // โหมดปกติจากตะกร้า
+    // โหมดปกติจากรถเข็น
     const selected = items.filter((item) =>
       selectedIds.includes(item.Shopping_Cart_Item_id),
     );

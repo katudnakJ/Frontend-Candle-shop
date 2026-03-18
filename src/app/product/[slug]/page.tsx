@@ -2,11 +2,6 @@
 
 import { use } from "react";
 import { useSearchParams } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
-
-import { GenericResponse } from "@/types/response.type";
-import { ProductDetailData } from "@/modules/products/detailproduct";
 import { useGetProductDetail } from "@/modules/products/hooks/useGetProductDetail";
 
 import Header from "@/components/layout/CustomerHeader";
@@ -47,18 +42,6 @@ export default function ProductDetailPage({
 
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">
             <div className="relative aspect-square w-full max-w-[400px] rounded-3xl overflow-hidden bg-gray-50 shadow-md drop-shadow-orange-300 border-cprojectfour border-4 ">
-              {/* แสดงรูปแบบปกติ */}
-              {/* <Image
-                src={
-                  product.images?.find((img) => img.is_primary)
-                    ?.product_img_slug ||
-                  product.images?.[0]?.product_img_slug ||
-                  "/placeholder-image.svg"
-                }
-                alt={product.product_name}
-                fill
-                className="object-cover"
-              /> */}
               {/* แสดงรูปแบบเลื่อนได้ */}
               <ProductImageCarousel images={productImages || []} />
             </div>
@@ -99,7 +82,7 @@ export default function ProductDetailPage({
           </div>
 
           <div className="max-w-[1200px] mx-auto px-4 md:px-6">
-            <ProductPurchaseActions price={product.price} />
+            <ProductPurchaseActions price={product.price} productId={product.productId} productName={product.productName} />
           </div>
         </main>
         <Footer />
