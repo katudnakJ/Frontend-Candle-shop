@@ -9,7 +9,7 @@ export interface ProductHomeItem {
   productSlug: string;
 }
 
-export interface ProductHomeData {
+export interface ProductHomeResData {
   allProducts: ProductHomeItem[];
   endAt: number;
   featuredProducts: ProductHomeItem[];

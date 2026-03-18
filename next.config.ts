@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "goerhyygukxfkphuyrnw.supabase.co",
-        pathname: "/**", // ต้องใส่ pathname เพื่ออนุญาตทุกโฟลเดอร์ใน supabase
+        pathname: "/**", 
       },
       {
         protocol: "https",

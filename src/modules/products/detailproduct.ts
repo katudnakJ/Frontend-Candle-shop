@@ -15,7 +15,7 @@ export interface ProductDetailImage {
   productImgPath: string;
 }
 
-export interface ProductDetailData {
+export interface ProductDetailResData {
   product: ProductItem;
   productImages: ProductDetailImage[];
 }

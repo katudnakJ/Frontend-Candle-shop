@@ -1,11 +1,10 @@
 "use client";
-// API : Get Products (All products)
+// API : Get Products (Detail products)
 
-import { useEffect } from "react";
+
 import {
   useQuery,
   keepPreviousData,
-  useQueryClient,
 } from "@tanstack/react-query";
 import { fetchCusProductsDetail } from "../services/productCusService";
 

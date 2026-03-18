@@ -1,6 +1,6 @@
-import { ProductHomeData } from "@/modules/products/homeproduct";
+import { ProductHomeResData } from "@/modules/products/homeproduct";
 
-export const MOCK_PRODUCT_SHOP_DATA: ProductHomeData = {
+export const MOCK_PRODUCT_SHOP_DATA: ProductHomeResData = {
   featuredProducts: [
     {
       productId: "prod-001",

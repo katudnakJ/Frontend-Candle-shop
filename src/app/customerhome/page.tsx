@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ListFilter, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { GenericResponse } from "@/types/response.type";
-import { ProductHomeData } from "@/modules/products/homeproduct";
+import { ProductHomeResData } from "@/modules/products/homeproduct";
 import { useGetAllProducts, usePrefetchHomeProducts } from "@/modules/products/hooks/useGetAllProducts";
 
 import { AllProductSkeleton } from "@/modules/products/components/AllProductSkeleton";
@@ -33,7 +33,7 @@ export default function Home() {
     currentPage,
     pageSize,
   ) as {
-    data: GenericResponse<ProductHomeData> | undefined;
+    data: GenericResponse<ProductHomeResData> | undefined;
     isLoading: boolean;
     isError: boolean;
   };
@@ -67,13 +67,13 @@ export default function Home() {
   // API : Get Products (All products)
   const productData = data?.data || data;
 
-  const allProducts = (productData as ProductHomeData)?.allProducts || [];
+  const allProducts = (productData as ProductHomeResData)?.allProducts || [];
   const recommendedItems =
-    (productData as ProductHomeData)?.featuredProducts || [];
-  const totalProducts = (productData as ProductHomeData)?.totalProducts || 0;
-  const nextPages = (productData as ProductHomeData)?.hasNext || false;
-  const productStartAt = (productData as ProductHomeData)?.startAt || 0;
-  const productEndAt = (productData as ProductHomeData)?.endAt || 0;
+    (productData as ProductHomeResData)?.featuredProducts || [];
+  const totalProducts = (productData as ProductHomeResData)?.totalProducts || 0;
+  const nextPages = (productData as ProductHomeResData)?.hasNext || false;
+  const productStartAt = (productData as ProductHomeResData)?.startAt || 0;
+  const productEndAt = (productData as ProductHomeResData)?.endAt || 0;
 
   const totalPages =
     totalProducts > 0 ? Math.ceil(totalProducts / pageSize) : 1;

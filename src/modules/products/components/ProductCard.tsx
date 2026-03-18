@@ -36,8 +36,10 @@ const ProductCard = ({ product, isRecommended = false, priority = false }: Produ
       ? product.productImgPath
       : "/placeholder-image.svg";
   const imgSrc = isError ? "/placeholder-image.svg" : initialImage;
-  //console.log("PICProductPath: " + product.productImgPath);
- // console.log("Full Product Object:", product);
+
+  console.log("INITIALIMAGE: " + initialImage);
+  console.log("PICProductPath: " + product.productImgPath);
+ console.log("Full Product Object:", product);
   return (
     <Link 
     key={product.productId}
