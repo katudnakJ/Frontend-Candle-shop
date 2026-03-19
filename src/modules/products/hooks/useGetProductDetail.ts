@@ -15,7 +15,7 @@ export const useGetProductDetail = (productId: string | null) => {
     placeholderData: keepPreviousData,
     enabled: !!productId,
     staleTime: 1000 * 60 * 60, // 1 ชม.
-    gcTime: 1000 * 60 * 60, // 1 ชม.
+    gcTime: 1000 * 60 * 70, // 1 ชม.
   });
 };
 

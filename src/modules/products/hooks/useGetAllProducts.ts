@@ -15,7 +15,7 @@ export const useGetAllProducts = (page: number = 0, size: number = 10) => {
     queryFn: () => fetchCusProducts(page, size),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 60, // 1 ชม.
-    gcTime: 1000 * 60 * 60, // 1 ชม.
+    gcTime: 1000 * 60 * 70, // 1 ชม.
   });
 };
 

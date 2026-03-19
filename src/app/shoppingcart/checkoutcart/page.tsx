@@ -5,10 +5,7 @@ import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import AddressCard from "@/modules/account/components/AddressCard";
 import { mockAddresses } from "@/modules/account/mockaddress";
-import {
-  CircleCheckBig,
-  MapPinCheck,
-} from "lucide-react";
+import { CircleCheckBig, MapPinCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
@@ -18,26 +15,18 @@ import { CartHeader } from "@/modules/cart/components/CartHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
+import { useCartData } from "@/modules/cart/hooks/useCartData";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { items, selectedIds, getPrimaryImage, refreshCart, setSelectedIds } =
-    useCartStore();
+  const { data: items = [], isLoading } = useCartData();
+  const { selectedIds, getPrimaryImage, setSelectedIds } = useCartStore();
   const selectedAddress = mockAddresses[0];
 
-  const selectedItems = useMemo(
-    () =>
-      items.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
-    [items, selectedIds],
-  );
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 800);
-
-    if (items.length === 0) {
-      refreshCart();
-    }
+    const timer = setTimeout(() => setIsMounted(true), 500);
 
     if (selectedIds.length === 0) {
       const saved = sessionStorage.getItem("selected_checkout_ids");
@@ -46,7 +35,19 @@ export default function CheckoutPage() {
       }
     }
     return () => clearTimeout(timer);
-  }, [items.length, selectedIds.length, refreshCart, setSelectedIds]);
+  }, [items.length, selectedIds.length, setSelectedIds]);
+  
+  
+  const selectedItems = useMemo(
+    () => items.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
+    [items, selectedIds],
+  );
+
+  useEffect(() => {
+    if (isMounted && !isLoading && selectedItems.length === 0 && items.length > 0) {
+       router.push("/shoppingcart");
+    }
+  }, [isMounted, isLoading, selectedItems.length, items.length, router]);
 
   const subtotal = selectedItems.reduce(
     (acc, item) => acc + (item.price ?? 0) * item.quantity,
@@ -73,9 +74,9 @@ export default function CheckoutPage() {
       </div>
     );
   }
-console.log("All Items in Store:", items);
-console.log("Selected IDs from Session:", selectedIds);
-console.log("Filtered Selected Items:", selectedItems);
+  console.log("All Items in Store:", items);
+  console.log("Selected IDs from Session:", selectedIds);
+  console.log("Filtered Selected Items:", selectedItems);
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />

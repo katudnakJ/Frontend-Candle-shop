@@ -5,9 +5,9 @@ import LineIcon from "@/components/icon/lineicon";
 
 import { useState } from "react";
 import { useAddCart } from "@/modules/cart/hooks/useAddCart";
-import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 import Link from "next/link";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
@@ -25,7 +25,7 @@ export default function ProductPurchaseActions({
   productName,
 }: DetailProductProps) {
   const router = useRouter();
-  const { refreshCart } = useCartStore();
+  const queryClient = useQueryClient();
   const [quantity, setQuantity] = useState(1);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [actionType, setActionType] = useState<"ADD" | "BUY" | null>(null);
@@ -35,20 +35,19 @@ export default function ProductPurchaseActions({
     addToCart(
       { productId, quantity },
       {
-
         onSuccess: async (response) => {
-          console.log("AXIOS RESPONSE:", response);
-          const itemdata = response?.data?.data || response?.data
+          queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
+          const itemdata = response?.data?.data || response?.data;
           if (actionType === "BUY") {
-            const shoppingCartItemId = itemdata.id
-            console.log("Extracted ID:", shoppingCartItemId)
+            const shoppingCartItemId = itemdata.id;
+            console.log("Extracted ID:", shoppingCartItemId);
             if (shoppingCartItemId) {
               sessionStorage.setItem(
                 "selected_checkout_ids",
                 JSON.stringify([shoppingCartItemId]),
               );
             }
-            await refreshCart();
+            
             router.push("/shoppingcart/checkoutcart");
           } else {
             toast.success(`เพิ่มสินค้า ${quantity} ชิ้นลงรถเข็นแล้ว!`, {
@@ -60,7 +59,7 @@ export default function ProductPurchaseActions({
           }
         },
         onError: () => {
-          toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+         setOpenConfirm(false);
         },
       },
     );
@@ -70,7 +69,6 @@ export default function ProductPurchaseActions({
     setActionType(type);
     setOpenConfirm(true);
   };
-
 
   return (
     <>

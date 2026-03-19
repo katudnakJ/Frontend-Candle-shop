@@ -19,14 +19,16 @@ export const useAddCart = () => {
     },
     onError: (error: Status) => {
       const err = error as Status;
-      const message = err.message || "การเชื่อมต่อขัดข้อง";
+      const message = err.message ?? "การเชื่อมต่อขัดข้อง";
 
       toast.error(message, {
         id: "add-cart-error",
       });
-
-      console.error("Add to cart error status:", error.status);
-      console.error("Add to cart error remark:", error.remark);
+      if (process.env.NODE_ENV === "development") {
+        console.error(
+          `[AddCart Error] Status: ${err.statusCode}, Remark: ${err.remark}`,
+        );
+      }
     },
   });
 };
