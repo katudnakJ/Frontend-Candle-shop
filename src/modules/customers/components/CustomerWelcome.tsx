@@ -44,7 +44,7 @@ export default function CustomerWelcome() {
             <h1 className="text-2xl md:text-3xl text-black">
               สวัสดีค่ะคุณ{" "}
               <span className="font-bold">
-                {userData?.displayName ?  userData.displayName : "ลูกค้า"}
+                {userData?.lineProfile.displayName ?? "ลูกค้า"}
               </span>
             </h1>
           )}

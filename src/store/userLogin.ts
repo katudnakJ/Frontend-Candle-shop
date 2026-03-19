@@ -1,4 +1,4 @@
-import { LineProfileResponse, UserLoginResponse } from "@/modules/auth/userLogin.type"
+import { UserLoginResponse } from "@/modules/auth/userLogin.type"
 import { Status } from "@/types/response.type"
 import { apiClient } from "@/utils/api"
 import { create } from "zustand"
@@ -12,14 +12,14 @@ const initialState = {
 
 type UseAuthStoreUserLogin = {
 //  State
-    userData : LineProfileResponse | null
+    userData : UserLoginResponse | null
     isLoading: boolean
     isLoggedIn : boolean
 
 //  Methods
     login : (lineToken : string) => void
     logout : () => void
-    getUserData : () => LineProfileResponse | null
+    getUserData : () => UserLoginResponse | null
 }
 
 export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>() (
@@ -36,7 +36,7 @@ persist(
             });
             
             set({
-                userData: response.data.lineProfile,
+                userData: response.data,
                 isLoading: false,
                 isLoggedIn: true
             });

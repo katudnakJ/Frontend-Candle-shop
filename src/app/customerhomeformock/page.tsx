@@ -1,4 +1,3 @@
-import Head from "next/head";
 
 import ProductCardformock from "@/modules/products/components/ProductCardformock";
 import { mockProducts } from "@/modules/products/mockdata";

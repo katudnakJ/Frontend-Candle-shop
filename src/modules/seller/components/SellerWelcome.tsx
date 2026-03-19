@@ -53,7 +53,7 @@ export default function SellerWelcome({ mode }: SellerWelcomeProps) {
                 <h1 className="text-2xl md:text-3xl text-black text-center">
                   สวัสดีค่ะคุณ{" "}
                   <span className="font-bold">
-                    {userData?.displayName ? userData.displayName : "แม่ค้า"}
+                    {userData?.lineProfile.displayName ?? "แม่ค้า"}
                   </span>
                 </h1>
               )}
