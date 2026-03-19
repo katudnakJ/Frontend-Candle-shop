@@ -29,7 +29,6 @@ export default function CustomerWelcome() {
     return () => clearTimeout(timer); 
   }, [storeLoading])
 
-console.log("displayName: "+userData?.displayName)
   return (
     <div className="bg-cprojectone border border-cprojectone">
     <section className="max-w-[1200px] m-10 xl:mx-auto py-6 px-4 md:px-10 bg-white rounded-2xl drop-shadow-md ">

@@ -1,7 +1,7 @@
 //default API response type
 
 export interface Status {
-  status: string;
+  statusCode: string;
   message: string;
   remark?: string;
 }

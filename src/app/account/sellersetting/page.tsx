@@ -25,7 +25,7 @@ export default function SellerSettingPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
+  const [delAddressId, setDelAddressId] = useState<string | null>(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isShowQR, setIsShowQR] = useState(false);
@@ -34,7 +34,6 @@ export default function SellerSettingPage() {
 
   const handleFileSelect = (file: File | null) => {
     setSelectedFile(file);
-    console.log("ไฟล์ที่พร้อมอัปโหลด:", file);
   };
 
   const handleConfirm = () => {
@@ -52,7 +51,6 @@ export default function SellerSettingPage() {
       // ตรงนี้คือที่ที่คุณต้องเรียก API (เช่น Axios หรือ Fetch)
       // ตัวอย่าง: await axios.post('/api/seller/update-qr', formData)
 
-      console.log("กำลังส่งไฟล์ไปที่ Server...", selectedFile);
       setSelectedFile(null);
       toast.success("บันทึกข้อมูลสำเร็จ!");
     } catch (error) {
@@ -117,22 +115,21 @@ export default function SellerSettingPage() {
   };
 
   const handleEdit = (id: string) => {
-    console.log("แก้ไขที่อยู่ ID:", id);
     router.push(`/account/address?id=${id}`);
   };
 
   const handleDelete = (id: string) => {
-    setAddressToDelete(id);
+    setDelAddressId(id);
     setIsDeleteOpen(true);
   };
   const confirmDeleteAddress = () => {
-    if (addressToDelete) {
+    if (delAddressId) {
       setAddresses((prev) =>
-        prev.filter((addr) => addr.address_id !== addressToDelete),
+        prev.filter((addr) => addr.addressId !== delAddressId),
       );
       toast.success("ลบที่อยู่สำเร็จ");
       setIsDeleteOpen(false);
-      setAddressToDelete(null);
+      setDelAddressId(null);
     }
   };
 
@@ -183,7 +180,7 @@ export default function SellerSettingPage() {
               {addresses.length > 0 ? (
                 addresses.map((addr) => (
                   <AddressCard
-                    key={addr.address_id}
+                    key={addr.addressId}
                     address={addr}
                     onEdit={handleEdit}
                     onDelete={handleDelete}

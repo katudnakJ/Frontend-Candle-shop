@@ -21,9 +21,7 @@ const useLiffLogin = () => {
       await liff.init({ liffId });
       if (liff.isLoggedIn()) {
         const token = liff.getAccessToken() || "";
-        storeUserLogin(token);
-        console.log("token :", token);
-        
+        storeUserLogin(token);        
         router.push(ROUTE.HOME);
       } else {
         liff.login({
@@ -33,7 +31,6 @@ const useLiffLogin = () => {
         return false;
       }
     } catch (err) {
-      console.log("LIFF initialization failed : ", err);
       setError("ไม่สามารถเชื่อมต่อกับ Line ได้" as unknown as Error);
     }
   };
@@ -43,12 +40,6 @@ const useLiffLogin = () => {
       await initializeLiff();
     })();
   }, []);
-
-  // const login = () => {
-  //     if (!liff.isLoggedIn()) {
-  //         liff.login();
-  //     }
-  // }
 
   const logout = async () => {
     if (liff.isLoggedIn()) {
