@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import AddressForm from "@/modules/account/components/AddressForm";
 import { AddressFormSkeleton } from "@/modules/account/components/AddressFormSkeleton";
 import { useState, useEffect, Suspense } from "react";
-import { useGetAddressDetail } from "@/modules/account/services/useAddressesQuery";
+import { useGetAddressDetail } from "@/modules/account/hooks/useAddressesQuery";
 
 function AddressPageContent() {
   const searchParams = useSearchParams();

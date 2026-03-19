@@ -43,6 +43,7 @@ persist(
                 
     },
     logout : async () => {
+        set({isLoading : true});        
         await apiClient.post<Status>("/v1/logout");
         set({
             userData: null,

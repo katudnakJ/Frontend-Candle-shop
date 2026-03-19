@@ -9,7 +9,7 @@ import Footer from "@/components/layout/Footer";
 import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
 import { toast } from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
-import { useGetAddressesList } from "@/modules/account/services/useAddressesQuery";
+import { useGetAddressesList } from "@/modules/account/hooks/useAddressesQuery";
 import { useAddressForm } from "@/modules/account/hooks/useAddressForm";
 import { Status } from "@/types/response.type";
 

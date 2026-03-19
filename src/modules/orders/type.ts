@@ -33,3 +33,21 @@ export interface Order {
   items: OrderItem[];
   slipURL?:string;
 }
+
+export interface OrderItemsResponse {
+  orderItemId : string;
+  pricePerUnit : number;
+  productImagePath : string | null;
+  productName : string;
+  quantity : number;
+  subTotal : number;
+}
+
+export interface OrdersResponse {
+  orderId: string;
+  addressLabel: string | null;
+  deliveryMethod: string | null;
+  netAmount: number;
+  orderItems: OrderItemsResponse[];
+
+}

@@ -1,4 +1,8 @@
+import { GenericResponse } from "@/types/response.type";
+import { apiClient } from "@/utils/api";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { GetSignedFileResponse } from "../types";
 
 export const PaymentService = {
   // Logic การดาวน์โหลดรูป
@@ -32,3 +36,15 @@ export const PaymentService = {
   },
   
 };
+
+
+export const useGetQRPaymentImage = (enabled?: boolean) => useQuery({
+  queryKey: ["getQRPaymentImage"],
+  queryFn: async () => {
+    const response = await apiClient.get<void, GenericResponse<GetSignedFileResponse>>("/v1/seller/qr-payment");
+    return response.data ?? null;
+  },
+  enabled,
+  staleTime: 5 * 60 * 1000,
+  retry: 0,
+});
