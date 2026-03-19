@@ -12,6 +12,7 @@ import {
   UserCircle,
   ClipboardList,
 } from "lucide-react";
+import { Button } from "@mui/material";
 
 
 const Header = () => {
@@ -100,6 +101,20 @@ const Header = () => {
                     <ClipboardList size={18} className="mr-2 " />
                       ประวัติการสั่งซื้อ
                     </Link>
+                  )}
+                </MenuItem>
+                <MenuItem>
+                  {({ focus }) => (
+                    <Button
+                      className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex w-full items-center px-4 py-2 text-left text-sm`}
+                      onClick={() => {
+                        localStorage.removeItem("lineLiffUserData");
+                        window.location.href = "/line-login";
+                      }}
+                    >
+                      ออกจากระบบ
+                    </Button>
+
                   )}
                 </MenuItem>
               </div>

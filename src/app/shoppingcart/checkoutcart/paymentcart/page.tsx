@@ -72,16 +72,12 @@ export default function PaymentPage() {
   // อีกหน่อยปรับเป็นเรียกจาก api ไม่ก็เก็บใน zustand และ ต้องเพิ่มกัน เช็คว่า orderID ใช่ของลูกค้าคนนี้ไหม 
   useEffect(() => {
     if (mode === "repay" && orderId) {
-      console.log("Fetching order:", orderId);
       setIsLoadingSeller(true);
 
       const foundOrder = mockOrders.find((o) => o.order_no === orderId);
       if (foundOrder) {
-        console.log("พบข้อมูล Order สำหรับชำระใหม่:", foundOrder);
         setRepayOrder(foundOrder);
       } else {
-        console.error("ไม่พบข้อมูล Order หมายเลข:", orderId);
-    
       }
 
       setIsLoadingSeller(false);

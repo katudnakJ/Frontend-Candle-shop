@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import LoadingScreen from "@/components/Loading/LoadingScreen";
 import useLiffLogin from "./lineLiffLogin.hook";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
@@ -27,7 +26,6 @@ const LineLiffLogin = () => {
       }
   }, [isLoggedIn, isLoading, router]);
 
-  console.log("Check Error:", error)
   return (
     <>
       {isLoading ? (

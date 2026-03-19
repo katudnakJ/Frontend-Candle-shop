@@ -32,7 +32,6 @@ export default function SellerWelcome({ mode }: SellerWelcomeProps) {
   }, [storeLoading]);
 
   const totalOrderPending = 2;
-  console.log("displayName: " + userData?.displayName);
   return (
     <div className="bg-cprojectone border border-cprojectone">
       {mode === "welcome" ? (

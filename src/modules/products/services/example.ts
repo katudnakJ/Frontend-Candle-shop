@@ -36,7 +36,6 @@
 //       endDate,
 //     ],
 //     queryFn: (): Promise<ReportResponse> =>
-//       apiClient.get(`/report/list/point_of_store`, {
 //         params
 //       }),
 //     retry: 0,

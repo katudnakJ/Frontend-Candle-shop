@@ -1,10 +1,10 @@
 "use client";
 
-import { mockAddresses } from "@/modules/account/mockaddress";
 import { useSearchParams, useRouter } from "next/navigation";
 import AddressForm from "@/modules/account/components/AddressForm";
 import { AddressFormSkeleton } from "@/modules/account/components/AddressFormSkeleton";
 import { useState, useEffect, Suspense } from "react";
+import { useGetAddressDetail } from "@/modules/account/services/useAddressesQuery";
 
 function AddressPageContent() {
   const searchParams = useSearchParams();
@@ -12,18 +12,13 @@ function AddressPageContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-   
     const timer = setTimeout(() => setIsLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
  
   const addressId = searchParams.get("id");
-
-  // (ในอนาคตคือ Fetch จาก API)
-  const editingAddress = mockAddresses.find(
-    (addr) => addr.address_id === addressId,
-  );
+  const {data : addressesData} = useGetAddressDetail(addressId as string);
 
   return (
     <div className="min-h-screen bg-amber-50">
@@ -33,10 +28,9 @@ function AddressPageContent() {
         ) : (
           <AddressForm
             key={addressId || "new"} 
-            initialData={editingAddress}
+            initialData={addressesData}
             onCancel={() => router.back()} 
-            onSubmit={(data) => {
-              console.log("บันทึก:", data);
+            onSubmit={() => {
               router.push("/account/customer"); 
             }}
           />

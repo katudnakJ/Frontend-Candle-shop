@@ -1,4 +1,4 @@
-import { ShoppingCart, ShoppingCartItem } from "../types";
+import { ShoppingCart } from "../types";
 import { MOCK_CART_DATA } from "../mockcart";
 
 // จำลองการ Delay เหมือนการเรียก API จริง
