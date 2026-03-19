@@ -29,7 +29,7 @@ const processShoppingCartItem = async (payload: AddShoppingCartItemReq) => {
     throw new Error("Failed to add item to shopping cart");
   }
 
-  return response;
+  return response.data;
 };
 export const addShoppingCartItem = processShoppingCartItem;
 export const updateShoppingCartItem = processShoppingCartItem;

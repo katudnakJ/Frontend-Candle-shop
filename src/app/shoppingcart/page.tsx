@@ -15,30 +15,26 @@ import { ShoppingCartSkeletonpage } from "@/modules/cart/components/skeletoncart
 
 export default function ShoppingCartPage() {
   const [isMounted, setIsMounted] = useState(false);
-  const { setSelectedIds, setItems } = useCartStore();
+  const { getPrimaryImage } = useCartStore();
   const {
-    items,
+    cartItem,
     selectedIds,
     toggleSelect,
     updateQuantity,
     removeItem,
-    getPrimaryImage,
     totalPrice,
     totalQuantity,
     isAllSelected,
     toggleSelectAll,
-  } = useCart(MOCK_CART_DATA);
+  } = useCart();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsMounted(true);
     }, 800);
-
-    setItems(items);
-    setSelectedIds(selectedIds);
     sessionStorage.setItem("selected_checkout_ids", JSON.stringify(selectedIds));
     return () => clearTimeout(timer);
-  }, [items, selectedIds, setItems, setSelectedIds]);
+  }, [selectedIds]);
 
 
   if (!isMounted) {
@@ -57,9 +53,9 @@ export default function ShoppingCartPage() {
 
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
-          <CartHeader itemCount={items.length} isShopingcart={true}/>
+          <CartHeader itemCount={cartItem.length} isShopingcart={true}/>
 
-          {items.length > 0 && (
+          {cartItem.length > 0 && (
             <div className="mb-4 flex items-center gap-2 px-2">
               <input
                 type="checkbox"
@@ -72,14 +68,14 @@ export default function ShoppingCartPage() {
           )}
 
           <div className="space-y-4">
-            {items.length === 0 ? (
+            {cartItem.length === 0 ? (
               <EmptyCartState />
             ) : (
-              items.map((item) => (
+              cartItem.map((item) => (
                 <CartItemCard
-                  key={item.Shopping_Cart_Item_id}
+                  key={item.shoppingCartItemId}
                   item={item}
-                  isSelected={selectedIds.includes(item.Shopping_Cart_Item_id)}
+                  isSelected={selectedIds.includes(item.shoppingCartItemId)}
                   image={getPrimaryImage(item)}
                   onToggle={toggleSelect}
                   onUpdateQty={updateQuantity}
@@ -90,7 +86,7 @@ export default function ShoppingCartPage() {
           </div>
         </div>
       </main>
-      {items.length > 0 && (
+      {cartItem .length > 0 && (
         <div className="sticky bottom-0 z-10">
           <CartSummaryBar totalQuantity={totalQuantity} totalPrice={totalPrice} />
         </div>

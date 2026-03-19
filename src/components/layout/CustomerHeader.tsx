@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartData } from "@/modules/cart/hooks/useCartData";
+import { useGetCartData } from "@/modules/cart/hooks/useGetCartData";
 import {
   Menu,
   MenuButton,
@@ -20,19 +20,26 @@ import {
 } from "lucide-react";
 import { Button } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
+import { ShoppingCartData } from "@/modules/cart/shoppingcartInterface";
+import { GenericResponse } from "@/types/response.type";
 
 const Header = () => {
   const queryClient = useQueryClient();
-  const { data: cartItems = [] } = useCartData();
+  const { data, isLoading } = useGetCartData() as {
+    data: GenericResponse<ShoppingCartData> | undefined;
+    isLoading: boolean;
+  };
+  const CartCountData = data?.data || data;
+  const cartcountItem = (CartCountData as ShoppingCartData)?.cartItems || [];
   const totalItemsCount = useMemo(() => {
-    return cartItems.length;
-  }, [cartItems]);
- if (process.env.NODE_ENV === "development") {
- console.group("🛒 Header Cart Status");
-console.log("%c Count: ", "color: green", totalItemsCount);
-console.log("Raw Data: ", cartItems);
-console.groupEnd();
- }
+    return cartcountItem.length;
+  }, [cartcountItem]);
+  if (process.env.NODE_ENV === "development") {
+    console.group("🛒 Header Cart Status");
+    console.log("%c Count: ", "color: green", totalItemsCount);
+    console.log("Raw Data: ", cartcountItem);
+    console.groupEnd();
+  }
   return (
     <header className=" border border-cprojectone top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
       <div className="max-w-300 mx-auto">

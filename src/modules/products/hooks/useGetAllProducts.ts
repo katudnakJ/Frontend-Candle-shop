@@ -23,11 +23,12 @@ export const usePrefetchHomeProducts = (
   nextPage: number,
   pageSize: number,
   hasNext: boolean,
+  totalPages: number
 ) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (hasNext) {
+    if (hasNext && nextPage < totalPages) {
       const cachedData = queryClient.getQueryData([
         "products-home",
         nextPage,
@@ -37,8 +38,9 @@ export const usePrefetchHomeProducts = (
         queryClient.prefetchQuery({
           queryKey: ["products-home", nextPage, pageSize],
           queryFn: () => fetchCusProducts(nextPage, pageSize),
+          staleTime: 1000 * 60 * 60,
         });
       }
     }
-  }, [nextPage, pageSize, hasNext, queryClient]);
+  }, [nextPage, pageSize, hasNext, totalPages, queryClient]);
 };

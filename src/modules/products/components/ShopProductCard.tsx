@@ -64,7 +64,7 @@ export default function ShopProductCard({
               ฿{product.price.toLocaleString()}
             </span>
             <span className="text-[10px] text-gray-400 font-k2d">
-              ขายแล้ว {product.totalSelled} ชิ้น
+              ขายแล้ว {product.totalSold} ชิ้น
             </span>
           </div>
         </div>

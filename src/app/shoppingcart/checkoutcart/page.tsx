@@ -15,16 +15,25 @@ import { CartHeader } from "@/modules/cart/components/CartHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
-import { useCartData } from "@/modules/cart/hooks/useCartData";
+import { useGetCartData } from "@/modules/cart/hooks/useGetCartData";
+import { GenericResponse } from "@/types/response.type";
+import { ShoppingCartData } from "@/modules/cart/shoppingcartInterface";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { data: items = [], isLoading } = useCartData();
+  const { data, isLoading } = useGetCartData() as {
+    data: GenericResponse<ShoppingCartData> | undefined;
+    isLoading: boolean;
+  };
+  console.log("CheckoutPRODUCT:" , data)
   const { selectedIds, getPrimaryImage, setSelectedIds } = useCartStore();
   const selectedAddress = mockAddresses[0];
 
+
+ const CheckoutData = data?.data || data;
+const cartItem = (CheckoutData as ShoppingCartData)?.cartItems|| [];
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 500);
 
@@ -35,19 +44,23 @@ export default function CheckoutPage() {
       }
     }
     return () => clearTimeout(timer);
-  }, [items.length, selectedIds.length, setSelectedIds]);
-  
-  
+  }, [cartItem.length, selectedIds.length, setSelectedIds]);
+
   const selectedItems = useMemo(
-    () => items.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
-    [items, selectedIds],
+    () => cartItem.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
+    [cartItem, selectedIds],
   );
 
   useEffect(() => {
-    if (isMounted && !isLoading && selectedItems.length === 0 && items.length > 0) {
-       router.push("/shoppingcart");
+    if (
+      isMounted &&
+      !isLoading &&
+      selectedItems.length === 0 &&
+      cartItem.length > 0
+    ) {
+      router.push("/shoppingcart");
     }
-  }, [isMounted, isLoading, selectedItems.length, items.length, router]);
+  }, [isMounted, isLoading, selectedItems.length, cartItem.length, router]);
 
   const subtotal = selectedItems.reduce(
     (acc, item) => acc + (item.price ?? 0) * item.quantity,
@@ -74,7 +87,7 @@ export default function CheckoutPage() {
       </div>
     );
   }
-  console.log("All Items in Store:", items);
+  console.log("All Items in Store:", cartItem);
   console.log("Selected IDs from Session:", selectedIds);
   console.log("Filtered Selected Items:", selectedItems);
   return (
@@ -83,7 +96,7 @@ export default function CheckoutPage() {
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4 space-y-6">
           <div>
-            <CartHeader itemCount={items.length} isCheckout={true} />
+            <CartHeader itemCount={cartItem.length} isCheckout={true} />
           </div>
           <section className="border-gray-300 border-b-2">
             <div className="flex font-black text-xl mb-3 gap-2 uppercase ">

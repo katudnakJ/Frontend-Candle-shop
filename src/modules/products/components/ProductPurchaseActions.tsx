@@ -37,9 +37,9 @@ export default function ProductPurchaseActions({
       {
         onSuccess: async (response) => {
           queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
-          const itemdata = response?.data?.data || response?.data;
+          const itemdata = response?.data?.id || response?.data;
           if (actionType === "BUY") {
-            const shoppingCartItemId = itemdata.id;
+            const shoppingCartItemId = itemdata;
             console.log("Extracted ID:", shoppingCartItemId);
             if (shoppingCartItemId) {
               sessionStorage.setItem(

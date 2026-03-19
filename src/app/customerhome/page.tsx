@@ -37,6 +37,7 @@ export default function Home() {
     isLoading: boolean;
     isError: boolean;
   };
+  //console.log("ALLPRODUCT:" , data)
 
   const handlePageChange = (newPage: number) => {
     const displayPage = newPage + 1;
@@ -81,7 +82,7 @@ export default function Home() {
   //const allProducts = [...recommendedItems, ...nonFeaturedItems];
   //(recommendedItems.length || 0) + (productData?.nonFeaturedTotal || 0);
 
-  usePrefetchHomeProducts(currentPage + 1, pageSize, nextPages);
+  usePrefetchHomeProducts(currentPage + 1, pageSize, nextPages, totalPages );
 
   const sortedProducts = useMemo(() => {
     const products = [...allProducts];
