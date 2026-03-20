@@ -39,7 +39,7 @@ export default function SellerSettingPage() {
   } = useAddressForm();
 
   const { data : existingQRCode} = useGetQRPaymentImage(
-    Boolean(isShowQR && !selectedFile )
+    Boolean(isShowQR && !selectedFile) || Boolean(isShowQR)
   );
 
   const handleFileSelect = (file: File | null) => {
@@ -57,10 +57,19 @@ export default function SellerSettingPage() {
     if (isUploading) return;
     setIsUploading(true);
 
+    if (!selectedFile) {
+      toast.error("กรุณาเลือกรูปภาพก่อนบันทึก");
+      return;
+    }
+
     try {
+      if (existingQRCode) {
+        await reUploadSellerQrPayment.mutateAsync(selectedFile);
+      } else {
+        await uploadSellerQrPayment.mutateAsync(selectedFile);
+      }
       
       setSelectedFile(null);
-      toast.success("บันทึกข้อมูลสำเร็จ!");
     } catch (error) {
       const err = error as Status;
       toast.error(err.message ?? "บันทึกล้มเหลว:");
@@ -79,6 +88,8 @@ export default function SellerSettingPage() {
     handleBoxClick: triggerFileInput,
     onFileChange: handleImageChange,
     resetFile: clearImage,
+    uploadSellerQrPayment,
+    reUploadSellerQrPayment,
   } = usePaymentSlip(handleFileSelect);
 
   useEffect(() => {
@@ -153,9 +164,12 @@ export default function SellerSettingPage() {
   const handleUndoImage = () => {
   if (existingQRCode) {
     setSlipPreview(existingQRCode.signedFileUrl);
-    setSelectedFile(null);     
-    toast.success("คืนค่ารูปเดิมเรียบร้อย");
+    
+  }else{
+    setSlipPreview(null);
   }
+  setSelectedFile(null);     
+  toast.success("คืนค่ารูปเดิมเรียบร้อย");
 };
 
   return (
@@ -219,6 +233,7 @@ export default function SellerSettingPage() {
               <div className="animate-in fade-in zoom-in-90 ">
                 <QRpaymentshop
                   qrCodeImage={slipPreview}
+                  hasExistingImage={Boolean(existingQRCode)}
                   selectedFile={selectedFile}
                   isImageLoading={isImageLoading}
                   isUploading={isUploading}
@@ -264,6 +279,11 @@ export default function SellerSettingPage() {
                 </button>
               </div>
             )}
+            <h1 className="text-sm text-gray-500 w-full text-left">
+        * คลิกที่กล่องด้านบนเพื่ออัปโหลดรูป QR Code สำหรับการรับชำระเงินผ่านธนาคาร <br />
+        * รองรับไฟล์รูปภาพประเภท JPG, JPEG, PNG ขนาดไม่เกิน 2MB <br />
+        * หากต้องการเปลี่ยนรูป สามารถคลิกที่รูปเพื่อเลือกใหม่ หรือกด ใช้รูปเดิม เพื่อใช้รูปเดิม
+      </h1>
           </section>
         </main>
         <Footer />

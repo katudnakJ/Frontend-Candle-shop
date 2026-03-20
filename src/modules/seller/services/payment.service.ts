@@ -3,6 +3,8 @@ import { apiClient } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { GetSignedFileResponse } from "../types";
+import { fa } from "zod/v4/locales";
+import { HttpStatusCode } from "axios";
 
 export const PaymentService = {
   // Logic การดาวน์โหลดรูป
@@ -45,6 +47,14 @@ export const useGetQRPaymentImage = (enabled?: boolean) => useQuery({
     return response.data ?? null;
   },
   enabled,
-  staleTime: 5 * 60 * 1000,
-  retry: 0,
+  staleTime: (response) => {
+    const data = response.state.data as GetSignedFileResponse | null;
+    if (data && data.expiresAt){
+      const remaining = new Date(data.expiresAt).getTime() - Date.now();
+      return remaining * 0.8
+    }
+    return 2 * 60 * 1000;
+  },
+  retry: 3,
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
 });

@@ -2,10 +2,10 @@
 
 import { Pencil, QrCode, RotateCcw } from "lucide-react";
 import Image from "next/image";
-import { GetSignedFileResponse } from "../types";
 
 interface QRpaymentshopProps {
   qrCodeImage: string | null;
+  hasExistingImage?: boolean;
   selectedFile: File | null;
   isImageLoading: boolean;
   isUploading: boolean;
@@ -13,7 +13,7 @@ interface QRpaymentshopProps {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onTriggerFileInput: () => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onClearImage: () => void;
+  onClearImage?: () => void;
   onUndoImage: () => void;
   onConfirm: () => void;
   setIsImageLoading: (loading: boolean) => void;
@@ -21,13 +21,13 @@ interface QRpaymentshopProps {
 
 export default function QRpaymentshop({
   qrCodeImage,
+  hasExistingImage,
   selectedFile,
   isUploading,
   inputKey,
   fileInputRef,
   onTriggerFileInput,
   onImageChange,
-  onClearImage,
   onUndoImage,
   onConfirm,
   setIsImageLoading,
@@ -50,19 +50,19 @@ export default function QRpaymentshop({
 
        <div
   onClick={onTriggerFileInput}
-  className="relative w-full max-w-[600px] aspect-[5/4] border-4 border-dashed border-gray-300 rounded-[2rem] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black hover:bg-zinc-50 transition-all group active:scale-95 overflow-hidden"
+  className={`relative w-full max-w-[600px] border-4 border-dashed border-gray-300 rounded-[2rem] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black hover:bg-zinc-50 transition-all group active:scale-95 overflow-hidden ${hasExistingImage ? "h-auto" : "min-h-[320px]"}`}
 >
-  {qrCodeImage ? (
+  {(hasExistingImage || selectedFile) && qrCodeImage ? (
     <>
       <Image
         src={qrCodeImage}
         alt="QR Code"
-        className="absolute inset-0 w-full h-full object-contain p-4"
+        className="block w-full h-auto object-contain p-4"
         onLoad={() => setIsImageLoading(false)}
         onError={() => setIsImageLoading(false)}
         priority
-        width={120}
-        height={120}
+        width={180}
+        height={180}
       />
       
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -89,13 +89,12 @@ export default function QRpaymentshop({
       {qrCodeImage && selectedFile && (
         <>  
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6"> 
-           {/* ปุ่มลองใหม่ */}
            <button
              onClick={onUndoImage}
              className="w-full sm:w-auto bg-gray-100 text-gray-800 px-8 py-3 rounded-full font-bold transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 hover:bg-gray-200"
            >
              <RotateCcw className="w-4 h-4 shrink-0" />
-             <span className="whitespace-nowrap">ลองใหม่</span>
+             <span className="whitespace-nowrap">ใช้รูปเดิม</span>
            </button>
 
            {/* ปุ่มยืนยัน */}

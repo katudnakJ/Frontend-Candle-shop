@@ -24,23 +24,22 @@ const LineLiffLogin = () => {
       {isLoading ? (
         <LoadingScreen />
       ) : isLoggedIn && (
-        <SellerHome />
-        // <>
-        //   {userData?.userRole.toLowerCase() === USER_ROLE.CUSTOMER.toLowerCase() ? 
-        //     (
-        //       <CustomerHome />
-        //     ) : userData?.userRole.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
-        //       <SellerHome />
-        //     ) : (
-        //       <ErrorPage 
-        //         message={ERROR_MESSAGE.USER_ROLE_NOT_FOUND}
-        //         onRetry={() => {
-        //           logout();
-        //         }}
-        //       />
-        //     )
-        //   }
-        // </>
+        <>
+          {userData?.userRole.toLowerCase() === USER_ROLE.CUSTOMER.toLowerCase() ? 
+            (
+              <CustomerHome />
+            ) : userData?.userRole.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
+              <SellerHome />
+            ) : (
+              <ErrorPage 
+                message={ERROR_MESSAGE.USER_ROLE_NOT_FOUND}
+                onRetry={() => {
+                  logout();
+                }}
+              />
+            )
+          }
+        </>
       )
       }
 
