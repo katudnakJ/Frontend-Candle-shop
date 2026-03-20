@@ -9,3 +9,4 @@ install zod
 install react-number-format
 install browser-image-compression
 install jspdf html2canvas
+install use-debounce
