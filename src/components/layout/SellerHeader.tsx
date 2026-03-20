@@ -40,7 +40,7 @@ const SellerHeader = () => {
         <div className="mx-3 md:mx-10 flex h-20 md:h-24 items-center justify-between px-2 md:px-8">
           <div className="flex items-center">
             <Link
-              href="/sellerhome"
+              href="/"
               className="flex items-center gap-2 group transition-colors"
             >
               <Home className="w-8 h-8 md:w-11 md:h-11 text-black group-hover:text-yellow-600" />

@@ -20,6 +20,7 @@ import { useGetAddressesList } from "@/modules/account/hooks/useAddressesQuery";
 import { useAddressForm } from "@/modules/account/hooks/useAddressForm";
 import { Status } from "@/types/response.type";
 import { useGetQRPaymentImage } from "@/modules/seller/services/payment.service";
+import { useAuthStoreUserLogin } from "@/store/userLogin";
 
 export default function SellerSettingPage() {
   const router = useRouter();
@@ -91,6 +92,10 @@ export default function SellerSettingPage() {
     uploadSellerQrPayment,
     reUploadSellerQrPayment,
   } = usePaymentSlip(handleFileSelect);
+
+  const {
+    userData,
+  } = useAuthStoreUserLogin();
 
   useEffect(() => {
     let isMounted = true;
@@ -229,7 +234,7 @@ export default function SellerSettingPage() {
 
 
               
-            {!slipPreview || isShowQR ? (
+            { userData?.isOwner &&(!slipPreview || isShowQR) ? (
               <div className="animate-in fade-in zoom-in-90 ">
                 <QRpaymentshop
                   qrCodeImage={slipPreview}

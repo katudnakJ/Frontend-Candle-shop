@@ -16,9 +16,7 @@ export default function CustomerWelcome() {
         setShowSkeleton(false);
       }, 0);
       return () => clearTimeout(timeoutId);
-    }
-
-    
+    }    
     const timer = setTimeout(() => {
       if (showSkeleton) {
         console.log("Loading timeout: Force showing default customer name");
