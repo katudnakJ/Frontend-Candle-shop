@@ -25,8 +25,8 @@ const processShoppingCartItem = async (payload: AddShoppingCartItemReq) => {
     "/v1/cart",
     payload,
   );
-  if (!response || !response.data) {
-    throw new Error("Failed to add item to shopping cart");
+  if (!response ) {
+    throw new Error("Failed to Add or Update item to shopping cart");
   }
 
   return response.data;
@@ -46,7 +46,7 @@ export const deleteShoppingCartItem = async (
     data: payload,
   });
 
-  if (!response || !response.data) {
+  if (!response ) {
     throw new Error("Failed to delete item from shopping cart");
   }
 

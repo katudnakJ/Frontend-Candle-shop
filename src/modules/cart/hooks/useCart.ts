@@ -1,23 +1,37 @@
-import {  useMemo} from "react";
+import { useMemo } from "react";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
-import { useUpdateCartItem, useDeleteCartItem } from "./useCartMutations";
+import {
+  useUpdateCartItem,
+  useDeleteCartItem,
+  useUpdateCartLocal,
+} from "./useCartMutations";
 import { useGetCartData } from "./useGetCartData";
+import { useDebouncedCallback } from "use-debounce";
 import { GenericResponse } from "@/types/response.type";
 import { ShoppingCartData } from "../shoppingcartInterface";
 
 export const useCart = () => {
-  const { data, isLoading } = useGetCartData() as {
+  const page = 0;
+  const size = 1;
+
+  const { data, isLoading } = useGetCartData(page, size) as {
     data: GenericResponse<ShoppingCartData> | undefined;
     isLoading: boolean;
   };
-  const resDate = data?.data || data;
-  const cartItem = (resDate as ShoppingCartData)?.cartItems || [];
-  const shoppingCartId = (resDate as ShoppingCartData)?.shoppingCartId;
+const { cartItem, shoppingCartId } = useMemo(() => {
+    const rawData = data?.data || data; 
+    const cartData = rawData as ShoppingCartData;
+    
+    return {
+      cartItem: cartData?.cartItems || [],
+      shoppingCartId: cartData?.shoppingCartId
+    };
+  }, [data]);
 
-  console.log("ITEMS IN USECART:", cartItem);
+  if (process.env.NODE_ENV === "development") {
+    console.log("ITEMS IN USECART:", cartItem);
+  }
 
-  const { mutate: updateQty } = useUpdateCartItem();
-  const { mutate: removeItem } = useDeleteCartItem();
   const { selectedIds, setSelectedIds } = useCartStore();
 
   const totals = useMemo(() => {
@@ -33,11 +47,13 @@ export const useCart = () => {
     );
   }, [cartItem, selectedIds]);
 
-
-  const isAllSelected = cartItem.length > 0 && selectedIds.length === cartItem.length;
+  const isAllSelected =
+    cartItem.length > 0 && selectedIds.length === cartItem.length;
 
   const toggleSelectAll = () => {
-    setSelectedIds(isAllSelected ? [] : cartItem.map((i) => i.shoppingCartItemId));
+    setSelectedIds(
+      isAllSelected ? [] : cartItem.map((i) => i.shoppingCartItemId),
+    );
   };
 
   const toggleSelect = (itemId: string) => {
@@ -48,6 +64,13 @@ export const useCart = () => {
     );
   };
 
+  const updateLocal = useUpdateCartLocal();
+  const { mutate: updateQty } = useUpdateCartItem(page, size);
+  const { mutate: removeItem } = useDeleteCartItem(page, size);
+
+  const debouncedUpdate = useDebouncedCallback((payload) => {
+    updateQty(payload);
+  }, 800);
 
   return {
     cartItem,
@@ -58,11 +81,15 @@ export const useCart = () => {
     toggleSelect,
     updateQuantity: (itemId: string, delta: number) => {
       const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
-      if (item) {
-        updateQty({
+      if (item && shoppingCartId) {
+        const newQty = Math.max(1, item.quantity + delta);
+
+        updateLocal(itemId, newQty, page, size);
+        debouncedUpdate({
           shoppingCartItemId: item.shoppingCartItemId,
           productId: item.productId,
-          quantity: Math.max(1, item.quantity + delta),
+          quantity: newQty,
+          shoppingCartId: shoppingCartId,
         });
       }
     },

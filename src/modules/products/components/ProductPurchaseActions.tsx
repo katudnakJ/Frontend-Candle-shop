@@ -12,6 +12,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import QuantityInputButton from "@/components/Button/QuantityInputButton";
+import { useCartStore } from "@/modules/cart/hooks/useCartstore";
+import { AddCartResData } from "@/modules/cart/shoppingcartInterface";
 
 interface DetailProductProps {
   price: number;
@@ -30,18 +32,29 @@ export default function ProductPurchaseActions({
   const [openConfirm, setOpenConfirm] = useState(false);
   const [actionType, setActionType] = useState<"ADD" | "BUY" | null>(null);
   const { mutate: addToCart, isPending } = useAddCart();
-
+  const { setSelectedIds } = useCartStore();
   const handleConfirm = () => {
     addToCart(
       { productId, quantity },
       {
         onSuccess: async (response) => {
+          if (process.env.NODE_ENV === "development") {
+          console.log("Check Response in Component:", response);
+          }
           queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
-          const itemdata = response?.data?.id || response?.data;
+          const resdata=  response?.data || response;
+          const typedData = resdata  as AddCartResData
+          const itemdata = typedData.id
+          
+          
+
+
           if (actionType === "BUY") {
             const shoppingCartItemId = itemdata;
-            console.log("Extracted ID:", shoppingCartItemId);
+           
+
             if (shoppingCartItemId) {
+              setSelectedIds([shoppingCartItemId]);
               sessionStorage.setItem(
                 "selected_checkout_ids",
                 JSON.stringify([shoppingCartItemId]),
@@ -165,3 +178,5 @@ export default function ProductPurchaseActions({
     </>
   );
 }
+
+

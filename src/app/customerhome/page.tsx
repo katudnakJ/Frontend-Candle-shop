@@ -66,22 +66,30 @@ export default function Home() {
   }, [currentPage]);
 
   // API : Get Products (All products)
+ const { 
+  allProducts, 
+  recommendedItems, 
+  totalProducts, 
+  nextPages, 
+  productStartAt, 
+  productEndAt 
+} = useMemo(() => {
   const productData = data?.data || data;
+  const typedData = productData as ProductHomeResData;
 
-  const allProducts = (productData as ProductHomeResData)?.allProducts || [];
-  const recommendedItems =
-    (productData as ProductHomeResData)?.featuredProducts || [];
-  const totalProducts = (productData as ProductHomeResData)?.totalProducts || 0;
-  const nextPages = (productData as ProductHomeResData)?.hasNext || false;
-  const productStartAt = (productData as ProductHomeResData)?.startAt || 0;
-  const productEndAt = (productData as ProductHomeResData)?.endAt || 0;
+  return {
+    allProducts: typedData?.allProducts || [],
+    recommendedItems: typedData?.featuredProducts || [],
+    totalProducts: typedData?.totalProducts || 0,
+    nextPages: typedData?.hasNext || false,
+    productStartAt: typedData?.startAt || 0,
+    productEndAt: typedData?.endAt || 0,
+  };
+}, [data]);
 
   const totalPages =
     totalProducts > 0 ? Math.ceil(totalProducts / pageSize) : 1;
-
-  //const allProducts = [...recommendedItems, ...nonFeaturedItems];
-  //(recommendedItems.length || 0) + (productData?.nonFeaturedTotal || 0);
-
+    
   usePrefetchHomeProducts(currentPage + 1, pageSize, nextPages, totalPages );
 
   const sortedProducts = useMemo(() => {
@@ -93,8 +101,7 @@ export default function Home() {
     if (sortBy === "newest") {
       return products.sort(
         (a, b) =>
-          new Date(b.productCreatedDate).getTime() -
-          new Date(a.productCreatedDate).getTime(),
+          new Date(b.productCreatedDate).getTime() - new Date(a.productCreatedDate).getTime(),
       );
     }
     return products;

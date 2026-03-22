@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useGetProductDetail } from "@/modules/products/hooks/useGetProductDetail";
 
@@ -9,6 +9,7 @@ import Footer from "@/components/layout/Footer";
 import ProductImageCarousel from "@/modules/products/components/ProductImageCarousel";
 import ProductPurchaseActions from "@/modules/products/components/ProductPurchaseActions";
 import { CartHeader } from "@/modules/cart/components/CartHeader";
+import { ProductDetailResData } from "@/modules/products/detailproduct";
 
 export default function ProductDetailPage({
   params,
@@ -21,12 +22,19 @@ export default function ProductDetailPage({
   const productId = searchParams.get("id");
   const { data, isLoading, isError } = useGetProductDetail(productId);
 
+  const { product, productImages } = useMemo(() => {
+    const productDetailData = data?.data || data;
+    const typedData = productDetailData as ProductDetailResData;
+    return {
+      product: typedData?.product || null,
+      productImages: typedData?.productImages || [],
+    };
+  }, [data]);
+
   if (isLoading)
     return <div className="p-10 text-center">กำลังโหลดข้อมูล...</div>;
   if (isError || !data)
     return <div className="p-10 text-center">ไม่พบข้อมูลสินค้า</div>;
-
-  const { product, productImages } = data?.data || data;;
 
   if (!product)
     return <div className="p-10 text-black">ไม่พบสินค้า (Name: {slug})</div>;
@@ -37,7 +45,7 @@ export default function ProductDetailPage({
         <Header />
         <main className="grow bg-white pb-20">
           <div className="max-w-[1200px] mx-auto p-4 flex items-center">
-        <CartHeader  isDetailProduct={true}/>
+            <CartHeader isDetailProduct={true} />
           </div>
 
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">
@@ -75,14 +83,32 @@ export default function ProductDetailPage({
 
                 <div className="flex justify-between items-center text-sm sm:text-base">
                   <span className="text-gray-500">เวลาผลิต</span>
-                  <span className="text-black font-semibold">3-5 วัน</span>
+                  <span className="text-black font-semibold">5-7 วัน</span>
+                </div>
+                <div className="pt-2 border-t border-gray-100">
+                  <p className="text-[11px] sm:text-xs text-gray-400 text-left italic">
+                    *กรณีสั่งซื้อมากกว่า{" "}
+                    <span className="text-red-400 font-bold">1,000 ชิ้น</span>{" "}
+                    ขึ้นไป
+                    <br className="block sm:hidden" />{" "}
+                    {/* ตัดบรรทัดเฉพาะมือถือ */}
+                    กรุณา{" "}
+                    <span className="text-gray-600 font-bold underline ">
+                      ติดต่อร้านค้าโดยตรง
+                    </span>{" "}
+                    เพื่อรับราคาพิเศษ
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="max-w-[1200px] mx-auto px-4 md:px-6">
-            <ProductPurchaseActions price={product.price} productId={product.productId} productName={product.productName} />
+            <ProductPurchaseActions
+              price={product.price}
+              productId={product.productId}
+              productName={product.productName}
+            />
           </div>
         </main>
         <Footer />

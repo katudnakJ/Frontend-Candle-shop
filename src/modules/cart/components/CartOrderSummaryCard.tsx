@@ -29,8 +29,9 @@ export const CartOrderSummaryCard = ({
         <div className="space-y-4 font-bold text-lg">
          
           <div className="flex justify-between">
-            <span className="text-gray-500 font-medium">
-              ยอดรวมสินค้า ({totalQuantity} รายการ)
+            <span className="max-[410px]:flex flex-col text-gray-500 font-medium">
+              ยอดรวมสินค้า 
+              <span>({totalQuantity} รายการ)</span>
             </span>
             <span className="text-black font-black">
               ฿{subtotal.toLocaleString()}

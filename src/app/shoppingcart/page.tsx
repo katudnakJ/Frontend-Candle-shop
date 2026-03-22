@@ -3,15 +3,15 @@
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 
+import { useEffect,useState } from "react";
 import { useCart } from "@/modules/cart/hooks/useCart";
-import { MOCK_CART_DATA } from "@/modules/cart/mockcart";
 import { CartHeader } from "@/modules/cart/components/CartHeader";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
-import EmptyCartState from "@/modules/cart/components/EmptyCartState";
-import { useEffect,useState } from "react";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { ShoppingCartSkeletonpage } from "@/modules/cart/components/skeletoncart/ShoppingCartSkeletonpage";
+
+import EmptyCartState from "@/modules/cart/components/EmptyCartState";
 
 export default function ShoppingCartPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -48,7 +48,7 @@ export default function ShoppingCartPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="flex flex-col w-full min-h-screen bg-white">
       <Header />
 
       <main className="flex-grow bg-white">

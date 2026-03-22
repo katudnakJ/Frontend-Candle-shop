@@ -18,22 +18,41 @@ import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummary
 import { useGetCartData } from "@/modules/cart/hooks/useGetCartData";
 import { GenericResponse } from "@/types/response.type";
 import { ShoppingCartData } from "@/modules/cart/shoppingcartInterface";
+import { useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+  const page = Number(searchParams.get("page")) || 0;
+  const size = Number(searchParams.get("size")) || 100;
+
+  const cachedData = queryClient.getQueryData<
+    GenericResponse<ShoppingCartData>
+  >(["shopping-cart", page, size]);
+
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { data, isLoading } = useGetCartData() as {
+  const { data, isLoading } = useGetCartData(page, size) as {
     data: GenericResponse<ShoppingCartData> | undefined;
     isLoading: boolean;
   };
-  console.log("CheckoutPRODUCT:" , data)
+    if (process.env.NODE_ENV === "development") {
+  console.log("CheckoutPRODUCT:", data);
+    }
   const { selectedIds, getPrimaryImage, setSelectedIds } = useCartStore();
   const selectedAddress = mockAddresses[0];
 
 
- const CheckoutData = data?.data || data;
-const cartItem = (CheckoutData as ShoppingCartData)?.cartItems|| [];
+  const displayData = data || cachedData;
+  const CheckoutData = data?.data || displayData;
+  const cartItem = useMemo(() => {
+    
+    
+    return (CheckoutData as ShoppingCartData)?.cartItems || [];
+  }, [CheckoutData]);
+
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 500);
 
@@ -44,10 +63,11 @@ const cartItem = (CheckoutData as ShoppingCartData)?.cartItems|| [];
       }
     }
     return () => clearTimeout(timer);
-  }, [cartItem.length, selectedIds.length, setSelectedIds]);
+  }, [selectedIds.length, setSelectedIds]);
 
   const selectedItems = useMemo(
-    () => cartItem.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
+    () =>
+      cartItem.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
     [cartItem, selectedIds],
   );
 
@@ -55,10 +75,13 @@ const cartItem = (CheckoutData as ShoppingCartData)?.cartItems|| [];
     if (
       isMounted &&
       !isLoading &&
-      selectedItems.length === 0 &&
-      cartItem.length > 0
+      cartItem.length > 0 &&
+      selectedItems.length === 0
     ) {
-      router.push("/shoppingcart");
+      const saved = sessionStorage.getItem("selected_checkout_ids");
+      if (!saved || JSON.parse(saved).length === 0) {
+        router.push("/shoppingcart");
+      }
     }
   }, [isMounted, isLoading, selectedItems.length, cartItem.length, router]);
 
@@ -87,11 +110,14 @@ const cartItem = (CheckoutData as ShoppingCartData)?.cartItems|| [];
       </div>
     );
   }
-  console.log("All Items in Store:", cartItem);
-  console.log("Selected IDs from Session:", selectedIds);
-  console.log("Filtered Selected Items:", selectedItems);
+  if (process.env.NODE_ENV === "development") {
+    console.log("All Items in Store:", cartItem);
+    console.log("Selected IDs from Session:", selectedIds);
+    console.log("Filtered Selected Items:", selectedItems);
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col w-full min-h-screen bg-white">
       <Header />
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4 space-y-6">

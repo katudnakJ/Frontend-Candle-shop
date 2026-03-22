@@ -60,11 +60,11 @@ export const CartSummaryBar = ({
             >
               <button
                 disabled={isDisabled}
-                className={`py-3 px-8 max-[360px]:px-15 md:px-30 rounded-2xl border-4 border-black font-black text-lg transition-all uppercase tracking-wider shrink
+                className={`py-3 px-12 max-[380px]:px-20 md:px-30 rounded-2xl border-4 border-black font-black text-lg transition-all uppercase tracking-wider shrink
                   ${
                     isDisabled
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-70 shadow-none"
-                      : "bg-[#FFB0D1] text-black cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
+                      : "bg-[#FFB0D1] text-black  cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
                   }`}
               >
                 ชำระเงิน

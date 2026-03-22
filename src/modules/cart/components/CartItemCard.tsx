@@ -4,8 +4,8 @@ import { Trash2, Plus, Minus } from "lucide-react";
 
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { useState } from "react";
-import Image from "next/image";
 import { CartItem } from "../shoppingcartInterface";
+import { SmartImage } from "@/components/commonui/SmartImage";
 
 interface CartItemProps {
   item: CartItem;
@@ -37,6 +37,17 @@ export const CartItemCard = ({
     setIsDialogOpen(false);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVal = parseInt(e.target.value);
+    if (!isNaN(newVal)) {
+      const clampedVal = Math.max(1, Math.min(1000, newVal));
+
+      onUpdateQty(item.shoppingCartItemId, clampedVal - item.quantity);
+    } else if (e.target.value === "") {
+      onUpdateQty(item.shoppingCartItemId, 1 - item.quantity);
+    }
+  };
+
   return (
     <>
       <div
@@ -55,18 +66,18 @@ export const CartItemCard = ({
         )}
 
         <div className="relative w-24 h-24 md:w-32 md:h-32 border-2 border-black rounded-2xl overflow-hidden bg-gray-50 shrink-0">
-          <Image
-            src={image || "/placeholder-image.svg"}
+          <SmartImage
+            key={image}
+            src={image}
             alt={item.productName || "Product Image"}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 96px, 128px"
-            priority={false}
           />
         </div>
 
         <div className="flex flex-col justify-between flex-1 min-w-0">
-          <div className="flex max-[360px]:flex-col justify-between items-start gap-2">
+          <div className="flex  justify-between items-start gap-2">
             <h3 className="font-black text-sm md:text-lg min-[360px]:truncate">
               {item.productName}
             </h3>
@@ -95,16 +106,16 @@ export const CartItemCard = ({
             variant="danger"
           />
 
-          <div className="flex max-[360px]:flex-col justify-between items-end mt-2">
-            <p className="font-black text-lg md:text-xl">฿{item.price}</p>
-            <div className="text-right">
+          <div className="flex max-[420px]:flex-col justify-between  items-end mt-2">
+            <p className="font-black text-[16px] md:text-xl">฿{item.price}/ชิ้น</p>
+            <div className="w-full min-[360px]:w-auto text-right">
               {isCheckout ? (
                 <div className="space-y-1">
                   <p className="text-sm font-bold text-gray-500">
                     จำนวน{" "}
                     <span className="text-black ml-4">{item.quantity}</span>
                   </p>
-                  <p className="font-black text-lg">
+                  <p className="font-black text-[16px] md:text-lg">
                     รวมทั้งหมด{" "}
                     <span className="text-red-500 ml-2">
                       ฿{((item.price ?? 0) * item.quantity).toLocaleString()}
@@ -120,9 +131,13 @@ export const CartItemCard = ({
                   >
                     <Minus className="w-4 h-4 cursor-pointer" />
                   </button>
-                  <span className="px-3 font-black border-x-2 border-black bg-gray-50">
-                    {item.quantity}
-                  </span>
+                  <input
+                    type="number"
+                    value={item.quantity}
+                    onChange={handleInputChange}
+                    className="w-14 px-1 text-center font-black border-x-2 border-black bg-gray-50 focus:outline-none 
+    [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
                   <button
                     onClick={() => onUpdateQty?.(item.shoppingCartItemId, 1)}
                     className="px-2 py-1 hover:bg-black hover:text-white transition-colors"

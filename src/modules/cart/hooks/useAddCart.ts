@@ -26,7 +26,7 @@ export const useAddCart = () => {
       });
       if (process.env.NODE_ENV === "development") {
         console.error(
-          `[AddCart Error] Status: ${err.statusCode}, Remark: ${err.remark}`,
+          `[AddCart Error] Status: ${err?.statusCode ?? 'N/A'}, Remark: ${err?.remark ?? 'Client Error'}`,
         );
       }
     },
