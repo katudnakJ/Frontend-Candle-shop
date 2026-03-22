@@ -11,6 +11,7 @@ return useQuery({
         return response.data ?? [];
       },
       staleTime: 5 * 60 * 1000,
+      retry: 0,
     })
 }
 
@@ -22,6 +23,7 @@ export const useGetAddressDetail = (addressId: string) => {
         return response.data ?? null;
       },
       staleTime: 5 * 60 * 1000,
+      retry: 0,
       enabled: !!addressId,
     })
 }

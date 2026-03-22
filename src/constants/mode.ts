@@ -3,4 +3,5 @@ export enum MODE {
     EDIT = "edit",
     DELETE = "delete",
     VIEW = "view",
+    WELCOME = "welcome",
 }
