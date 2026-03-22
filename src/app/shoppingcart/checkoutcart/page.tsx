@@ -11,7 +11,7 @@ import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import calculateShipping from "@/utils/calculateShipping";
 import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
-import { CartHeader } from "@/modules/cart/components/CartHeader";
+import { PreviousButton } from "@/components/commonui/PreviousButton";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
@@ -122,7 +122,7 @@ export default function CheckoutPage() {
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4 space-y-6">
           <div>
-            <CartHeader itemCount={cartItem.length} isCheckout={true} />
+            <PreviousButton itemCount={cartItem.length} isCheckout={true} />
           </div>
           <section className="border-gray-300 border-b-2">
             <div className="flex font-black text-xl mb-3 gap-2 uppercase ">

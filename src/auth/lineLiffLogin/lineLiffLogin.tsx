@@ -19,6 +19,11 @@ const LineLiffLogin = () => {
     userData
   } = useAuthStoreUserLogin();  
 
+     if (process.env.NODE_ENV === "development") {
+
+        console.log("USERDATA IS : ",userData)      
+     }
+
   return (
     <>
       {isLoading ? (

@@ -8,7 +8,7 @@ import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import ProductImageCarousel from "@/modules/products/components/ProductImageCarousel";
 import ProductPurchaseActions from "@/modules/products/components/ProductPurchaseActions";
-import { CartHeader } from "@/modules/cart/components/CartHeader";
+import { PreviousButton } from "@/components/commonui/PreviousButton";
 import { ProductDetailResData } from "@/modules/products/detailproduct";
 
 export default function ProductDetailPage({
@@ -45,7 +45,7 @@ export default function ProductDetailPage({
         <Header />
         <main className="grow bg-white pb-20">
           <div className="max-w-[1200px] mx-auto p-4 flex items-center">
-            <CartHeader isDetailProduct={true} />
+            <PreviousButton isDetailProduct={true} />
           </div>
 
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">

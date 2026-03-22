@@ -7,7 +7,7 @@ import { CircleCheckBig } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import calculateShipping from "@/utils/calculateShipping";
-import { CartHeader } from "@/modules/cart/components/CartHeader";
+import { PreviousButton } from "@/components/commonui/PreviousButton";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { QRpaymentSkeletonpage } from "@/modules/cart/components/skeletoncart/QRpaymentSkeletonpage";
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
@@ -160,7 +160,7 @@ export default function PaymentPage() {
           <div>
             {mode === "repay" ? (
               <div className="mb-4">
-                <CartHeader
+                <PreviousButton
                 itemCount={paymentData.displayItems.length}
                 isRepay={true}
               />
@@ -172,7 +172,7 @@ export default function PaymentPage() {
                 </p>
               </div>
             ) : (
-              <CartHeader
+              <PreviousButton
                 itemCount={paymentData.displayItems.length}
                 isCheckout={true}
               />

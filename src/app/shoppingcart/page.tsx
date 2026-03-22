@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 
 import { useEffect,useState } from "react";
 import { useCart } from "@/modules/cart/hooks/useCart";
-import { CartHeader } from "@/modules/cart/components/CartHeader";
+import { PreviousButton } from "@/components/commonui/PreviousButton";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
@@ -53,7 +53,7 @@ export default function ShoppingCartPage() {
 
       <main className="flex-grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
-          <CartHeader itemCount={cartItem.length} isShopingcart={true}/>
+          <PreviousButton itemCount={cartItem.length} isShopingcart={true}/>
 
           {cartItem.length > 0 && (
             <div className="mb-4 flex items-center gap-2 px-2">
