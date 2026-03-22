@@ -1,4 +1,3 @@
-import { Status } from "@/types/response.type";
 
 export interface LineProfileResponse {
     displayName : string
@@ -8,6 +7,6 @@ export interface LineProfileResponse {
 export interface UserLoginResponse {
     userId : string
     userRole : string
+    isOwner : boolean
     lineProfile : LineProfileResponse
-    status : Status
 }

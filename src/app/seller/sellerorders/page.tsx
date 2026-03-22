@@ -3,22 +3,20 @@
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
-import { OrderCard } from "@/modules/orders/components/OrderCard";
+// import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
 import { useSellerOrders } from "@/modules/orders/hooks/useSellerOrders";
+import { SELLER_ORDER_TAB } from "@/constants/status";
 
 export default function Sellerorders (){
 
-  const { activeTab, setActiveTab, filteredOrders, isLoading } =
-    useSellerOrders();
-
-  const tabs = [
-    { key: "PD", label: "รอตรวจสอบ" },
-    { key: "TS", label: "ที่ต้องจัดส่ง" },
-    // { key: "TR", label: "ที่ต้องได้รับ" },
-    { key: "CP", label: "สำเร็จแล้ว" },
-  ];
+  const { 
+    activeTab, 
+    setActiveTab, 
+    OrdersByTab, 
+    isLoading 
+  } = useSellerOrders();
 
 
   return (
@@ -30,7 +28,7 @@ export default function Sellerorders (){
 
           <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-6">
             <div className="flex bg-white border-4 border-black rounded-2xl overflow-hidden  mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  ">
-              {tabs.map((tab) => (
+              {SELLER_ORDER_TAB.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as OrderStatus)}
@@ -53,15 +51,18 @@ export default function Sellerorders (){
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order) => (
-                    <OrderCard key={order.order_id} order={order} mode="Seller" />
-                  ))
-                ) : (
-                  /* กรณีไม่มีข้อมูลใน Tab นั้น */
-                  <div className="text-center py-20 bg-white border-4 border-dashed border-gray-300 rounded-[2rem]">
-                    <p className="text-gray-400 font-black text-xl">
-                      ไม่พบรายการสั่งซื้อในหน้านี้
+                {
+                  OrdersByTab.length > 0 ? (
+                    OrdersByTab.map((order) => (
+                      <div key={order.order_id} className="border border-gray-300 rounded-lg p-4">
+                        {/* Order content goes here */}
+                      </div>
+                    ))
+                  ) : (
+                    /* กรณีไม่มีข้อมูลใน Tab นั้น */
+                    <div className="text-center py-20 bg-white border-4 border-dashed border-gray-300 rounded-[2rem]">
+                      <p className="text-gray-400 font-black text-xl">
+                        ไม่พบรายการสั่งซื้อในหน้านี้
                     </p>
                   </div>
                 )}

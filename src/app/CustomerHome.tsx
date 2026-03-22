@@ -17,7 +17,7 @@ import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
 import ProductCard from "@/modules/products/components/ProductCard";
 
 
-export default function Home() {
+export default function CustomerHome() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sortBy, setSortBy] = useState<string>("default");
@@ -42,7 +42,7 @@ export default function Home() {
   const handlePageChange = (newPage: number) => {
     const displayPage = newPage + 1;
     if (displayPage === 1) {
-      router.push(`/customerhome`, { scroll: false });
+      router.push(`/`, { scroll: false });
     } else {
       router.push(`?page=${displayPage}`, { scroll: false });
     }

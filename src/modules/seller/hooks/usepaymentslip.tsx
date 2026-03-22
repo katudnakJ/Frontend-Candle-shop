@@ -2,6 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { PaymentService } from "../services/payment.service";
 import { toast } from "react-hot-toast";
 import imageCompression from "browser-image-compression";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/utils/api";
+import { Status } from "@/types/response.type";
 
 export const usePaymentSlip = (
   onFileSelect: (file: File | null) => void,
@@ -11,6 +14,8 @@ export const usePaymentSlip = (
   const [fileError, setFileError] = useState(false);
   const [inputKey, setInputKey] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+
 
   const revokePreview = useCallback((url: string | null) => {
     if (url && url.startsWith("blob:")) {
@@ -98,6 +103,57 @@ const resetFile = useCallback(() => {
     setFileError(false);
   }, [onFileSelect, revokePreview]);
 
+  const uploadSellerQrPayment = useMutation({
+    mutationKey: ["reUploadSellerQrPayment"],
+    mutationFn: async (qrImageFile: File) => {
+      const formData = new FormData();
+      formData.append("imageData", qrImageFile);
+
+      const response = apiClient.post("/v1/seller/qr-payment", 
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        })
+
+        return response ?? null;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["getQRPaymentImage"] });
+      toast.success("อัปโหลดสลิปสำเร็จ");
+    },
+    onError: (error : Status) => {
+      toast.error(error.message ?? "เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
+    }
+  });
+
+  const reUploadSellerQrPayment = useMutation({
+    mutationKey: ["reUploadSellerQrPayment"], 
+    mutationFn: async (qrImageFile: File) => {
+      const formData = new FormData();
+      formData.append("imageData", qrImageFile);
+
+      const response = apiClient.put("/v1/seller/qr-payment",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        })
+        return response ?? null;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["getQRPaymentImage"] });
+      toast.success("อัปโหลดสลิปสำเร็จ");
+    },
+    onError: (error : Status) => {
+      toast.error(error.message ?? "เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
+    }
+  });
+
   return {
     slipPreview,
     fileError,
@@ -107,5 +163,7 @@ const resetFile = useCallback(() => {
     handleBoxClick,
     onFileChange,
     resetFile,
+    uploadSellerQrPayment,
+    reUploadSellerQrPayment,
   };
 };

@@ -1,9 +1,11 @@
 "use client";
 
-import { QrCode, X } from "lucide-react";
+import { Pencil, QrCode, RotateCcw } from "lucide-react";
+import Image from "next/image";
 
 interface QRpaymentshopProps {
   qrCodeImage: string | null;
+  hasExistingImage?: boolean;
   selectedFile: File | null;
   isImageLoading: boolean;
   isUploading: boolean;
@@ -11,7 +13,7 @@ interface QRpaymentshopProps {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onTriggerFileInput: () => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onClearImage: () => void;
+  onClearImage?: () => void;
   onUndoImage: () => void;
   onConfirm: () => void;
   setIsImageLoading: (loading: boolean) => void;
@@ -19,18 +21,18 @@ interface QRpaymentshopProps {
 
 export default function QRpaymentshop({
   qrCodeImage,
+  hasExistingImage,
   selectedFile,
-  isImageLoading,
   isUploading,
   inputKey,
   fileInputRef,
   onTriggerFileInput,
   onImageChange,
-  onClearImage,
   onUndoImage,
   onConfirm,
   setIsImageLoading,
 }: QRpaymentshopProps) {
+
   return (
     <div className="flex flex-col items-center gap-6 py-6">
       <h2 className="text-xl font-bold text-black w-full text-left">
@@ -46,86 +48,67 @@ export default function QRpaymentshop({
         className="hidden"
       />
 
-      {qrCodeImage ? (
-        <div className="relative group w-full max-w-[600px] animate-in fade-in zoom-in duration-300">
-          {isImageLoading && !selectedFile && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-zinc-50 border-2 border-black rounded-[2rem] animate-pulse">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm font-bold text-black">
-                  กำลังโหลดรูปภาพ...
-                </p>
-              </div>
-            </div>
-          )}
-
-          <img
-            src={qrCodeImage}
-            alt="PromptPay QR"
-            onLoad={() => setIsImageLoading(false)}
-            onError={() => setIsImageLoading(false)}
-            className={`w-full aspect-[5/4] object-contain border-2 border-black rounded-[2rem] bg-zinc-50 p-2 transition-all duration-500 ${
-              isImageLoading && !selectedFile
-                ? "opacity-0 scale-95"
-                : "opacity-100 scale-100"
-            }`}
+       <div
+  onClick={onTriggerFileInput}
+  className={`relative w-full max-w-[600px] border-4 border-dashed border-gray-300 rounded-[2rem] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black hover:bg-zinc-50 transition-all group active:scale-95 overflow-hidden ${hasExistingImage ? "h-auto" : "min-h-[320px]"}`}
+>
+  {(hasExistingImage || selectedFile) && qrCodeImage ? (
+    <>
+      <Image
+        src={qrCodeImage}
+        alt="QR Code"
+        className="block w-full h-auto object-contain p-4"
+        onLoad={() => setIsImageLoading(false)}
+        onError={() => setIsImageLoading(false)}
+        priority
+        width={180}
+        height={180}
+      />
+      
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+        <Pencil className="opacity-0 group-hover:opacity-100 transition-opacity font-black text-white text-sm" 
+          size={25} color="#ffffff"
           />
-          <button
-            type="button"
-            onClick={onClearImage}
-            className="absolute -top-3 -right-3 bg-red-500 text-white p-2 rounded-full shadow-xl hover:bg-red-600 transition-all border-2 border-white active:scale-90"
-          >
-            <X size={20} />
-          </button>
-        </div>
-      ) : (
-        <div
-          onClick={onTriggerFileInput}
-          className="w-full max-w-[600px] aspect-[5/4] border-4 border-dashed border-gray-300 rounded-[2rem] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-black hover:bg-zinc-50 transition-all group active:scale-95"
-        >
-          <div className="p-5 bg-zinc-100 rounded-full group-hover:bg-cprojectone transition-colors">
-            <QrCode
-              size={40}
-              className="text-gray-400 group-hover:text-black"
-            />
-          </div>
-          <span className="font-black text-gray-500 group-hover:text-black text-center px-4">
-            คลิกเพื่อเพิ่มรูป <br /> QR Code ธนาคาร
-          </span>
-        </div>
-      )}
+        <span className="opacity-0 group-hover:opacity-100 transition-opacity font-black text-white text-shadow-black text-shadow-2xs text-lg ml-5">
+          เปลี่ยนรูป
+        </span>
+      </div>
+    </>
+  ) : (
+    <>
+      <div className="p-5 bg-zinc-100 rounded-full group-hover:bg-cprojectone transition-colors">
+        <QrCode size={40} className="text-gray-400 group-hover:text-black" />
+      </div>
+      <span className="font-black text-gray-500 group-hover:text-black text-center px-4">
+        คลิกเพื่อเพิ่มรูป <br /> QR Code ธนาคาร
+      </span>
+    </>
+  )}
+</div>
 
       {qrCodeImage && selectedFile && (
-        <button
-          onClick={onConfirm}
-          disabled={isUploading}
-          className={`mt-4 bg-black text-white px-10 py-3 rounded-full font-bold transition-all shadow-lg active:scale-95 
-            ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-800"}`}
-        >
-          {isUploading ? "กำลังบันทึก..." : "ยืนยันข้อมูล QR Payment"}
-        </button>
-      )}
+        <>  
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6"> 
+           <button
+             onClick={onUndoImage}
+             className="w-full sm:w-auto bg-gray-100 text-gray-800 px-8 py-3 rounded-full font-bold transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 hover:bg-gray-200"
+           >
+             <RotateCcw className="w-4 h-4 shrink-0" />
+             <span className="whitespace-nowrap">ใช้รูปเดิม</span>
+           </button>
 
-      <div className="bg-blue-50 border-2 border-blue-200 p-4 rounded-2xl space-y-2">
-        <p className="font-bold text-xl text-blue-700  mb-2">
-          💡 คำแนะนำการใช้งาน:
-        </p>
-        <ul className="text-[14px] text-blue-600 font-medium space-y-1 list-decimal pl-4">
-          <li>ตรวจสอบชื่อและหมายเลขบัญชีบนรูปภาพให้ถูกต้อง</li>
-          <li>หากต้องการแก้ไข ให้กดปุ่ม (X) และอัปโหลดรูปใหม่อีกครั้ง</li>
-          <li >
-          <span className="flex items-center gap-2">
-          หากเผลอลบและต้องการรูปเดิม
-            <button
-              onClick={onUndoImage}
-              className="px-2 py-0.5 bg-orange-200 hover:bg-orange-300 text-orange-800 rounded-lg font-bold transition-colors underline"
-            >
-              คลิกที่นี่เพื่อคืนค่า
-            </button>
-            </span>
-          </li>
-        </ul>
-      </div>
+           {/* ปุ่มยืนยัน */}
+           <button
+             onClick={onConfirm}
+             disabled={isUploading}
+             className={`w-full sm:w-auto bg-black text-white px-10 py-3 rounded-full font-bold transition-all shadow-lg active:scale-95 
+               ${isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-800"}`}
+           >
+             {isUploading ? "กำลังบันทึก..." : "ยืนยันข้อมูล QR Payment"}
+           </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

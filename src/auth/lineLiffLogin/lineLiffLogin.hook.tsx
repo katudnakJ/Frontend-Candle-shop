@@ -27,7 +27,6 @@ const useLiffLogin = () => {
         liff.login({
           redirectUri: `${process.env.NEXT_PUBLIC_LINE_LIFF_REDIRECT_URL}`,
         });
-        router.push(ROUTE.HOME); //อาจมีการbug เรื่องทับซ้อนกัน Redirect
         return false;
       }
     } catch (err) {
@@ -36,16 +35,25 @@ const useLiffLogin = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      await initializeLiff();
-    })();
-  }, []);
+  let isMounted = true;
+
+  (async () => {
+    await initializeLiff();
+    if (isMounted) {
+      setError(null);
+    }
+  })();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
 
   const logout = async () => {
     if (liff.isLoggedIn()) {
       liff.logout();
-      storeUserLogout();
-      router.refresh();
+      await storeUserLogout();
+      window.location.replace("/");
     }
   };
 

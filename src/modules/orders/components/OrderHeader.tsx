@@ -7,12 +7,11 @@ interface OrderHeaderProps {
 }
 
 export function OrderHeader ({ mode = "customerorders" , namemode}: OrderHeaderProps) {
-  const clickback = mode === "sellerorders" ? "/sellerhome" : "/customerhome"
    
    return(
   <div className="flex items-center gap-2 mb-6">
     <div className="flex items-center">
-      <Link href={clickback}>
+      <Link href="/">
         <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
       </Link>
       <span>
