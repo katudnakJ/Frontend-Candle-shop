@@ -11,8 +11,7 @@ const useLiffLogin = () => {
 
   const router = useRouter();
 
-  const { login: storeUserLogin, logout: storeUserLogout } =
-    useAuthStoreUserLogin();
+  const { login: storeUserLogin, logout: storeUserLogout } = useAuthStoreUserLogin();
 
    const liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
 
@@ -20,8 +19,9 @@ const useLiffLogin = () => {
     try {
       await liff.init({ liffId });
       if (liff.isLoggedIn()) {
+
         const token = liff.getAccessToken() || "";
-        storeUserLogin(token);        
+        
         router.push(ROUTE.HOME);
       } else {
         liff.login({
