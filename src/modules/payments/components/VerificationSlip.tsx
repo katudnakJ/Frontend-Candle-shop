@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X } from "lucide-react";
-import { Order } from "@/modules/orders/type";
+import { Order, OrdersResponse } from "@/modules/orders/type";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 
 interface VerificationModalProps {
-  order: Order;
+  order: OrdersResponse;
   onClose: () => void;
   onConfirm: () => void;
   onReject: (reason: string) => void;
@@ -57,12 +57,12 @@ export const VerificationSlip = ({
                 onClick={() => setIsImageZoomed(true)}
                 className="relative min-h-[300px] max-h-[500px] w-full border-4 border-black rounded-3xl overflow-hidden bg-gray-100 shadow-[inner_0_2px_4px_rgba(0,0,0,0.1)]"
               >
-                <Image
+                {/* <Image
                   src={order.slipURL || "/placeholder-image.svg"}
                   alt="Payment Slip"
                   fill
                   className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
-                />
+                /> */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center">
                   <span className="bg-black/50 text-white px-3 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                     คลิกเพื่อขยาย
@@ -74,7 +74,7 @@ export const VerificationSlip = ({
                 <p className="font-bold text-sm text-gray-500 text-center">
                   ยอดที่ต้องชำระ:{" "}
                   <span className="text-red-600 text-lg">
-                    ฿<CurrencyDisplay amount={order.net_amount} /> 
+                    ฿<CurrencyDisplay amount={order.netAmount} /> 
                   </span>
                 </p>
               </div>
@@ -153,13 +153,13 @@ export const VerificationSlip = ({
                   </button>
 
                   <div className="relative w-full h-full max-w-5xl max-h-[90vh]">
-                    <Image
+                    {/* <Image
                       src={order.slipURL || "/placeholder-image.svg"}
                       alt="Full Payment Slip"
                       fill
                       className="object-contain"
                       priority
-                    />
+                    /> */}
                   </div>
                 </div>,
                 document.body,
@@ -183,7 +183,7 @@ export const VerificationSlip = ({
             <br />
             <span>ยอดเงิน: </span>
             <span className="font-bold text-black">
-              ฿<CurrencyDisplay amount={order.net_amount} /> 
+              ฿<CurrencyDisplay amount={order.netAmount} /> 
             </span>{" "}
           </>
         }

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Order } from "../type";
-import { useGetOrdersByStatus } from "@/modules/seller/hooks/useGetOrder";
+import { OrderByStatusResponse, useGetOrdersByStatus } from "@/modules/seller/hooks/useGetOrder";
 
 export const useSellerOrders = () => {
  
@@ -9,8 +9,16 @@ export const useSellerOrders = () => {
   const {data : orders, isLoading} = useGetOrdersByStatus(activeTab.toUpperCase());
 
   
-  const OrdersByTab = useMemo(() => {
-    return orders?.data.orders || [];
+  const OrdersByTab: OrderByStatusResponse = useMemo(() => {
+    return orders?.data || {
+      orders: [],
+      page: 0,
+      size: 0,
+      startAt: 0,
+      endAt: 0,
+      hasNext: false,
+      totalOrders: 0,
+    };
   }, [orders]);
 
   return {

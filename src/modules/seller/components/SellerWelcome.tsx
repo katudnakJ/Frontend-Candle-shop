@@ -18,7 +18,7 @@ export default function SellerWelcome({ mode }: SellerWelcomeProps) {
   const [showSkeleton, setShowSkeleton] = useState(true);
   const { 
     data : totalOrderPending, isError, error 
-  } = useGetOrderCountByStatus(ORDER_STATUS.PENDING, mode === MODE.WELCOME);
+  } = useGetOrderCountByStatus(ORDER_STATUS.PENDING, mode === MODE.WELCOME && !storeLoading);
 
   useEffect(() => {
 

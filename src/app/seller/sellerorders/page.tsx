@@ -3,11 +3,12 @@
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
-// import { OrderCard } from "@/modules/orders/components/OrderCard";
+import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
 import { useSellerOrders } from "@/modules/orders/hooks/useSellerOrders";
 import { SELLER_ORDER_TAB } from "@/constants/status";
+import { useAuthStoreUserLogin } from "@/store/userLogin";
 
 export default function Sellerorders (){
 
@@ -18,6 +19,7 @@ export default function Sellerorders (){
     isLoading 
   } = useSellerOrders();
 
+  const { userData } = useAuthStoreUserLogin();
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-white">
@@ -52,10 +54,14 @@ export default function Sellerorders (){
             ) : (
               <div className="space-y-2">
                 {
-                  OrdersByTab.length > 0 ? (
-                    OrdersByTab.map((order) => (
-                      <div key={order.order_id} className="border border-gray-300 rounded-lg p-4">
+                  OrdersByTab.size > 0 ? (
+                    OrdersByTab.orders.map((order) => (
+                      <div key={order.orderId} className="border border-gray-300 rounded-lg p-4">
                         {/* Order content goes here */}
+                        <OrderCard 
+                          order={order}
+                          mode={userData?.userRole}
+                        />
                       </div>
                     ))
                   ) : (

@@ -48,6 +48,12 @@ export interface OrdersResponse {
   addressLabel: string | null;
   deliveryMethod: string | null;
   netAmount: number;
+  orderNo: string;
+  orderStatus: string;
+  rejectionReason: string | null;
+  orderCreatedAt: string;
+  totalAmount: number;
+  totalQuantity: number;
+  trackingNo: string[];
   orderItems: OrderItemsResponse[];
-
 }

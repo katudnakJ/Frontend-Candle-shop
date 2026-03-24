@@ -1,11 +1,11 @@
-import { Order } from "@/modules/orders/type";
+import { Order, OrdersResponse } from "@/modules/orders/type";
 import { GenericResponse } from "@/types/response.type";
 import { apiClient } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query"
 
 
- interface OrderByStatusResponse {
-  orders: Order[];
+ export interface OrderByStatusResponse {
+  orders: OrdersResponse[];
   page: number;
   size: number;
   startAt: number;
@@ -36,10 +36,12 @@ export const useGetOrdersByStatus = (status: string) => {
     return useQuery({
         queryKey: ["getOrdersByStatus", status],
         queryFn: async () => {
-            return await apiClient.get<void, GenericResponse<OrderByStatusResponse>>(`/v1/seller/orders`,
+            return await apiClient.get<void, GenericResponse<OrderByStatusResponse>>(`/v1/order`,
                 {
                     params: {
                         status: status,
+                        page : 0,
+                        size : 10,
                     }
                 }
             );
