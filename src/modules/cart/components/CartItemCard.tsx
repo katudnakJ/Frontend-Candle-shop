@@ -3,7 +3,7 @@
 import { Trash2, Plus, Minus } from "lucide-react";
 
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CartItem } from "../shoppingcartInterface";
 import { SmartImage } from "@/components/commonui/SmartImage";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
@@ -16,6 +16,8 @@ interface CartItemProps {
   onUpdateQty: (id: string, delta: number) => void;
   onRemove: (id: string) => void;
   image: string;
+  max?: number;
+  min?: number;
 }
 
 export const CartItemCard = ({
@@ -26,9 +28,12 @@ export const CartItemCard = ({
   onUpdateQty,
   onRemove,
   image,
+  max = 1000,
+  min = 1,
 }: CartItemProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+  const [inputValue, setInputValue] = useState<string | number>(item.quantity);
+  const [prevQuantity, setPrevQuantity] = useState(item.quantity);
   const handleRemoveClick = () => {
     setIsDialogOpen(true);
   };
@@ -38,14 +43,32 @@ export const CartItemCard = ({
     setIsDialogOpen(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVal = parseInt(e.target.value);
-    if (!isNaN(newVal)) {
-      const clampedVal = Math.max(1, Math.min(1000, newVal));
+  if (item.quantity !== prevQuantity) {
+    setPrevQuantity(item.quantity);
+    setInputValue(item.quantity === 0 ? "" : item.quantity);
+  }
 
-      onUpdateQty(item.shoppingCartItemId, clampedVal - item.quantity);
-    } else if (e.target.value === "") {
-      onUpdateQty(item.shoppingCartItemId, 1 - item.quantity);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setInputValue(val);
+
+    if (val !== "") {
+      const num = parseInt(val);
+      if (!isNaN(num)) {
+        const clampedVal = Math.min(max, num);
+
+        onUpdateQty(item.shoppingCartItemId, clampedVal - item.quantity);
+      }
+    }
+  };
+  //  else if (e.target.value === "") {
+  //   onUpdateQty(item.shoppingCartItemId, 1 - item.quantity);
+  // }
+
+  const handleBlur = () => {
+    if (item.quantity < min || inputValue === "") {
+      onUpdateQty(item.shoppingCartItemId, min - item.quantity);
+      setInputValue(min);
     }
   };
 
@@ -108,7 +131,9 @@ export const CartItemCard = ({
           />
 
           <div className="flex max-[420px]:flex-col justify-between  items-end mt-2">
-            <p className="font-black text-[16px] md:text-xl">฿{item.price}/ชิ้น</p>
+            <p className="font-black text-[16px] md:text-xl">
+              ฿{item.price}/ชิ้น
+            </p>
             <div className="w-full min-[360px]:w-auto text-right">
               {isCheckout ? (
                 <div className="space-y-1">
@@ -119,7 +144,10 @@ export const CartItemCard = ({
                   <p className="font-black text-[16px] md:text-lg">
                     รวมทั้งหมด{" "}
                     <span className="text-red-500 ml-2">
-                      ฿<CurrencyDisplay amount={((item.price ?? 0) * item.quantity)} />
+                      ฿
+                      <CurrencyDisplay
+                        amount={(item.price ?? 0) * item.quantity}
+                      />
                     </span>
                   </p>
                 </div>
@@ -128,14 +156,16 @@ export const CartItemCard = ({
                 <div className="flex items-center border-2 border-black rounded-xl overflow-hidden bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                   <button
                     onClick={() => onUpdateQty?.(item.shoppingCartItemId, -1)}
-                    className="px-2 py-1 hover:bg-black hover:text-white transition-colors"
+                    disabled={item.quantity <= min}
+                    className="px-2 py-1 hover:bg-black hover:text-white transition-colors disabled:cursor-not-allowed cursor-pointer "
                   >
-                    <Minus className="w-4 h-4 cursor-pointer" />
+                    <Minus className="w-4 h-4  " />
                   </button>
                   <input
                     type="number"
-                    value={item.quantity}
+                    value={inputValue}
                     onChange={handleInputChange}
+                    onBlur={handleBlur}
                     className="w-14 px-1 text-center font-black border-x-2 border-black bg-gray-50 focus:outline-none 
     [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
