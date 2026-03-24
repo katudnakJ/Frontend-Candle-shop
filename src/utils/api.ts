@@ -1,4 +1,8 @@
-import axios, { AxiosError, AxiosHeaders, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  InternalAxiosRequestConfig,
+} from "axios";
 import liff from "@line/liff";
 import { appConfig } from "../config/appConfig";
 import { camelizeKeys, decamelizeKeys } from "humps";
@@ -49,10 +53,10 @@ function hasSnakeCaseKey(input: unknown): boolean {
   const obj = input as Record<string, unknown>;
   for (const key of Object.keys(obj)) {
     if (key.includes("_")) return true;
-      if (hasSnakeCaseKey(obj[key])) return true;
-    }
+    if (hasSnakeCaseKey(obj[key])) return true;
+  }
 
-return false;
+  return false;
 }
 
 // ใช้สำหรับ silent relogin เมื่อ access token หมดอายุ และ refresh token ยังไม่หมดอายุ
@@ -67,80 +71,101 @@ async function silentReloginWithLiff() {
   }
 
   const cfg: RetryConfig = {
-  headers: AxiosHeaders.from({
-    Authorization: `Bearer ${token}`,
-  }),
-  skipAuthRefresh: true,
-};
+    headers: AxiosHeaders.from({
+      Authorization: `Bearer ${token}`,
+    }),
+    skipAuthRefresh: true,
+  };
 
-await apiClient.post("/v1/login", {}, cfg);
+  await apiClient.post("/v1/login", {}, cfg);
 }
 
 apiClient.interceptors.response.use(
   (response) => {
     if (response.data) {
-      response.data = hasSnakeCaseKey(response.data) ? camelizeKeys(response.data) : response.data;
+      response.data = hasSnakeCaseKey(response.data)
+        ? camelizeKeys(response.data)
+        : response.data;
     }
     return response.data;
   },
   async (error: AxiosError) => {
-  const currentPath = window.location.pathname;
-  const originalConfig = error.config as RetryConfig | undefined;
-  const is401 = error.response?.status === 401;
-
-// ลอง relogin และ replay request เดิม 1 ครั้ง
-if (
-  is401 &&
-  originalConfig &&
-  !originalConfig._retry &&
-  !originalConfig.skipAuthRefresh
-) {
-  originalConfig._retry = true;
-
-  try {
-    if (!reloginPromise) {
-        reloginPromise = silentReloginWithLiff().finally(() => {
-        reloginPromise = null;
-      });
+    const currentPath = window.location.pathname;
+    const originalConfig = error.config as RetryConfig | undefined;
+    const is401 = error.response?.status === 401;
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔍 [Interceptor] Error Status:", error.response?.status);
     }
+    // ลอง relogin และ replay request เดิม 1 ครั้ง
+    if (
+      is401 &&
+      originalConfig &&
+      !originalConfig._retry &&
+      !originalConfig.skipAuthRefresh
+    ) {
+      originalConfig._retry = true;
 
-    await reloginPromise;
-    return apiClient(originalConfig);
-  } catch {}
-}
-    if (error.response && error.response.status === 401) {
+      try {
+        if (process.env.NODE_ENV === "development") {
+          console.log("🛠️ Attempting Silent Login...");
+        }
+        if (!reloginPromise) {
+          reloginPromise = silentReloginWithLiff().finally(() => {
+            reloginPromise = null;
+          });
+        }
+
+        await reloginPromise;
+        if (process.env.NODE_ENV === "development") {
+          console.log("✅ Silent Login Success! Retrying original request...");
+        }
+        return apiClient(originalConfig);
+      } catch (reloginError) {
+        if (process.env.NODE_ENV === "development") {
+          console.error("❌ Silent login failed", reloginError);
+        }
+      }
+    }
+    if (is401) {
       if (isRedirecting) {
+        console.log("🚧 [Interceptor] Already redirecting, ignoring this 401");
         return Promise.reject(error);
       }
-      isRedirecting = true;
 
-      if (!isToastShowing) {
-        isToastShowing = true;
-        toast.error("เซสชั่นหมดอายุ กรุณาเข้าสู่ระบบใหม่", {
-          id: "auth-error",
-        });
-        setTimeout(() => {
-          isToastShowing = false;
-        }, 3000);
-      }
       if (currentPath !== "/") {
-        localStorage.removeItem("auth-storage");
+        isRedirecting = true;
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            "📢 [Interceptor] Session Expired. Showing Toast and Redirecting...",
+          );
+        }
+        if (!isToastShowing) {
+          isToastShowing = true;
+          toast.error("เซสชั่นหมดอายุ กรุณาเข้าสู่ระบบใหม่", {
+            id: "auth-error",
+          });
+        }
+        if (process.env.NODE_ENV === "development") {
+          console.log("🏠 Redirecting to login page...");
+        }
         useAuthStoreUserLogin.getState().logout();
-      }
-      if (currentPath !== "/") {
+
         setTimeout(() => {
           window.location.href = "/";
-          isRedirecting = false;
         }, 1500);
-      }else{
-        isRedirecting = false ;
+      } else {
+        if (process.env.NODE_ENV === "development") {
+          console.log("🏠 [Interceptor] Already at home, no redirect needed.");
+        }
       }
+
       return Promise.reject(error);
     }
 
     // Normalize error payload (รองรับทั้ง snake_case / camelCase)
     const rawData = error.response?.data;
-    const parsedData = rawData && hasSnakeCaseKey(rawData) ? camelizeKeys(rawData) : rawData;
+    const parsedData =
+      rawData && hasSnakeCaseKey(rawData) ? camelizeKeys(rawData) : rawData;
 
     const statusNode = parsedData as Status;
 
@@ -154,7 +179,9 @@ if (
         "A connection error occurred. Please try again.",
       remark: statusNode?.remark,
     };
-
+    if (process.env.NODE_ENV === "development") {
+      console.error("⚠️ [Interceptor] Other Error:", error.message);
+    }
     return Promise.reject(err);
   },
 );

@@ -18,6 +18,7 @@ type UseAuthStoreUserLogin = {
     isLoggedIn : boolean
 
 //  Methods
+    setLoading: (loading: boolean) => void
     login : (response : UserLoginResponse) => void
     logout : () => void
     getUserData : () => UserLoginResponse | null
@@ -27,6 +28,12 @@ export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>() (
 persist(
     (set, get) => ({
       ...initialState,
+
+        setLoading: (loading: boolean) => {
+                set({ isLoading: loading });
+            },
+
+
     login : async (response : UserLoginResponse) => {
             
             set({
