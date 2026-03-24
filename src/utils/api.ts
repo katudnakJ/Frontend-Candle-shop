@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosHeaders, InternalAxiosRequestConfig } from "axios";
+import liff from "@line/liff";
 import { appConfig } from "../config/appConfig";
 import { camelizeKeys, decamelizeKeys } from "humps";
 import { Status } from "@/types/response.type";
@@ -7,6 +8,13 @@ import toast from "react-hot-toast";
 
 let isToastShowing = false;
 let isRedirecting = false;
+
+let reloginPromise: Promise<void> | null = null;
+
+type RetryConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
+  skipAuthRefresh?: boolean;
+};
 
 const apiClient = axios.create({
   baseURL: appConfig.localApiEndpointUrl,
@@ -47,6 +55,27 @@ function hasSnakeCaseKey(input: unknown): boolean {
 return false;
 }
 
+// ใช้สำหรับ silent relogin เมื่อ access token หมดอายุ และ refresh token ยังไม่หมดอายุ
+async function silentReloginWithLiff() {
+  if (!liff.isLoggedIn()) {
+    throw new Error("LIFF is not logged in");
+  }
+
+  const token = liff.getAccessToken();
+  if (!token) {
+    throw new Error("No LIFF access token");
+  }
+
+  const cfg: RetryConfig = {
+  headers: AxiosHeaders.from({
+    Authorization: `Bearer ${token}`,
+  }),
+  skipAuthRefresh: true,
+};
+
+await apiClient.post("/v1/login", {}, cfg);
+}
+
 apiClient.interceptors.response.use(
   (response) => {
     if (response.data) {
@@ -54,8 +83,31 @@ apiClient.interceptors.response.use(
     }
     return response.data;
   },
-  (error) => {
-    const currentPath = window.location.pathname;
+  async (error: AxiosError) => {
+  const currentPath = window.location.pathname;
+  const originalConfig = error.config as RetryConfig | undefined;
+  const is401 = error.response?.status === 401;
+
+// ลอง relogin และ replay request เดิม 1 ครั้ง
+if (
+  is401 &&
+  originalConfig &&
+  !originalConfig._retry &&
+  !originalConfig.skipAuthRefresh
+) {
+  originalConfig._retry = true;
+
+  try {
+    if (!reloginPromise) {
+        reloginPromise = silentReloginWithLiff().finally(() => {
+        reloginPromise = null;
+      });
+    }
+
+    await reloginPromise;
+    return apiClient(originalConfig);
+  } catch {}
+}
     if (error.response && error.response.status === 401) {
       if (isRedirecting) {
         return Promise.reject(error);
@@ -90,7 +142,7 @@ apiClient.interceptors.response.use(
     const rawData = error.response?.data;
     const parsedData = rawData && hasSnakeCaseKey(rawData) ? camelizeKeys(rawData) : rawData;
 
-    const statusNode = parsedData?.status ?? parsedData;
+    const statusNode = parsedData as Status;
 
     const err: Status = {
       statusCode:
@@ -102,11 +154,6 @@ apiClient.interceptors.response.use(
         "A connection error occurred. Please try again.",
       remark: statusNode?.remark,
     };
-
-    // debug only development
-    if (process.env.NODE_ENV === "development") {
-      console.log("throw error from backend", err);
-    }
 
     return Promise.reject(err);
   },
