@@ -180,7 +180,7 @@ apiClient.interceptors.response.use(
       remark: statusNode?.remark,
     };
     if (process.env.NODE_ENV === "development") {
-      console.error("⚠️ [Interceptor] Other Error:", error.message);
+      console.error("⚠️ [Interceptor] Other Error:", error.response?.data || error.message);
     }
     return Promise.reject(err);
   },
