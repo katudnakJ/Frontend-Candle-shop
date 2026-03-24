@@ -30,13 +30,15 @@ return (
         <LoadingScreen />
       ) : isLoggedIn && (
         <>
-          {userData?.userRole.toLowerCase() === USER_ROLE.CUSTOMER.toLowerCase() ? 
+          {userData?.userRole?.toLowerCase() === USER_ROLE.CUSTOMER.toLowerCase() ? 
             (
               <CustomerHome />
-            ) : userData?.userRole.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
+            ) : userData?.userRole?.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
               <SellerHome />
+
             ) : userData?.userRole.toLowerCase() === USER_ROLE.ADMIN.toLowerCase() ? (
               <SellerHome /> // for workaround admin login to access seller dashboard
+
             ) : (
               <ErrorPage 
                 message={ERROR_MESSAGE.USER_ROLE_NOT_FOUND}

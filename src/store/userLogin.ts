@@ -1,4 +1,5 @@
 import { UserLoginResponse } from "@/modules/auth/userLogin.type"
+import { useAuthService } from "@/services/useAuthLogin"
 import { Status } from "@/types/response.type"
 import { apiClient } from "@/utils/api"
 import { create } from "zustand"
@@ -17,7 +18,7 @@ type UseAuthStoreUserLogin = {
     isLoggedIn : boolean
 
 //  Methods
-    login : (lineToken : string) => void
+    login : (response : UserLoginResponse) => void
     logout : () => void
     getUserData : () => UserLoginResponse | null
 }
@@ -26,17 +27,10 @@ export const useAuthStoreUserLogin = create<UseAuthStoreUserLogin>() (
 persist(
     (set, get) => ({
       ...initialState,
-    login : async (lineToken : string) => {
-            set({isLoading : true});
-            
-            const response = await apiClient.post<UserLoginResponse>("/v1/login",{},{
-                headers: {
-                    'Authorization': `Bearer ${lineToken}`
-                }
-            });
+    login : async (response : UserLoginResponse) => {
             
             set({
-                userData: response.data,
+                userData: response,
                 isLoading: false,
                 isLoggedIn: true
             });

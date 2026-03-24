@@ -11,8 +11,7 @@ const useLiffLogin = () => {
 
   const router = useRouter();
 
-  const { login: storeUserLogin, logout: storeUserLogout } =
-    useAuthStoreUserLogin();
+  const { login: storeUserLogin, logout: storeUserLogout } = useAuthStoreUserLogin();
 
   const liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
 
@@ -20,14 +19,16 @@ const useLiffLogin = () => {
     try {
       await liff.init({ liffId });
       if (liff.isLoggedIn()) {
+
         const token = liff.getAccessToken() || "";
-        storeUserLogin(token);
+
         
 
         const currentQuery = window.location.search;
         if (!currentQuery && window.location.pathname === "/") {
           router.push(ROUTE.HOME);
         }
+
       } else {
         liff.login({
           redirectUri: `${process.env.NEXT_PUBLIC_LINE_LIFF_REDIRECT_URL}`,
