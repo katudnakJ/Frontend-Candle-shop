@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import {
   useUpdateCartItem,
@@ -9,33 +9,75 @@ import { useGetCartData } from "./useGetCartData";
 import { useDebouncedCallback } from "use-debounce";
 import { GenericResponse } from "@/types/response.type";
 import { ShoppingCartData } from "../shoppingcartInterface";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
-export const useCart = () => {
-  const page = 0;
-  const size = 10;
 
-  const { data, isLoading } = useGetCartData(page, size) as {
+export const useCart = (currentPage: number) => {
+  const size = 2;
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const { data, isLoading, isPlaceholderData} = useGetCartData(currentPage, size) as {
     data: GenericResponse<ShoppingCartData> | undefined;
     isLoading: boolean;
+    isPlaceholderData: boolean;
   };
-const { cartItem, shoppingCartId } = useMemo(() => {
-    const rawData = data?.data || data; 
-    const cartData = rawData as ShoppingCartData;
-    
-    return {
-      cartItem: cartData?.cartItems || [],
-      shoppingCartId: cartData?.shoppingCartId
-    };
-  }, [data]);
+  const { cartItem, shoppingCartId, endAt, startAt, hasNext, totalItems } =
+    useMemo(() => {
+      const rawData = data?.data || data;
+      const cartData = rawData as ShoppingCartData;
+
+      return {
+        cartItem: cartData?.cartItems || [],
+        shoppingCartId: cartData?.shoppingCartId,
+        endAt: cartData?.endAt || 0,
+        startAt: cartData?.startAt || 0,
+        hasNext: cartData?.hasNext || false,
+        totalItems: cartData?.totalItems || 0,
+      };
+    }, [data]);
 
   if (process.env.NODE_ENV === "development") {
     console.log("ITEMS IN USECART:", cartItem);
+    console.log("ShoppingCartId:", shoppingCartId);
+    console.log("EndAt:", endAt);
+    console.log("StartAt:", startAt);
+    console.log("HasNext:", hasNext);
+    console.log("TotalItems:", totalItems);
   }
 
-  const { selectedIds, setSelectedIds } = useCartStore();
+  const {
+    selectedIds,
+    allCartItems,
+    totalItems: storeTotalItems,
+    setTotalItems,
+    setSelectedIds,
+    setAllCartItems,
+    removeFromStore,
+  } = useCartStore();
+
+  useEffect(() => {
+    const rawData = data?.data || data;
+
+    const items = (rawData as ShoppingCartData)?.cartItems || [];
+    const total = (rawData as ShoppingCartData)?.totalItems || 0;
+
+    const currentStoreTotal = useCartStore.getState().totalItems;
+
+    if (!isLoading) {
+      if (total !== currentStoreTotal) {
+        setTotalItems(total);
+      }
+
+      if (items.length > 0) {
+        setAllCartItems(items);
+      }
+    }
+  }, [data, isLoading, setTotalItems, setAllCartItems]);
 
   const totals = useMemo(() => {
-    const selectedItems = cartItem.filter((item) =>
+    const selectedItems = allCartItems.filter((item) =>
       selectedIds.includes(item.shoppingCartItemId),
     );
     return selectedItems.reduce(
@@ -45,15 +87,24 @@ const { cartItem, shoppingCartId } = useMemo(() => {
       }),
       { totalQuantity: 0, totalPrice: 0 },
     );
-  }, [cartItem, selectedIds]);
+  }, [allCartItems, selectedIds]);
 
-  const isAllSelected =
-    cartItem.length > 0 && selectedIds.length === cartItem.length;
+  const isAllSelected = useMemo(
+    () =>
+      cartItem.length > 0 &&
+      cartItem.every((item) => selectedIds.includes(item.shoppingCartItemId)),
+    [cartItem, selectedIds],
+  );
 
   const toggleSelectAll = () => {
-    setSelectedIds(
-      isAllSelected ? [] : cartItem.map((i) => i.shoppingCartItemId),
-    );
+    if (isAllSelected) {
+      const currentIds = cartItem.map((i) => i.shoppingCartItemId);
+      setSelectedIds(selectedIds.filter((id) => !currentIds.includes(id)));
+    } else {
+      const currentIds = cartItem.map((i) => i.shoppingCartItemId);
+      const newSelected = Array.from(new Set([...selectedIds, ...currentIds]));
+      setSelectedIds(newSelected);
+    }
   };
 
   const toggleSelect = (itemId: string) => {
@@ -65,8 +116,8 @@ const { cartItem, shoppingCartId } = useMemo(() => {
   };
 
   const updateLocal = useUpdateCartLocal();
-  const { mutate: updateQty } = useUpdateCartItem(page, size);
-  const { mutate: removeItem } = useDeleteCartItem(page, size);
+  const { mutate: updateQty } = useUpdateCartItem(currentPage, size);
+  const { mutate: removeItem } = useDeleteCartItem(currentPage, size);
 
   const debouncedUpdate = useDebouncedCallback((payload) => {
     updateQty(payload);
@@ -75,6 +126,12 @@ const { cartItem, shoppingCartId } = useMemo(() => {
   return {
     cartItem,
     isLoading,
+    isPlaceholderData,
+    totalItems: storeTotalItems,
+    hasNext,
+    startAt,
+    endAt,
+    pageSize: size,
     selectedIds,
     isAllSelected,
     toggleSelectAll,
@@ -84,7 +141,7 @@ const { cartItem, shoppingCartId } = useMemo(() => {
       if (item && shoppingCartId) {
         const newQty = Math.max(1, item.quantity + delta);
 
-        updateLocal(itemId, newQty, page, size);
+        updateLocal(itemId, newQty, currentPage, size);
         debouncedUpdate({
           shoppingCartItemId: item.shoppingCartItemId,
           productId: item.productId,
@@ -96,10 +153,22 @@ const { cartItem, shoppingCartId } = useMemo(() => {
     removeItem: (itemId: string) => {
       const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
       if (item) {
-        removeItem({
-          shoppingCartId: shoppingCartId,
-          shoppingCartItemId: item.shoppingCartItemId,
-        });
+        removeItem(
+          {
+            shoppingCartId: shoppingCartId,
+            shoppingCartItemId: item.shoppingCartItemId,
+          },
+          {
+            onSuccess: async () => {
+              removeFromStore(itemId);
+              await queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
+              if (cartItem.length === 1 && currentPage > 0) {
+                const displayPage = currentPage; // currentPage คือ index 0, ดังนั้นหน้าก่อนหน้าคือ index ปัจจุบันพอดี
+                router.push(`?page=${displayPage}`, { scroll: true });
+              }
+            },
+          },
+        );
       }
     },
     ...totals,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetCartData } from "@/modules/cart/hooks/useGetCartData";
+import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import {
   Menu,
   MenuButton,
@@ -8,7 +9,7 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { Fragment, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -25,21 +26,30 @@ import { GenericResponse } from "@/types/response.type";
 
 const Header = () => {
   const queryClient = useQueryClient();
+  const { totalItems: storeTotalItems, setTotalItems } = useCartStore();
   const { data, isLoading } = useGetCartData() as {
     data: GenericResponse<ShoppingCartData> | undefined;
     isLoading: boolean;
   };
-  const CartCountData = data?.data || data;
-  const cartcountItem = (CartCountData as ShoppingCartData)?.cartItems || [];
-  const totalItemsCount = useMemo(() => {
-    return cartcountItem.length;
-  }, [cartcountItem]);
+  useEffect(() => {
+    if (data) {
+      const CartCountData = data?.data || data;
+      const apiTotal = (CartCountData as ShoppingCartData)?.totalItems || 0;
+
+      if (apiTotal !== useCartStore.getState().totalItems) {
+        setTotalItems(apiTotal);
+      }
+    }
+  }, [data, setTotalItems]);
+  const totalItemsCount = storeTotalItems;
+
   if (process.env.NODE_ENV === "development") {
     console.group("🛒 Header Cart Status");
     console.log("%c Count: ", "color: green", totalItemsCount);
-    console.log("Raw Data: ", cartcountItem);
+    console.log("Raw Data: ", storeTotalItems);
     console.groupEnd();
   }
+
   return (
     <header className=" border border-cprojectone top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
       <div className="max-w-300 mx-auto">
@@ -124,7 +134,7 @@ const Header = () => {
                     <MenuItem>
                       {({ focus }) => (
                         <Button
-                         className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex w-full items-center px-4 py-2 text-left text-sm`}
+                          className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex w-full items-center px-4 py-2 text-left text-sm`}
                           onClick={() => {
                             queryClient.clear();
                             localStorage.removeItem("lineLiffUserData");

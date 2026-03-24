@@ -235,7 +235,7 @@ export default function CustomerHome() {
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 0}
-                        className="flex items-center gap-1 px-3 py-2 max-[400px]:text-[11px] text-sm font-medium text-gray-500 hover:text-amber-500 disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 px-3 py-2  text-sm font-medium text-gray-500 hover:text-amber-500 disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
                       >
                         <ChevronLeft size={18} />
                         <span>Previous</span>
@@ -275,7 +275,7 @@ export default function CustomerHome() {
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={!nextPages || currentPage + 1 >= totalPages}
-                        className="flex items-center gap-1 px-3 py-2 max-[400px]:text-[11px] text-sm font-medium text-gray-500  hover:text-amber-500  disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 px-3 py-2  text-sm font-medium text-gray-500  hover:text-amber-500  disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
                       >
                         <span>Next Page</span>
                         <ChevronRight size={18} />

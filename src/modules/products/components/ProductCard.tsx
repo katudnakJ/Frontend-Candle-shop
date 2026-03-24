@@ -7,7 +7,7 @@ import { ProductHomeItem } from "@/modules/products/homeproduct";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 interface ProductCardProps {
   product: ProductHomeItem;
   isRecommended?: boolean;
@@ -30,6 +30,7 @@ const ProductCard = ({ product, isRecommended = false, priority = false }: Produ
   //   }
   //   return slug;
   // };
+  const router = useRouter()
   const [isError, setIsError] = useState(false);
   const initialImage =
     product.productImgPath && product.productImgPath.trim() !== ""
@@ -81,10 +82,10 @@ const ProductCard = ({ product, isRecommended = false, priority = false }: Produ
             </div>
             {!isRecommended && (
               <button
-                className="p-2 border border-black rounded-lg hover:bg-black hover:text-white transition-all group/btn"
-                onClick={(e) => {
-                  e.preventDefault(); 
-                  // ใส่ Logic Add to Cart ตรงนี้
+                className="p-2 border border-black rounded-lg hover:bg-black hover:text-white transition-all group/btn cursor-pointer"
+                onClick={() => {
+                  router.push(`/product/${product.productSlug}?id=${product.productId}`)
+                 
                 }}
               >
                 <ShoppingCart
