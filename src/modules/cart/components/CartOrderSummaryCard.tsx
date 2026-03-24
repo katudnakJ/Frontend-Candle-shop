@@ -1,3 +1,4 @@
+import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 import { NotebookPen } from "lucide-react";
 
 interface CartOrderSummaryCardProps {
@@ -31,10 +32,10 @@ export const CartOrderSummaryCard = ({
           <div className="flex justify-between">
             <span className="max-[410px]:flex flex-col text-gray-500 font-medium">
               ยอดรวมสินค้า 
-              <span>({totalQuantity} รายการ)</span>
+              <span> {totalQuantity.toLocaleString()} รายการ</span>
             </span>
             <span className="text-black font-black">
-              ฿{subtotal.toLocaleString()}
+              ฿<CurrencyDisplay amount={subtotal} />
             </span>
           </div>
 
@@ -42,7 +43,7 @@ export const CartOrderSummaryCard = ({
           <div className="flex justify-between">
             <span className="text-gray-500 font-medium">ค่าจัดส่ง</span>
             <span className="text-black font-black">
-              ฿{shippingFee.toLocaleString()}
+              ฿{<CurrencyDisplay amount={shippingFee} />}
             </span>
           </div>
 
@@ -57,7 +58,7 @@ export const CartOrderSummaryCard = ({
               </p>
             </div>
             <span className="text-4xl font-black italic text-red-600 underline">
-              ฿{totalAmount.toLocaleString()}
+              ฿<CurrencyDisplay amount={totalAmount} />
             </span>
           </div>
         </div>

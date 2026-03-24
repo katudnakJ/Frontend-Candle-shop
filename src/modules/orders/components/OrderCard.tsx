@@ -18,6 +18,7 @@ import {
 import { toast } from "react-hot-toast";
 import { VerificationSlip } from "@/modules/payments/components/VerificationSlip";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 
 interface OrderCardProps {
   order: Order;
@@ -219,7 +220,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                         ราคาสินค้า/ชิ้น:
                       </span>{" "}
                       <span className="font-black">
-                        {item.price_at_purchase.toLocaleString()} ฿
+                        <CurrencyDisplay amount={item.price_at_purchase} /> ฿
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -442,7 +443,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                           ค่าจัดส่ง:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right">
-                          ฿{(order.shipping_fee || 0).toLocaleString()}
+                          ฿<CurrencyDisplay amount={order.shipping_fee || 0} /> 
                         </span>
                       </div>
 
@@ -451,7 +452,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                           ยอดสุทธิ:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right">
-                          ฿{order.net_amount.toLocaleString()}
+                          ฿<CurrencyDisplay amount={order.net_amount} /> 
                         </span>
                       </div>
                     </div>

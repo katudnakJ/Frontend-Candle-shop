@@ -12,7 +12,7 @@ import { ShoppingCartData } from "../shoppingcartInterface";
 
 export const useCart = () => {
   const page = 0;
-  const size = 1;
+  const size = 10;
 
   const { data, isLoading } = useGetCartData(page, size) as {
     data: GenericResponse<ShoppingCartData> | undefined;

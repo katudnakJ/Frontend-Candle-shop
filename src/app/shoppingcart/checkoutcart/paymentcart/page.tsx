@@ -5,7 +5,7 @@ import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import { CircleCheckBig } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCartStore } from "@/modules/cart/hooks/useCartstore";
+import { useGetCartData } from "@/modules/cart/hooks/useGetCartData";
 import calculateShipping from "@/utils/calculateShipping";
 import { PreviousButton } from "@/components/commonui/PreviousButton";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
@@ -14,14 +14,32 @@ import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummary
 import { Seller } from "@/modules/seller/types";
 import { PaymentMethodCard } from "@/modules/seller/components/PaymentMethodCard";
 import { Order, OrderItem } from "@/modules/orders/type";
-import { ShoppingCartItem } from "@/modules/cart/types";
 
 import { mockSellerData } from "@/modules/seller/mockSellerData";
 import { mockOrders } from "@/modules/orders/mockOrderData";
 import { toast } from "react-hot-toast";
+import { GenericResponse } from "@/types/response.type";
+import {
+  ShoppingCartData,
+  CartItem,
+} from "@/modules/cart/shoppingcartInterface";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCartStore } from "@/modules/cart/hooks/useCartstore";
+import {
+  useGetAddressDetail,
+  useGetAddressesList,
+} from "@/modules/account/hooks/useAddressesQuery";
+
+interface DisplayPaymentItem {
+  id: string | number;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
 
 interface PaymentData {
-  displayItems: (OrderItem | ShoppingCartItem)[];
+  displayItems: DisplayPaymentItem[];
   subtotal: number;
   shippingFee: number;
   totalAmount: number;
@@ -31,28 +49,105 @@ interface PaymentData {
 export default function PaymentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
+
+  const {
+    selectedIds,
+    checkoutItems,
+    selectedAddress,
+    getPrimaryImage,
+    setSelectedIds,
+    setCheckoutItems,
+    setSelectedAddress,
+  } = useCartStore();
+
   const orderId = searchParams.get("orderId");
   const mode = searchParams.get("mode");
+  const selectAddressId = searchParams.get("addressid");
+
+  const { data: addressesData, isLoading: isLoadingAddr } = useGetAddressDetail(
+    selectAddressId || "",
+    {
+      enabled:
+        !!selectAddressId &&
+        (!selectedAddress || selectedAddress.addressId !== selectAddressId),
+    },
+  );
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { items, selectedIds, refreshCart, setSelectedIds } = useCartStore();
+  const page = Number(searchParams.get("page")) || 0;
+  const size = Number(searchParams.get("size")) || 100;
+
+  const cachedData = queryClient.getQueryData<
+    GenericResponse<ShoppingCartData>
+  >(["shopping-cart", page, size]);
+
+  const { data, isLoading } = useGetCartData(page, size) as {
+    data: GenericResponse<ShoppingCartData> | undefined;
+    isLoading: boolean;
+  };
+  if (process.env.NODE_ENV === "development") {
+    console.log("CheckoutPRODUCT:", data);
+  }
   const [seller, setSeller] = useState<Seller | null>(null);
   const [isLoadingSeller, setIsLoadingSeller] = useState(true);
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [showPaymentError, setShowPaymentError] = useState(false);
   const [repayOrder, setRepayOrder] = useState<Order | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const displayData = data || cachedData;
+  const CheckoutData = data?.data || displayData;
+  const cartItem = useMemo(() => {
+    return (CheckoutData as ShoppingCartData)?.cartItems || [];
+  }, [CheckoutData]);
+
+  useEffect(() => {
+    if (!selectedAddress && addressesData) {
+      setSelectedAddress(addressesData);
+    }
+  }, [selectedAddress, addressesData, setSelectedAddress]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 800);
-    if (items.length === 0) refreshCart();
 
     if (selectedIds.length === 0 && !orderId) {
       const saved = sessionStorage.getItem("selected_checkout_ids");
       if (saved) setSelectedIds(JSON.parse(saved));
     }
     return () => clearTimeout(timer);
-  }, [items.length, selectedIds.length, refreshCart, setSelectedIds, orderId]);
+  }, [selectedIds.length, setSelectedIds, orderId]);
+
+  const selectedItems = useMemo(
+    () =>
+      cartItem.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
+    [cartItem, selectedIds],
+  );
+
+  useEffect(() => {
+    if (
+      isMounted &&
+      !isLoading &&
+      !isSubmitting &&
+      mode !== "repay" &&
+      checkoutItems.length === 0 &&
+      selectedItems.length === 0
+    ) {
+      const saved = sessionStorage.getItem("selected_checkout_ids");
+      if (!saved || JSON.parse(saved).length === 0) {
+        router.push("/shoppingcart");
+      }
+    }
+  }, [
+    isMounted,
+    isLoading,
+    isSubmitting,
+    checkoutItems.length,
+    selectedItems.length,
+    mode,
+    router,
+  ]);
 
   useEffect(() => {
     const fetchSellerData = async () => {
@@ -69,7 +164,7 @@ export default function PaymentPage() {
     fetchSellerData();
   }, []);
 
-  // อีกหน่อยปรับเป็นเรียกจาก api ไม่ก็เก็บใน zustand และ ต้องเพิ่มกัน เช็คว่า orderID ใช่ของลูกค้าคนนี้ไหม 
+  // อีกหน่อยปรับเป็นเรียกจาก api ไม่ก็เก็บใน zustand และ ต้องเพิ่มกัน เช็คว่า orderID ใช่ของลูกค้าคนนี้ไหม
   useEffect(() => {
     if (mode === "repay" && orderId) {
       setIsLoadingSeller(true);
@@ -85,52 +180,84 @@ export default function PaymentPage() {
   }, [mode, orderId]);
 
   const paymentData = useMemo<PaymentData>(() => {
+    // กรณี Repay (จาก Order History)
     if (mode === "repay" && repayOrder) {
+      const items = (repayOrder.items || []).map((item: OrderItem) => ({
+        id: item.product_id,
+        name: item.product_name_at_purchase,
+        price: item.price_at_purchase,
+        quantity: item.quantity,
+        image: item.product_img_path,
+      }));
+
       return {
-        displayItems: repayOrder.items || [],
+        displayItems: items,
         subtotal: repayOrder.total_amount,
         shippingFee: repayOrder.shipping_fee || 0,
         totalAmount: repayOrder.net_amount,
-        totalQuantity: (repayOrder.items || []).reduce(
-          (acc, item) => acc + item.quantity,
-          0,
-        ),
+        totalQuantity: items.reduce((acc, item) => acc + item.quantity, 0),
       };
     }
 
-    // โหมดปกติจากรถเข็น
-    const selected = items.filter((item) =>
-      selectedIds.includes(item.Shopping_Cart_Item_id),
-    );
-    const sub = selected.reduce(
-      (acc, item) => acc + (item.product?.price ?? 0) * item.quantity,
+    // กรณี Checkout ปกติ (จาก Cart)
+    const sourceItems =
+      checkoutItems.length > 0 ? checkoutItems : selectedItems;
+
+    const items = sourceItems.map((item: CartItem) => ({
+      id: item.shoppingCartItemId,
+      name: item.productName || "สินค้า",
+      price: item.price ?? 0,
+      quantity: item.quantity,
+      image: getPrimaryImage(item),
+    }));
+
+    const sub = items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
       0,
     );
-    const qty = selected.reduce((acc, item) => acc + item.quantity, 0);
+    const qty = items.reduce((acc, item) => acc + item.quantity, 0);
     const ship = calculateShipping(qty);
 
     return {
-      displayItems: selected,
+      displayItems: items,
       subtotal: sub,
       shippingFee: ship,
       totalAmount: sub + ship,
       totalQuantity: qty,
     };
-  }, [items, selectedIds, mode, repayOrder]);
+  }, [checkoutItems, selectedItems, mode, repayOrder, getPrimaryImage]);
 
   const handleConfirm = () => {
     setIsOpen(false);
-    router.replace("/account/orderhistory");
-   toast.success(
-        <div className="flex flex-col justify-center py-1">
-          <span className="leading-tight">ยืนยันการชำระเงินเรียบร้อย</span>
-        </div>,
-        {
-          className:
-            " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-          duration: 3000,
-        },
+    setIsSubmitting(true);
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("Submitting with Address:", selectedAddress?.addressId);
+      console.log(
+        "Submitting Items:",
+        checkoutItems.length > 0 ? checkoutItems : selectedItems,
       );
+    }
+
+    try {
+      if (mode === "repay") {
+        // เรียก API: updatePaymentSlip(orderId, slipFile)
+      } else {
+        // เรียก API: createOrder({ items: selectedIds, addressId, slipFile })
+      }
+      router.replace("/account/orderhistory");
+      toast.success("ยืนยันการชำระเงินเรียบร้อย");
+
+      setTimeout(() => {
+      setSelectedIds([]);
+      setCheckoutItems([]);
+      setSelectedAddress(null);
+      sessionStorage.removeItem("selected_checkout_ids");
+      }, 500);
+    } catch (error) {
+      toast.error("เกิดข้อผิดพลาดในการส่งข้อมูล");
+      setIsSubmitting(false);
+    }
   };
 
   const handleConfirmOrder = () => {
@@ -142,7 +269,27 @@ export default function PaymentPage() {
     setIsOpen(true);
   };
 
-  if (!isMounted) {
+  const isDataReady =
+    mode === "repay"
+      ? !!repayOrder
+      : checkoutItems.length > 0 || selectedItems.length > 0;
+  const isAddressReady = !!selectedAddress;
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("=== Zustand Store Monitor ===");
+      console.log("Selected IDs:", selectedIds);
+      console.log("Checkout Items:", checkoutItems);
+      console.log("Selected Address:", selectedAddress);
+      console.log("============================");
+    }
+  }, [selectedIds, checkoutItems, selectedAddress]);
+
+  if (
+    !isMounted ||
+    isLoading ||
+    (selectAddressId && isLoadingAddr && !isAddressReady) ||
+    !isDataReady
+  ) {
     return (
       <div className="flex flex-col min-h-screen bg-white">
         <Header />
@@ -161,9 +308,9 @@ export default function PaymentPage() {
             {mode === "repay" ? (
               <div className="mb-4">
                 <PreviousButton
-                itemCount={paymentData.displayItems.length}
-                isRepay={true}
-              />
+                  itemCount={paymentData.displayItems.length}
+                  isRepay={true}
+                />
                 <h1 className="text-2xl font-black">
                   ชำระเงินใหม่ Order #{orderId}
                 </h1>
@@ -220,13 +367,20 @@ export default function PaymentPage() {
               )}
               <button
                 onClick={handleConfirmOrder}
+                disabled={!slipFile || isSubmitting || isLoadingAddr}
                 className={`w-full py-5 text-2xl font-black rounded-full transition-all mt-6 ${
-                  !slipFile
+                  !slipFile || isSubmitting || isLoadingAddr
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-black text-white shadow-[8px_8px_0px_0px_rgba(220,38,38,1)]"
                 }`}
               >
-                {slipFile ? "ยืนยันการชำระเงิน" : "กรุณาแนบสลิปก่อนยืนยัน"}
+                {isLoadingAddr
+                  ? "กำลังโหลดข้อมูลที่อยู่..."
+                  : isSubmitting
+                    ? "กำลังดำเนินการ..."
+                    : slipFile
+                      ? "ยืนยันการชำระเงิน"
+                      : "กรุณาแนบสลิปก่อนยืนยัน"}
               </button>
               {!slipFile && showPaymentError && (
                 <p className="text-red-500 font-bold mt-2 text-sm">

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePaymentSlip } from "@/modules/seller/hooks/usepaymentslip";
 import { PaymentService } from "@/modules/seller/services/payment.service";
 import { Seller } from "@/modules/seller/types";
+import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 
 interface PaymentMethodCardProps {
   seller: Seller | null;
@@ -77,7 +78,7 @@ export const PaymentMethodCard = ({
                 <p className="text-sm font-bold text-blue-900">
                   โอนเงินจำนวน{" "}
                   <span className="text-lg underline font-black text-red-600">
-                    ฿{totalAmount.toLocaleString()}
+                    ฿<CurrencyDisplay amount={totalAmount} /> 
                   </span>{" "}
                   เรียบร้อยแล้ว โปรดแนบสลิปด้านข้าง
                 </p>

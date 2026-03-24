@@ -6,6 +6,7 @@ import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { useState } from "react";
 import { CartItem } from "../shoppingcartInterface";
 import { SmartImage } from "@/components/commonui/SmartImage";
+import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 
 interface CartItemProps {
   item: CartItem;
@@ -118,7 +119,7 @@ export const CartItemCard = ({
                   <p className="font-black text-[16px] md:text-lg">
                     รวมทั้งหมด{" "}
                     <span className="text-red-500 ml-2">
-                      ฿{((item.price ?? 0) * item.quantity).toLocaleString()}
+                      ฿<CurrencyDisplay amount={((item.price ?? 0) * item.quantity)} />
                     </span>
                   </p>
                 </div>

@@ -9,14 +9,17 @@ interface SmartImageProps extends Omit<ImageProps, "onError"> {
 
 export const SmartImage = ({
   src,
-  fallback = "placeholder-image.svg", 
+  fallback = "/placeholder-image.svg",
   alt,
   ...props
 }: SmartImageProps) => {
   const [hasError, setHasError] = useState(false);
+
+  const imageSrc = hasError || !src ? fallback : src;
+
   const [prevSrc, setPrevSrc] = useState(src);
 
-if (src !== prevSrc) {
+  if (src !== prevSrc) {
     setHasError(false);
     setPrevSrc(src);
   }
@@ -25,9 +28,12 @@ if (src !== prevSrc) {
     <Image
       {...props}
       key={typeof src === "string" ? src : undefined}
-      src={hasError || !src ? fallback : src}
+      src={imageSrc}
       alt={alt || "product image"}
-      onError={() => setHasError(true)}
+      onError={() => {
+        setHasError(true);
+      }}
+      unoptimized={true}
     />
   );
 };

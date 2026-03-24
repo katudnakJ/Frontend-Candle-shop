@@ -24,7 +24,7 @@ const LineLiffLogin = () => {
         console.log("USERDATA IS : ",userData)      
      }
 
-  return (
+return (
     <>
       {isLoading ? (
         <LoadingScreen />
@@ -35,6 +35,8 @@ const LineLiffLogin = () => {
               <CustomerHome />
             ) : userData?.userRole.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
               <SellerHome />
+            ) : userData?.userRole.toLowerCase() === USER_ROLE.ADMIN.toLowerCase() ? (
+              <SellerHome /> // for workaround admin login to access seller dashboard
             ) : (
               <ErrorPage 
                 message={ERROR_MESSAGE.USER_ROLE_NOT_FOUND}

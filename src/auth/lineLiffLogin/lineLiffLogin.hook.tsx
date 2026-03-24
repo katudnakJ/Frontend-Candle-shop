@@ -14,20 +14,20 @@ const useLiffLogin = () => {
   const { login: storeUserLogin, logout: storeUserLogout } =
     useAuthStoreUserLogin();
 
-   const liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
+  const liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID as string;
 
   const initializeLiff = async () => {
     try {
       await liff.init({ liffId });
       if (liff.isLoggedIn()) {
         const token = liff.getAccessToken() || "";
-        storeUserLogin(token);       
+        storeUserLogin(token);
         
-        
+
         const currentQuery = window.location.search;
         if (!currentQuery && window.location.pathname === "/") {
-         router.push(ROUTE.HOME);
-      }
+          router.push(ROUTE.HOME);
+        }
       } else {
         liff.login({
           redirectUri: `${process.env.NEXT_PUBLIC_LINE_LIFF_REDIRECT_URL}`,
@@ -40,22 +40,22 @@ const useLiffLogin = () => {
   };
 
   useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
 
-  (async () => {
-    await initializeLiff();
-    if (isMounted) {
-      setError(null);
-    }
-  })();
+    (async () => {
+      await initializeLiff();
+      if (isMounted) {
+        setError(null);
+      }
+    })();
 
-  return () => {
-    isMounted = false;
-  };
-}, []);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const logout = async () => {
-    if (liff.isLoggedIn()) {
+     if (liff.isLoggedIn()) {
       liff.logout();
       await storeUserLogout();
       window.location.replace("/");

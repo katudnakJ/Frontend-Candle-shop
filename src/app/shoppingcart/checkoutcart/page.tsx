@@ -1,25 +1,31 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import AddressCard from "@/modules/account/components/AddressCard";
-import { mockAddresses } from "@/modules/account/mockaddress";
-import { CircleCheckBig, MapPinCheck } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCartStore } from "@/modules/cart/hooks/useCartstore";
-import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import calculateShipping from "@/utils/calculateShipping";
-import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
-import { PreviousButton } from "@/components/commonui/PreviousButton";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
-import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
-import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
+
+import { useRouter } from "next/navigation";
+import { useMemo, useEffect, useState } from "react";
 import { useGetCartData } from "@/modules/cart/hooks/useGetCartData";
-import { GenericResponse } from "@/types/response.type";
-import { ShoppingCartData } from "@/modules/cart/shoppingcartInterface";
 import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCartStore } from "@/modules/cart/hooks/useCartstore";
+
+import { GenericResponse } from "@/types/response.type";
+import { ShoppingCartData } from "@/modules/cart/shoppingcartInterface";
+
+import { CartItemCard } from "@/modules/cart/components/CartItemCard";
+import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
+import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
+import { PreviousButton } from "@/components/commonui/PreviousButton";
+import { CartCheckoutSkeletonpage } from "@/modules/cart/components/skeletoncart/CartCheckoutSkeletonpage";
+import { CircleCheckBig, MapPinCheck } from "lucide-react";
+
+import { useGetAddressesList } from "@/modules/account/hooks/useAddressesQuery";
+import { Addresses } from "@/modules/account/addresses";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -34,22 +40,43 @@ export default function CheckoutPage() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const {
+    selectedIds,
+    getPrimaryImage,
+    setSelectedIds,
+    setCheckoutItems,
+    setSelectedAddress,
+  } = useCartStore();
   const { data, isLoading } = useGetCartData(page, size) as {
     data: GenericResponse<ShoppingCartData> | undefined;
     isLoading: boolean;
   };
-    if (process.env.NODE_ENV === "development") {
-  console.log("CheckoutPRODUCT:", data);
-    }
-  const { selectedIds, getPrimaryImage, setSelectedIds } = useCartStore();
-  const selectedAddress = mockAddresses[0];
+  if (process.env.NODE_ENV === "development") {
+    console.log("CheckoutPRODUCT:", data);
+  }
 
+  const { data: addressesData } = useGetAddressesList();
+  if (process.env.NODE_ENV === "development") {
+    console.log("ADDRESS??CheckoutPRODUCT:", addressesData);
+  }
+
+  const selectedAddress = useMemo(() => {
+    const list = addressesData;
+
+    if (Array.isArray(list)) {
+      const defaultAddr = list.find((addr: Addresses) => addr.isDefault);
+
+      return defaultAddr || list[0] || null;
+    }
+    return null;
+  }, [addressesData]);
+  if (process.env.NODE_ENV === "development") {
+    console.log("SelectedAddress??CheckoutPRODUCT:", selectedAddress);
+  }
 
   const displayData = data || cachedData;
   const CheckoutData = data?.data || displayData;
   const cartItem = useMemo(() => {
-    
-    
     return (CheckoutData as ShoppingCartData)?.cartItems || [];
   }, [CheckoutData]);
 
@@ -97,8 +124,18 @@ export default function CheckoutPage() {
   const totalAmount = subtotal + shippingFee;
 
   const handleConfirm = () => {
+    if (!selectedAddress) {
+      toast.error("กรุณาเพิ่มที่อยู่จัดส่งก่อนดำเนินการต่อ");
+      setIsOpen(false);
+      return;
+    }
+
     setIsOpen(false);
-    router.replace("/shoppingcart/checkoutcart/paymentcart");
+    setCheckoutItems(selectedItems);
+    setSelectedAddress(selectedAddress);
+    router.replace(
+      `/shoppingcart/checkoutcart/paymentcart?addressid=${selectedAddress.addressId}`,
+    );
   };
 
   if (!isMounted) {
@@ -132,9 +169,20 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-12 w-full mb-5 ">
               <button
                 onClick={() => router.push("/account/customer")}
-                className="col-start-1 col-span-11 md:col-start-2 md:col-span-10 text-left transition-all active:scale-[0.97] shadow-amber-100  hover:shadow-lg hover:translate-y-1 "
+                className="col-start-1 col-span-11 md:col-start-2 md:col-span-10 text-left transition-all active:scale-[0.97] shadow-amber-100  hover:shadow-lg hover:translate-y-1 cursor-pointer "
               >
-                <AddressCard address={selectedAddress} showActions={false} />
+                {selectedAddress ? (
+                  <AddressCard address={selectedAddress} showActions={false} />
+                ) : (
+                  <div className="p-6 border-2 border-dashed border-gray-200 rounded-2xl text-center">
+                    <div className="flex flex-col">
+                      <p className="text-blue-500  font-bold">คลิกที่นี้</p>
+                      <p className="text-gray-500 font-bold">
+                        ยังไม่มีข้อมูลที่อยู่ กรุณาเพิ่มที่อยู่จัดส่ง
+                      </p>
+                    </div>
+                  </div>
+                )}
               </button>
             </div>
             <p className="text-xs md:text-md text-red-500 flex justify-end mr-2">
@@ -145,12 +193,13 @@ export default function CheckoutPage() {
           <section className="space-y-4 ">
             <div className="flex font-black text-xl mb-3 gap-2 uppercase">
               <CircleCheckBig className="text-yellow-500" />
-              รายการสินค้า ({totalQuantity})
+              รายการสินค้า ({selectedItems.length})
             </div>
             <div className="grid grid-cols-12 w-full gap-4">
               <div className="col-start-1 col-span-12 md:col-start-2 md:col-span-10 space-y-4">
                 {selectedItems.length > 0 ? (
                   selectedItems.map((item) => (
+                   
                     <CartItemCard
                       key={item.shoppingCartItemId}
                       item={item}
@@ -161,6 +210,7 @@ export default function CheckoutPage() {
                       onUpdateQty={() => {}}
                       onRemove={() => {}}
                     />
+                    
                   ))
                 ) : (
                   <div className="text-center py-10 border-2 border-dashed border-gray-200 rounded-3xl">

@@ -124,7 +124,7 @@ const Header = () => {
                     <MenuItem>
                       {({ focus }) => (
                         <Button
-                          className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex w-full items-center px-4 py-2 text-left text-sm`}
+                         className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex w-full items-center px-4 py-2 text-left text-sm`}
                           onClick={() => {
                             queryClient.clear();
                             localStorage.removeItem("lineLiffUserData");

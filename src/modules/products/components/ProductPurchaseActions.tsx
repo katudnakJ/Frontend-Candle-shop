@@ -14,6 +14,7 @@ import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import QuantityInputButton from "@/components/Button/QuantityInputButton";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { AddCartResData } from "@/modules/cart/shoppingcartInterface";
+import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 
 interface DetailProductProps {
   price: number;
@@ -122,7 +123,7 @@ export default function ProductPurchaseActions({
             {isPending ? "กำลังเพิ่มข้อมูลการสั่งซื้อ..." : "ซื้อสินค้าทันที"}
           </span>
           <span className="text-md md:text-xl text-red-500 font-extrabold mt-1">
-            ฿{(price * quantity).toLocaleString()}
+            ฿<CurrencyDisplay amount={price * quantity} /> 
           </span>
         </button>
         <ConfirmDialog
@@ -166,7 +167,7 @@ export default function ProductPurchaseActions({
                       ยอดรวม:
                     </span>
                     <span className="text-xl font-bold text-red-500">
-                      ฿{(price * quantity).toLocaleString()}
+                      ฿<CurrencyDisplay amount={price * quantity} /> 
                     </span>
                   </div>
                 )}
