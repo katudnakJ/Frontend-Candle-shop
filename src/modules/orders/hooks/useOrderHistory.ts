@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { Order } from "../type";
-import { mockOrders } from "../mockOrderData"; // เดี๋ยวเปลี่ยนเป็นเรียก Service ตอนต่อ BE
+import { OrdersResponse } from "../type";
+import { ORDER_STATUS } from "@/constants/status";
 
 export const useOrderHistory = () => {
  
-  const [activeTab, setActiveTab] = useState<Order["order_status"] | "ALL">("PD");
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [activeTab, setActiveTab] = useState<OrdersResponse["orderStatus"] | "ALL">("PD");
+  const [orders, setOrders] = useState<OrdersResponse[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   
@@ -15,7 +15,7 @@ export const useOrderHistory = () => {
       try {
        
         await new Promise((resolve) => setTimeout(resolve, 500));
-        setOrders(mockOrders);
+        setOrders([]);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
@@ -32,9 +32,9 @@ export const useOrderHistory = () => {
       if (activeTab === "ALL") return true;
       
       if (activeTab === "PD") {
-        return order.order_status === "PD" || order.order_status === "RJ";
+        return order.orderStatus.toUpperCase() === ORDER_STATUS.PENDING || order.rejectionReason !== null;
       }
-      return order.order_status === activeTab;
+      return order.orderStatus === activeTab;
     });
   }, [orders, activeTab]);
 

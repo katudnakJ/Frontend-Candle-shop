@@ -6,9 +6,10 @@ import { Loader2 } from "lucide-react";
 import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
-import { useSellerOrders } from "@/modules/orders/hooks/useSellerOrders";
+import { useSellerOrders } from "@/modules/orders/hooks/index";
 import { SELLER_ORDER_TAB } from "@/constants/status";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
+import { USER_ROLE } from "@/constants/userRole";
 
 export default function Sellerorders (){
 
@@ -60,7 +61,7 @@ export default function Sellerorders (){
                         {/* Order content goes here */}
                         <OrderCard 
                           order={order}
-                          mode={userData?.userRole}
+                          role={userData?.userRole.toLocaleUpperCase() as USER_ROLE}
                         />
                       </div>
                     ))

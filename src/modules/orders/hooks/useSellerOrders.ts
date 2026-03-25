@@ -1,10 +1,10 @@
-import { useState, useMemo, useEffect } from "react";
-import { Order } from "../type";
+import { useState, useMemo } from "react";
 import { OrderByStatusResponse, useGetOrdersByStatus } from "@/modules/seller/hooks/useGetOrder";
+import { OrdersResponse } from "../type";
 
 export const useSellerOrders = () => {
  
-  const [activeTab, setActiveTab] = useState<Order["order_status"] | "ALL">("PD");
+  const [activeTab, setActiveTab] = useState<OrdersResponse["orderStatus"] | "ALL">("PD");
 
   const {data : orders, isLoading} = useGetOrdersByStatus(activeTab.toUpperCase());
 
@@ -20,6 +20,8 @@ export const useSellerOrders = () => {
       totalOrders: 0,
     };
   }, [orders]);
+
+  
 
   return {
     activeTab,

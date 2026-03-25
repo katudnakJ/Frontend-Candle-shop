@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Order, OrdersResponse } from "../type";
+import { OrdersResponse } from "../type";
 import { useReceiptPDF } from "../hooks/useReceiptPDF";
 import { ReceiptTemplate } from "./ReceiptTemplate";
 import Image from "next/image";
@@ -21,16 +21,15 @@ import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 import { USER_ROLE } from "@/constants/userRole";
 import { ORDER_STATUS, PAYMENT_STATUS } from "@/constants/status";
-import { UserLoginResponse } from "@/modules/auth/userLogin.type";
+import { useOrderCard } from "../hooks/index";
 
 interface OrderCardProps {
   order: OrdersResponse;
-  mode?: USER_ROLE | string;
-  userData?: UserLoginResponse | null;
+  role?: USER_ROLE | USER_ROLE.CUSTOMER;
 }
 
-export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: OrderCardProps) => {
-  const trackingList = order.trackingNo?.join(", ").split(/[,\s]+/).filter(Boolean);
+export const OrderCard = ({ order, role }: OrderCardProps) => {
+  const trackingList = order?.trackingNo?.join(", ").split(/[,\s]+/).filter(Boolean);
   const [showTrackkingnoInput, setShowTrackkingnoInput] = useState(false);
   const [isConfirmTrackingNoopen, setisConfirmTrackingNoopen] = useState(false);
   const [trackkingno, settrackkingno] = useState("");
@@ -45,93 +44,12 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
     );
   };
 
-  const router = useRouter();
-
-  // const getStatusDisplay = (status: OrdersResponse["orderStatus"]) => {
-  //   switch (status) {
-  //     case "PD":
-  //       return {
-  //         label: "รอตรวจสอบชำระเงิน",
-  //         color: "text-purple-600",
-  //         bg: "bg-purple-50",
-  //         border: "border-purple-600",
-  //       };
-  //     case "RJ":
-  //       return {
-  //         label: "การชำระเงินถูกปฏิเสธ",
-  //         color: "text-red-600",
-  //         bg: "bg-red-50",
-  //         border: "border-red-600",
-  //       };
-  //     case "TS":
-  //       return {
-  //         label: "ที่ต้องจัดส่ง",
-  //         color: "text-blue-600",
-  //         bg: "bg-blue-50",
-  //         border: "border-blue-600",
-  //       };
-  //     case "TR":
-  //       return {
-  //         label: "ที่ต้องได้รับ",
-  //         color: "text-amber-600",
-  //         bg: "text-amber-50",
-  //         border: "border-amber-600",
-  //       };
-  //     case "CP":
-  //       return {
-  //         label: "สำเร็จแล้ว",
-  //         color: "text-green-600",
-  //         bg: "bg-green-50",
-  //         border: "border-green-600",
-  //       };
-  //     default:
-  //       return { label: status, color: "text-gray-600", bg: "bg-gray-50" };
-  //   }
-  // };
-  const handlepaymentagain = () => {
-    router.push(
-      `/shoppingcart/checkoutcart/paymentcart?orderId=${order.orderId}&mode=repay`,
-    );
-  };
-  // const { receiptRef, downloadPDF } = useReceiptPDF(order);
-  // const statusInfo = getStatusDisplay(order.order_status);
-
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
 
-  const handleConfirmPayment = async () => {
-    toast.success(
-      <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight"> ยืนยันการชำระเงินสำเร็จ!</span>
-      </div>,
-      {
-        className:
-          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-        duration: 3000,
-      },
-    );
-
-    setIsVerifyOpen(false);
-  };
-
-  const handleRejectPayment = async (reason: string) => {
-    toast.success(
-      <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight"> ยืนยันการปฏิเสธสำเร็จแล้ว!</span>
-      </div>,
-      {
-        className:
-          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-        duration: 3000,
-      },
-    );
-    setIsVerifyOpen(false);
-  };
-
-  const handleConfirmTracking = (finalList: string[]) => {
-    const finalPayload = finalList.join(",");
-    console.log("ส่งไป Backend =>", finalPayload);
-    // ต้องมาทำตัว finalPayload ส่งไปให้ API
-  };
+  const { 
+    handlePaymentAgain,
+    handleAddTrackingNumber
+  } = useOrderCard(setIsVerifyOpen, order!);
 
   const pulseStyle = `
   @keyframes pulse-green-simple {
@@ -139,7 +57,6 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
     50% { background-color: #f0fdf4; border-color: #22c55e; color: #16a34a; }
   }
 `;
-
   return (
     <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden mb-8 transition-all">
       <style>{pulseStyle}</style>
@@ -158,7 +75,7 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
           onClick={() => setIsCardExpanded(!isCardExpanded)}
           className="w-full flex justify-between items-center font-black text-lg border-3 border-black border-b-0 px-6 py-5 rounded-t-[2rem] bg-white translate-y-[3px] hover:bg-gray-50 transition-colors"
         >
-          <span>Order #{order.orderNo}</span>
+          <span>Order #{order?.orderNo}</span>
           <ChevronDown
             className={`transition-transform duration-500 ${isCardExpanded ? "rotate-180" : ""}`}
             size={24}
@@ -170,7 +87,7 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
       <div className="p-5 space-y-3">
         {/* Product Items (แสดงเสมอแต่เป็นแบบกะทัดรัด) */}
         <div className="space-y-3">
-          {order.orderItems?.map((item) => {
+          {order?.orderItems?.map((item) => {
             const isItemExpanded = expandedItem.includes(item.orderItemId);
             return (
               <div
@@ -254,25 +171,25 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
               {/* Info Section (Tracking / RJ / CP) */}
               <div className="px-5 pb-2 space-y-3">
                 {/* กรณี RJ*/}
-                {order.orderStatus === "RJ" && (
+                {order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED&& role?.toUpperCase() === USER_ROLE.CUSTOMER &&(
                   <div className="p-4 bg-red-100 border-2 border-red-500 rounded-2xl flex items-start gap-3">
                     <AlertCircle className="text-red-600 shrink-0" />
                     <div className="text-sm">
                       <p className="font-black text-red-700">
-                        ชำระเงินไม่สำเร็จ:
+                        ชำระเงินไม่สำเร็จเนื่องจาก
                       </p>
                       <p className="text-red-600 font-bold">
-                        {order.rejectionReason || "สลิปไม่ถูกต้อง"}
+                        : {order?.rejectionReason || "สลิปไม่ถูกต้อง"}
                       </p>
                     </div>
                   </div>
                 )}
 
                 {/* กรณี TS/TR*/}
-                {(order.orderStatus === "TS" ||
-                  order.orderStatus === "TR" ||
-                  order.orderStatus === "CP") &&
-                  order.trackingNo && (
+                {(order?.orderStatus?.toLocaleUpperCase() === ORDER_STATUS.TO_SHIP ||
+                  order?.orderStatus === ORDER_STATUS.TO_RECEIVE ||
+                  order?.orderStatus === ORDER_STATUS.COMPLETED) &&
+                  order?.trackingNo?.length > 0 && (
                     <div className="flex flex-col p-4 bg-blue-50 border-2 border-black rounded-2xl gap-3  ">
                       <div className="flex items-center gap-2">
                         <Truck className="text-blue-600" size={20} />
@@ -315,21 +232,11 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
                     </div>
                   )}
 
-                คัดลอกเลขพัสดุทั้งหมด ทีเดียว <button
-                disabled
-                onClick={() => {
-                  navigator.clipboard.writeText(order.trackingNo?.join(", ") || "");
-                  toast.success("คัดลอกเลขพัสดุแล้ว");
-                }}
-                className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer hidden"
-              >
-                <Copy size={16} />
-              </button>
-
                 {/* สำหรับ TS ที่ยังไม่มีเลขพัสดุ */}
-                {order.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP && !order.trackingNo && (
+                {order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP 
+                && order?.trackingNo.length === 0 && (
                   <>
-                    {role.toUpperCase() === USER_ROLE.SELLER ? (
+                    {role?.toUpperCase() === USER_ROLE.SELLER ? (
                       <div className="flex flex-col gap-3 p-4 bg-blue-50 border-2 border-black rounded-[2rem]">
                         <div className="flex items-center gap-2 text-blue-700 font-black text-xs px-2 uppercase">
                           <Truck size={16} />
@@ -395,7 +302,7 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
                   </>
                 )}
 
-                {order.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED && (
+                {order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED && (
                   <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
@@ -428,7 +335,7 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                     <span className="text-gray-500 font-bold text-sm whitespace-nowrap">
                       สั่งสินค้าเมื่อ:{" "}
-                      {new Date(order.orderCreatedAt).toLocaleDateString(
+                      {new Date(order?.orderCreatedAt).toLocaleDateString(
                         "th-TH",
                       )}
                     </span>
@@ -438,7 +345,7 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
                           จำนวนสินค้าทั้งหมด:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right max-[350px]:text-left">
-                          {(order.totalQuantity || 0).toLocaleString()} ชิ้น
+                          {(order?.totalQuantity || 0).toLocaleString()} ชิ้น
                         </span>
                       </div>
 
@@ -447,7 +354,7 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
                           ค่าจัดส่ง:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right">
-                          ฿<CurrencyDisplay amount={order.netAmount - order.totalAmount || 0} /> 
+                          ฿<CurrencyDisplay amount={order?.netAmount - order?.totalAmount || 0} /> 
                         </span>
                       </div>
 
@@ -464,20 +371,20 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
                 </div>
 
                 <div className="flex gap-3">
-                  {/* <button className="flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
+                  <button className="flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
             รายละเอียด
-          </button> */}
+          </button>
 
-                  {order.rejectionReason && (
+                  {order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED && role?.toUpperCase() === USER_ROLE.CUSTOMER && (
                     <button
-                      onClick={handlepaymentagain}
+                      onClick={handlePaymentAgain}
                       className="flex-1 max-[340px]:text-sm py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
                     >
                       ชำระเงินใหม่
                     </button>
                   )}
 
-                  { userData?.userRole === USER_ROLE.CUSTOMER && order.orderStatus.toUpperCase() === ORDER_STATUS.TO_RECEIVE && (
+                  { role === USER_ROLE.CUSTOMER && order?.orderStatus?.toUpperCase() === ORDER_STATUS.TO_RECEIVE && (
                     // ต้องทำตัว hadle api update status ว่า Complete ไป  backend
                     <button className="flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
                       ได้รับสินค้าแล้ว
@@ -489,9 +396,9 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
                 รีวิวสินค้า
              </button>
           )} */}
-                  {order.orderStatus.toUpperCase() === ORDER_STATUS.PENDING && (
+                  {order?.orderStatus.toUpperCase() === ORDER_STATUS.PENDING && (
                     <>
-                      {role.toUpperCase() === USER_ROLE.SELLER ? (
+                      {role?.toUpperCase() === USER_ROLE.SELLER ? (
                         <button
                           onClick={() => setIsVerifyOpen(true)}
                           className="flex-1 py-3 max-[340px]:text-sm border-4 rounded-full font-black cursor-pointer transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-none"
@@ -522,18 +429,16 @@ export const OrderCard = ({ order, mode: role = USER_ROLE.CUSTOMER, userData }: 
       </div>
       {isVerifyOpen && (
         <VerificationSlip
-          order={order}
+          order={order as OrdersResponse}
           onClose={() => setIsVerifyOpen(false)}
-          onConfirm={handleConfirmPayment}
-          onReject={handleRejectPayment}
         />
       )}
       <ConfirmDialog
-        open={isConfirmTrackingNoopen}
+        open={isConfirmTrackingNoopen}  
         onClose={() => setisConfirmTrackingNoopen(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
+          await handleAddTrackingNumber(order?.orderId, cleanTrackingList);
           setisConfirmTrackingNoopen(false);
-          handleConfirmTracking(cleanTrackingList);
         }}
         title="ยืนยันหมายเลข Tracking No."
         content={
