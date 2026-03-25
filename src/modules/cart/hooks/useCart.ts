@@ -12,13 +12,15 @@ import { ShoppingCartData } from "../shoppingcartInterface";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-
 export const useCart = (currentPage: number) => {
   const size = 2;
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const { data, isLoading, isPlaceholderData} = useGetCartData(currentPage, size) as {
+  const { data, isLoading, isPlaceholderData } = useGetCartData(
+    currentPage,
+    size,
+  ) as {
     data: GenericResponse<ShoppingCartData> | undefined;
     isLoading: boolean;
     isPlaceholderData: boolean;
@@ -54,6 +56,7 @@ export const useCart = (currentPage: number) => {
     setTotalItems,
     setSelectedIds,
     setAllCartItems,
+    setCheckoutItems,
     removeFromStore,
   } = useCartStore();
 
@@ -71,10 +74,40 @@ export const useCart = (currentPage: number) => {
       }
 
       if (items.length > 0) {
-        setAllCartItems(items);
+        const currentAllItems = useCartStore.getState().allCartItems;
+
+        const newItemsMap = new Map(
+          items.map((item) => [item.shoppingCartItemId, item]),
+        );
+
+        const mergedItems = currentAllItems.map((oldItem) => {
+          if (newItemsMap.has(oldItem.shoppingCartItemId)) {
+            return newItemsMap.get(oldItem.shoppingCartItemId)!;
+          }
+          return oldItem;
+        });
+
+        items.forEach((newItem) => {
+          const exists = currentAllItems.some(
+            (i) => i.shoppingCartItemId === newItem.shoppingCartItemId,
+          );
+          if (!exists) {
+            mergedItems.push(newItem);
+          }
+        });
+
+        setAllCartItems(mergedItems);
       }
     }
   }, [data, isLoading, setTotalItems, setAllCartItems]);
+
+  useEffect(() => {
+    const selectedItems = allCartItems.filter((item) =>
+      selectedIds.includes(item.shoppingCartItemId),
+    );
+
+    setCheckoutItems(selectedItems);
+  }, [allCartItems, selectedIds, setCheckoutItems]);
 
   const totals = useMemo(() => {
     const selectedItems = allCartItems.filter((item) =>
@@ -142,6 +175,15 @@ export const useCart = (currentPage: number) => {
         const newQty = Math.max(1, item.quantity + delta);
 
         updateLocal(itemId, newQty, currentPage, size);
+
+        const currentAll = useCartStore.getState().allCartItems;
+        const updatedAll = currentAll.map((i) =>
+          i.shoppingCartItemId === itemId ? { ...i, quantity: newQty } : i,
+        );
+
+        // สั่ง Update Store
+        setAllCartItems(updatedAll);
+
         debouncedUpdate({
           shoppingCartItemId: item.shoppingCartItemId,
           productId: item.productId,
@@ -161,7 +203,9 @@ export const useCart = (currentPage: number) => {
           {
             onSuccess: async () => {
               removeFromStore(itemId);
-              await queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
+              await queryClient.invalidateQueries({
+                queryKey: ["shopping-cart"],
+              });
               if (cartItem.length === 1 && currentPage > 0) {
                 const displayPage = currentPage; // currentPage คือ index 0, ดังนั้นหน้าก่อนหน้าคือ index ปัจจุบันพอดี
                 router.push(`?page=${displayPage}`, { scroll: true });

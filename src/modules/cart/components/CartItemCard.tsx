@@ -50,25 +50,31 @@ export const CartItemCard = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    setInputValue(val);
+    if (val === "") {
+      setInputValue("");
+      return;
+    }
 
-    if (val !== "") {
-      const num = parseInt(val);
-      if (!isNaN(num)) {
-        const clampedVal = Math.min(max, num);
+    const num = parseInt(val);
+    if (!isNaN(num)) {
 
-        onUpdateQty(item.shoppingCartItemId, clampedVal - item.quantity);
-      }
+      let finalVal = num;
+      if (num > max) finalVal = max;
+
+      setInputValue(finalVal);
+
+      onUpdateQty(item.shoppingCartItemId, finalVal - item.quantity);
     }
   };
-  //  else if (e.target.value === "") {
-  //   onUpdateQty(item.shoppingCartItemId, 1 - item.quantity);
-  // }
+
 
   const handleBlur = () => {
     if (item.quantity < min || inputValue === "") {
       onUpdateQty(item.shoppingCartItemId, min - item.quantity);
       setInputValue(min);
+    } else if (item.quantity > max) {
+      onUpdateQty(item.shoppingCartItemId, max);
+      setInputValue(max);
     }
   };
 
@@ -171,9 +177,10 @@ export const CartItemCard = ({
                   />
                   <button
                     onClick={() => onUpdateQty?.(item.shoppingCartItemId, 1)}
-                    className="px-2 py-1 hover:bg-black hover:text-white transition-colors"
+                    disabled={item.quantity >= max}
+                    className="px-2 py-1 hover:bg-black hover:text-white transition-colors disabled:cursor-not-allowed cursor-pointer"
                   >
-                    <Plus className="w-4 h-4 cursor-pointer" />
+                    <Plus className="w-4 h-4" />
                   </button>
                 </div>
               )}

@@ -79,6 +79,7 @@ export default function PaymentPage() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isSuccessCheckout, setSuccessCheckout] = useState(false);
   const page = Number(searchParams.get("page")) || 0;
   const size = Number(searchParams.get("size")) || 100;
   const [seller, setSeller] = useState<Seller | null>(null);
@@ -135,9 +136,11 @@ export default function PaymentPage() {
 
   useEffect(() => {
     if (
+      
       isMounted &&
       !isLoading &&
       !isCheckingOut &&
+      !isSuccessCheckout&&
       mode !== "repay" &&
       checkoutItems.length === 0 &&
       selectedItems.length === 0
@@ -151,6 +154,7 @@ export default function PaymentPage() {
     isMounted,
     isLoading,
     isCheckingOut,
+    isSuccessCheckout,
     checkoutItems.length,
     selectedItems.length,
     mode,
@@ -273,6 +277,7 @@ export default function PaymentPage() {
     }
     checkoutMutate(payload, {
       onSuccess: () => {
+        setSuccessCheckout(true);
         toast.success("ยืนยันการชำระเงินเรียบร้อย");
 
         setTimeout(() => {
@@ -280,7 +285,7 @@ export default function PaymentPage() {
           setCheckoutItems([]);
           setSelectedAddress(null);
           sessionStorage.removeItem("selected_checkout_ids");
-        }, 500);
+        }, 300);
 
         router.replace("/account/orderhistory");
       },
