@@ -1,7 +1,7 @@
 import { OrdersResponse } from "@/modules/orders/type";
 import { GenericResponse } from "@/types/response.type";
 import { apiClient } from "@/utils/api";
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query"
 
 
  export interface OrderByStatusResponse {
@@ -33,18 +33,23 @@ export const useGetOrderCountByStatus = (status: string, enabled: boolean) => {
 }
 
 export const useGetOrdersByStatus = (status: string) => {
-    return useQuery({
+    return useInfiniteQuery({
         queryKey: ["getOrdersByStatus", status],
-        queryFn: async () => {
-            return await apiClient.get<void, GenericResponse<OrderByStatusResponse>>(`/v1/order`,
+        queryFn: async ({ pageParam = 0 }) => {
+            const response = await apiClient.get<void, GenericResponse<OrderByStatusResponse>>(`/v1/order`,
                 {
                     params: {
                         status: status,
-                        page : 0,
-                        size : 10,
+                        page: pageParam,
+                        size : 2,
                     }
                 }
             );
+            return response;
+        },
+        initialPageParam: 0,
+        getNextPageParam: (lastPage) => {
+          return lastPage.data?.hasNext ? lastPage.data.page + 1 : undefined;
         },
         retry: 0,
         staleTime: 5 * 60 * 1000,

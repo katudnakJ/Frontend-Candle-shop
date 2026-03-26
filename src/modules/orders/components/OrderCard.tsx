@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { OrdersResponse } from "../type";
-import { ReceiptTemplate } from "./ReceiptTemplate";
 import Image from "next/image";
 import {
   Truck,
@@ -52,7 +51,7 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
     getStatusDisplay,
     handleDowloadPDF,
     isPDFCreating,
-  } = useOrderCard(setIsVerifyOpen, order!);
+  } = useOrderCard(setIsVerifyOpen);
 
 
   const statusInfo = getStatusDisplay(

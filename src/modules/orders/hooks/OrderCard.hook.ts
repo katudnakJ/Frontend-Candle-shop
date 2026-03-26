@@ -9,7 +9,6 @@ import { getOrderReceiptWithStale } from "../services";
 
 export const useOrderCard = (
     setIsVerifyOpen : (bool: boolean) => void,
-    order : OrdersResponse
 ) => {
 
     const router = useRouter();
@@ -61,13 +60,13 @@ export const useOrderCard = (
 
     const [isPDFCreating, setIsPDFCreating] = useState(false);
 
-    const handlePaymentAgain = () => {
-        toast.error("checkout flow needed")
-        console.log("ข้อความจาก handlePaymentAgain \n ใช้เส้น : /v1/checkout/${orderId}", );
+    const handlePaymentAgain = (orderId: string) => {
+        // toast.error("checkout flow needed")
+        // console.log("ข้อความจาก handlePaymentAgain \n ใช้เส้น : /v1/checkout/${orderId}", );
         
-        // router.push(
-        //   `/shoppingcart/checkoutcart/paymentcart?orderId=${order.orderId}&mode=repay`,
-        // );
+        router.push(
+          `/shoppingcart/checkoutcart/paymentcart?orderId=${orderId}&mode=repay`,
+        );
     };  
     
     const handleAddTrackingNumber = async (orderId: string, trackingNumber: string[]) => {
