@@ -20,8 +20,6 @@ export interface ShoppingCartData {
   shoppingCartId: string;
   endAt: number;
   startAt: number;
-  page: number;
-  size: number;
   hasNext: boolean;
   totalItems: number;
 }

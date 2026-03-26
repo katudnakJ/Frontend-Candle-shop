@@ -7,52 +7,56 @@ import {
 } from "./useCartMutations";
 import { useGetCartData } from "./useGetCartData";
 import { useDebouncedCallback } from "use-debounce";
-import { GenericResponse } from "@/types/response.type";
-import { ShoppingCartData } from "../shoppingcartInterface";
+
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
-export const useCart = (currentPage: number) => {
-  const size = 2;
+
+export const useCart = () => {
+
+
+  const size = 1;
   const queryClient = useQueryClient();
-  const router = useRouter();
 
-  const { data, isLoading, isPlaceholderData } = useGetCartData(
-    currentPage,
-    size,
-  ) as {
-    data: GenericResponse<ShoppingCartData> | undefined;
-    isLoading: boolean;
-    isPlaceholderData: boolean;
-  };
-  const { cartItem, shoppingCartId, endAt, startAt, hasNext, totalItems } =
-    useMemo(() => {
-      const rawData = data?.data || data;
-      const cartData = rawData as ShoppingCartData;
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    isPlaceholderData,
+  } = useGetCartData(size);
 
-      return {
-        cartItem: cartData?.cartItems || [],
-        shoppingCartId: cartData?.shoppingCartId,
-        endAt: cartData?.endAt || 0,
-        startAt: cartData?.startAt || 0,
-        hasNext: cartData?.hasNext || false,
-        totalItems: cartData?.totalItems || 0,
-      };
-    }, [data]);
+  if (process.env.NODE_ENV === "development") {
+    console.log("DATA IN useCart:", data);
+  }
+  const { cartItem, shoppingCartId, endAt, totalItemsFromApi } = useMemo(() => {
+    const pages = data?.pages || [];
+    const allItems = pages.flatMap((p) => {
+      const actualData = p?.data || p;
+      return actualData?.cartItems || [];
+    });
+    const lastPage = pages[pages.length - 1]?.data || pages[pages.length - 1];
+    const lastPageData = lastPage;
+    return {
+      cartItem: allItems,
+      shoppingCartId: lastPageData?.shoppingCartId,
+      totalItemsFromApi: lastPageData?.totalItems || 0,
+      endAt: allItems.length,
+    };
+  }, [data]);
 
   if (process.env.NODE_ENV === "development") {
     console.log("ITEMS IN USECART:", cartItem);
     console.log("ShoppingCartId:", shoppingCartId);
     console.log("EndAt:", endAt);
-    console.log("StartAt:", startAt);
-    console.log("HasNext:", hasNext);
-    console.log("TotalItems:", totalItems);
+    // console.log("StartAt:", startAt);
+    // console.log("HasNext:", hasNext);
+    console.log("TotalItems:", totalItemsFromApi);
   }
 
   const {
     selectedIds,
     allCartItems,
-    totalItems: storeTotalItems,
     setTotalItems,
     setSelectedIds,
     setAllCartItems,
@@ -61,45 +65,13 @@ export const useCart = (currentPage: number) => {
   } = useCartStore();
 
   useEffect(() => {
-    const rawData = data?.data || data;
-
-    const items = (rawData as ShoppingCartData)?.cartItems || [];
-    const total = (rawData as ShoppingCartData)?.totalItems || 0;
-
-    const currentStoreTotal = useCartStore.getState().totalItems;
-
     if (!isLoading) {
-      if (total !== currentStoreTotal) {
-        setTotalItems(total);
-      }
-
-      if (items.length > 0) {
-        const currentAllItems = useCartStore.getState().allCartItems;
-
-        const newItemsMap = new Map(
-          items.map((item) => [item.shoppingCartItemId, item]),
-        );
-
-        const mergedItems = currentAllItems.map((oldItem) => {
-          if (newItemsMap.has(oldItem.shoppingCartItemId)) {
-            return newItemsMap.get(oldItem.shoppingCartItemId)!;
-          }
-          return oldItem;
-        });
-
-        items.forEach((newItem) => {
-          const exists = currentAllItems.some(
-            (i) => i.shoppingCartItemId === newItem.shoppingCartItemId,
-          );
-          if (!exists) {
-            mergedItems.push(newItem);
-          }
-        });
-
-        setAllCartItems(mergedItems);
-      }
+      setTotalItems(totalItemsFromApi);
     }
-  }, [data, isLoading, setTotalItems, setAllCartItems]);
+    if (!isLoading && cartItem.length > 0) {
+      setAllCartItems(cartItem);
+    }
+  }, [cartItem, totalItemsFromApi, isLoading, setTotalItems, setAllCartItems]);
 
   useEffect(() => {
     const selectedItems = allCartItems.filter((item) =>
@@ -135,8 +107,7 @@ export const useCart = (currentPage: number) => {
       setSelectedIds(selectedIds.filter((id) => !currentIds.includes(id)));
     } else {
       const currentIds = cartItem.map((i) => i.shoppingCartItemId);
-      const newSelected = Array.from(new Set([...selectedIds, ...currentIds]));
-      setSelectedIds(newSelected);
+      setSelectedIds(Array.from(new Set([...selectedIds, ...currentIds])));
     }
   };
 
@@ -149,8 +120,8 @@ export const useCart = (currentPage: number) => {
   };
 
   const updateLocal = useUpdateCartLocal();
-  const { mutate: updateQty } = useUpdateCartItem(currentPage, size);
-  const { mutate: removeItem } = useDeleteCartItem(currentPage, size);
+  const { mutate: updateQty } = useUpdateCartItem(size);
+  const { mutate: removeItem } = useDeleteCartItem(size);
 
   const debouncedUpdate = useDebouncedCallback((payload) => {
     updateQty(payload);
@@ -159,36 +130,34 @@ export const useCart = (currentPage: number) => {
   return {
     cartItem,
     isLoading,
+    isFetchingNextPage,
     isPlaceholderData,
-    totalItems: storeTotalItems,
-    hasNext,
-    startAt,
+    totalItems: totalItemsFromApi,
+    hasNext: hasNextPage,
+    startAt: 1,
     endAt,
     pageSize: size,
     selectedIds,
     isAllSelected,
+    fetchNextPage,
     toggleSelectAll,
     toggleSelect,
     updateQuantity: (itemId: string, delta: number) => {
       const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
       if (item && shoppingCartId) {
         const newQty = Math.max(1, item.quantity + delta);
+        updateLocal(itemId, newQty);
 
-        updateLocal(itemId, newQty, currentPage, size);
-
-        const currentAll = useCartStore.getState().allCartItems;
-        const updatedAll = currentAll.map((i) =>
+        const updatedAll = allCartItems.map((i) =>
           i.shoppingCartItemId === itemId ? { ...i, quantity: newQty } : i,
         );
-
-        // สั่ง Update Store
         setAllCartItems(updatedAll);
 
         debouncedUpdate({
           shoppingCartItemId: item.shoppingCartItemId,
           productId: item.productId,
           quantity: newQty,
-          shoppingCartId: shoppingCartId,
+          shoppingCartId,
         });
       }
     },
@@ -196,20 +165,13 @@ export const useCart = (currentPage: number) => {
       const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
       if (item) {
         removeItem(
+          { shoppingCartId, shoppingCartItemId: item.shoppingCartItemId },
           {
-            shoppingCartId: shoppingCartId,
-            shoppingCartItemId: item.shoppingCartItemId,
-          },
-          {
-            onSuccess: async () => {
+            onSuccess: () => {
               removeFromStore(itemId);
-              await queryClient.invalidateQueries({
-                queryKey: ["shopping-cart"],
+              queryClient.invalidateQueries({
+                queryKey: ["shopping-cart", size],
               });
-              if (cartItem.length === 1 && currentPage > 0) {
-                const displayPage = currentPage; // currentPage คือ index 0, ดังนั้นหน้าก่อนหน้าคือ index ปัจจุบันพอดี
-                router.push(`?page=${displayPage}`, { scroll: true });
-              }
             },
           },
         );

@@ -27,26 +27,26 @@ import { GenericResponse } from "@/types/response.type";
 const Header = () => {
   const queryClient = useQueryClient();
   const { totalItems: storeTotalItems, setTotalItems } = useCartStore();
-  const { data, isLoading } = useGetCartData() as {
-    data: GenericResponse<ShoppingCartData> | undefined;
-    isLoading: boolean;
-  };
+  const { data, isLoading } = useGetCartData(100) 
   useEffect(() => {
     if (data) {
-      const CartCountData = data?.data || data;
-      const apiTotal = (CartCountData as ShoppingCartData)?.totalItems || 0;
-
-      if (apiTotal !== useCartStore.getState().totalItems) {
-        setTotalItems(apiTotal);
+      const pages = data?.pages || [];
+      const CartCountData  = pages[pages.length - 1]?.data || pages[pages.length - 1];
+      const apiTotal = CartCountData.totalItems;
+      if (process.env.NODE_ENV === "development") {
+        console.group("🚩 Header Cart Status");
+        console.log("Raw Data: ", CartCountData);
+        console.log("Raw ApiTotal: ", apiTotal);
       }
+
+      setTotalItems(apiTotal);
     }
   }, [data, setTotalItems]);
   const totalItemsCount = storeTotalItems;
 
   if (process.env.NODE_ENV === "development") {
     console.group("🛒 Header Cart Status");
-    console.log("%c Count: ", "color: green", totalItemsCount);
-    console.log("Raw Data: ", storeTotalItems);
+    console.log("%c Count: ", "color: yellow", totalItemsCount);
     console.groupEnd();
   }
 

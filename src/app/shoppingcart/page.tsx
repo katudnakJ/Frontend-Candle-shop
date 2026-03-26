@@ -3,34 +3,33 @@
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 
-import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import { useCart } from "@/modules/cart/hooks/useCart";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
-import { CartPagination } from "@/modules/cart/components/CartPagination";
 import { ShoppingCartSkeletonpage } from "@/modules/cart/components/skeletoncart/ShoppingCartSkeletonpage";
 import { PreviousButton } from "@/components/commonui/PreviousButton";
 
 import EmptyCartState from "@/modules/cart/components/EmptyCartState";
 
 export default function ShoppingCartPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
 
-  const pageParam = Number(searchParams.get("page")) || 1;
-  const currentPage = pageParam - 1;
+
 
   const [isMounted, setIsMounted] = useState(false);
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+  });
   const { getPrimaryImage } = useCartStore();
   const {
     cartItem,
     totalItems,
     hasNext,
-    startAt,
+    fetchNextPage,
+    isFetchingNextPage,
     endAt,
-    pageSize,
     isLoading,
     isPlaceholderData,
     selectedIds,
@@ -41,7 +40,7 @@ export default function ShoppingCartPage() {
     updateQuantity,
     removeItem,
     toggleSelectAll,
-  } = useCart(currentPage);
+  } = useCart();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -54,23 +53,30 @@ export default function ShoppingCartPage() {
     return () => clearTimeout(timer);
   }, [selectedIds]);
 
-  const totalPages = Math.ceil(totalItems / pageSize);
-
-  const handlePageChange = (newPage: number) => {
-    const displayPage = newPage + 1;
-    router.push(`?page=${displayPage}`, { scroll: true });
-  };
-
   useEffect(() => {
-    if (
-      !isLoading &&
-      cartItem.length === 0 &&
-      totalItems > 0 &&
-      currentPage > 0
-    ) {
-      handlePageChange(currentPage - 1);
+    if (inView && hasNext && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  }, [cartItem.length, totalItems, currentPage, isLoading]);
+  }, [inView, hasNext, isFetchingNextPage, fetchNextPage]);
+
+
+  // const totalPages = Math.ceil(totalItems / pageSize);
+
+  // const handlePageChange = (newPage: number) => {
+  //   const displayPage = newPage + 1;
+  //   router.push(`?page=${displayPage}`, { scroll: true });
+  // };
+
+  // useEffect(() => {
+  //   if (
+  //     !isLoading &&
+  //     cartItem.length === 0 &&
+  //     totalItems > 0 &&
+  //     currentPage > 0
+  //   ) {
+  //     handlePageChange(currentPage - 1);
+  //   }
+  // }, [cartItem.length, totalItems, currentPage, isLoading]);
 
   if (!isMounted) {
     return (
@@ -110,20 +116,34 @@ export default function ShoppingCartPage() {
             {cartItem.length === 0 ? (
               <EmptyCartState />
             ) : (
-              cartItem.map((item) => (
-                <CartItemCard
-                  key={item.shoppingCartItemId}
-                  item={item}
-                  isSelected={selectedIds.includes(item.shoppingCartItemId)}
-                  image={getPrimaryImage(item)}
-                  onToggle={toggleSelect}
-                  onUpdateQty={updateQuantity}
-                  onRemove={removeItem}
-                />
-              ))
-            )}
+              <>
+                {cartItem.map((item) => (
+                  <CartItemCard
+                    key={item.shoppingCartItemId}
+                    item={item}
+                    isSelected={selectedIds.includes(item.shoppingCartItemId)}
+                    image={getPrimaryImage(item)}
+                    onToggle={toggleSelect}
+                    onUpdateQty={updateQuantity}
+                    onRemove={removeItem}
+                  />
+                ))}
+                <div ref={ref} className="h-20 flex justify-center items-center">
+                  {isFetchingNextPage ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-6 h-6 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-sm text-gray-500">กำลังโหลดรายการเพิ่มเติม...</p>
+                    </div>
+                  ) : hasNext ? (
+                    <p className="text-sm text-gray-400 italic">เลื่อนลงเพื่อโหลดเพิ่ม</p>
+                  ) : cartItem.length > 0 ? (
+                    <p className="text-sm text-gray-400">สิ้นสุดรายการสินค้าทั้งหมด {totalItems} รายการ</p>
+                  ) : null}
+                </div>
+              </>
+              )}
           </div>
-          {totalItems > pageSize && (
+          {/* {totalItems > pageSize && (
             <CartPagination
               pageParam={pageParam}
               totalPages={totalPages}
@@ -133,7 +153,7 @@ export default function ShoppingCartPage() {
               onPageChange={handlePageChange}
               hasNext={hasNext}
             />
-          )}
+          )} */}
         </div>
         {isPlaceholderData && (
           <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm z-50">
