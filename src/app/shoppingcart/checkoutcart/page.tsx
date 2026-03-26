@@ -29,17 +29,9 @@ import { Addresses } from "@/modules/account/addresses";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const queryClient = useQueryClient();
-  const page = Number(searchParams.get("page")) || 0;
-  const size = Number(searchParams.get("size")) || 100;
-
-  const cachedData = queryClient.getQueryData<
-    GenericResponse<ShoppingCartData>
-  >(["shopping-cart", page, size]);
-
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
   const {
     allCartItems,
     selectedIds,
@@ -48,10 +40,7 @@ export default function CheckoutPage() {
     setCheckoutItems,
     setSelectedAddress,
   } = useCartStore();
-  const { data, isLoading } = useGetCartData(page, size) as {
-    data: GenericResponse<ShoppingCartData> | undefined;
-    isLoading: boolean;
-  };
+  const { data, isLoading } = useGetCartData();
   if (process.env.NODE_ENV === "development") {
     console.log("CheckoutPRODUCT:", data);
   }
@@ -74,46 +63,45 @@ export default function CheckoutPage() {
   if (process.env.NODE_ENV === "development") {
     console.log("SelectedAddress??CheckoutPRODUCT:", selectedAddress);
   }
-
-  const displayData = data || cachedData;
-  const CheckoutData = data?.data || displayData;
   const cartItem = useMemo(() => {
-    return (CheckoutData as ShoppingCartData)?.cartItems || [];
-  }, [CheckoutData]);
+    const pages = data?.pages || [];
+    return pages.flatMap((p) => {
+      const actualData = p?.data || p;
+      return actualData?.cartItems || [];
+    });
+  }, [data]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 500);
-
-    if (selectedIds.length === 0) {
-      const saved = sessionStorage.getItem("selected_checkout_ids");
-      if (saved) {
-        setSelectedIds(JSON.parse(saved));
+    const saved = sessionStorage.getItem("selected_checkout_ids");
+    if (saved) {
+      const parsedIds = JSON.parse(saved);
+      if (parsedIds.length > 0 && selectedIds.length === 0) {
+        setSelectedIds(parsedIds);
       }
     }
+
+    const timer = setTimeout(() => setIsMounted(true), 500);
     return () => clearTimeout(timer);
   }, [selectedIds.length, setSelectedIds]);
 
-  const selectedItems = useMemo(
-    () =>
-      allCartItems.filter((item) =>
-        selectedIds.includes(item.shoppingCartItemId),
-      ),
-    [allCartItems, selectedIds],
-  );
+  const selectedItems = useMemo(() => {
+    const sourceItems = allCartItems.length > 0 ? allCartItems : cartItem;
+
+    return sourceItems.filter((item) =>
+      selectedIds.includes(item.shoppingCartItemId),
+    );
+  }, [cartItem, allCartItems, selectedIds]);
 
   useEffect(() => {
-    if (
-      isMounted &&
-      !isLoading &&
-      cartItem.length > 0 &&
-      selectedItems.length === 0
-    ) {
+    if (isMounted && !isLoading) {
       const saved = sessionStorage.getItem("selected_checkout_ids");
-      if (!saved || JSON.parse(saved).length === 0) {
+      const parsedSaved = saved ? JSON.parse(saved) : [];
+
+      if (parsedSaved.length === 0) {
         router.replace("/shoppingcart");
       }
     }
-  }, [isMounted, isLoading, selectedItems.length, cartItem.length, router]);
+  }, [isMounted, isLoading, router]);
 
   const subtotal = selectedItems.reduce(
     (acc, item) => acc + (item.price ?? 0) * item.quantity,

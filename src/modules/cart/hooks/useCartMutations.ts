@@ -19,7 +19,7 @@ type UpdateCartMutationPayload = AddShoppingCartItemReq & {
 };
 
 //ต้องตรงกับ size ที่ useCart
-const samesizeinuseCart = 1;
+const samesizeinuseCart = 10;
 
 export const useUpdateCartLocal = () => {
   const queryClient = useQueryClient();
