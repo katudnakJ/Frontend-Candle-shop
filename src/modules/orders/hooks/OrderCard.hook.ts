@@ -61,11 +61,8 @@ export const useOrderCard = (
     const [isPDFCreating, setIsPDFCreating] = useState(false);
 
     const handlePaymentAgain = (orderId: string) => {
-        // toast.error("checkout flow needed")
-        // console.log("ข้อความจาก handlePaymentAgain \n ใช้เส้น : /v1/checkout/${orderId}", );
-        
         router.push(
-          `/shoppingcart/checkoutcart/paymentcart?orderId=${orderId}&mode=repay`,
+          `/shoppingcart/checkoutcart/paymentcart?addressid=`,
         );
     };  
     
