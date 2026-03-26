@@ -27,7 +27,7 @@ import { GenericResponse } from "@/types/response.type";
 const Header = () => {
   const queryClient = useQueryClient();
   const { totalItems: storeTotalItems, setTotalItems } = useCartStore();
-  const { data, isLoading } = useGetCartData(100) 
+  const { data, isLoading } = useGetCartData(100 , "checkout") 
   useEffect(() => {
     if (data) {
       const pages = data?.pages || [];

@@ -14,7 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 export const useCart = () => {
 
 
-  const size = 1;
+  const size = 10;
   const queryClient = useQueryClient();
 
   const {
