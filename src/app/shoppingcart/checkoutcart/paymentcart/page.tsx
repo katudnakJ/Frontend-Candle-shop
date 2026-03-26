@@ -80,31 +80,25 @@ export default function PaymentPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isSuccessCheckout, setSuccessCheckout] = useState(false);
-  const page = Number(searchParams.get("page")) || 0;
   const size = Number(searchParams.get("size")) || 100;
   const [seller, setSeller] = useState<Seller | null>(null);
   const [isLoadingSeller, setIsLoadingSeller] = useState(true);
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [showPaymentError, setShowPaymentError] = useState(false);
   const [repayOrder, setRepayOrder] = useState<Order | null>(null);
-  
-  const cachedData = queryClient.getQueryData<
-    GenericResponse<ShoppingCartData>
-  >(["shopping-cart", page, size]);
 
-  const { data, isLoading } = useGetCartData(page, size) as {
-    data: GenericResponse<ShoppingCartData> | undefined;
-    isLoading: boolean;
-  };
+  const { data, isLoading } = useGetCartData();
   if (process.env.NODE_ENV === "development") {
     console.log("CheckoutPRODUCT:", data);
   }
 
-  const detailItemsData = data || cachedData;
-  const CheckoutData = data?.data || detailItemsData;
   const cartItem = useMemo(() => {
-    return (CheckoutData as ShoppingCartData)?.cartItems || [];
-  }, [CheckoutData]);
+    const pages = data?.pages || [];
+    return pages.flatMap((p) => {
+      const actualData = p?.data || p;
+      return actualData?.cartItems || [];
+    });
+  }, [data]);
 
   const { data: existingQRCode, isLoading: isLoadingQR } =
     useGetQRPaymentImageForCus();
@@ -123,30 +117,38 @@ export default function PaymentPage() {
 
     if (selectedIds.length === 0 && !orderId) {
       const saved = sessionStorage.getItem("selected_checkout_ids");
-      if (saved) setSelectedIds(JSON.parse(saved));
+      if (saved) {
+        const parsedIds = JSON.parse(saved);
+        if (parsedIds.length > 0) {
+          setSelectedIds(parsedIds);
+        }
+      }
     }
     return () => clearTimeout(timer);
   }, [selectedIds.length, setSelectedIds, orderId]);
 
-  const selectedItems = useMemo(
-    () =>
-      cartItem.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
-    [cartItem, selectedIds],
-  );
+  const selectedItems = useMemo(() => {
+    if (checkoutItems.length > 0) return checkoutItems;
+
+    if (cartItem.length > 0) {
+      return cartItem.filter((item) =>
+        selectedIds.includes(item.shoppingCartItemId),
+      );
+    }
+
+    return [];
+  }, [cartItem, selectedIds, checkoutItems]);
 
   useEffect(() => {
-    if (
-      
-      isMounted &&
-      !isLoading &&
-      !isCheckingOut &&
-      !isSuccessCheckout&&
-      mode !== "repay" &&
-      checkoutItems.length === 0 &&
-      selectedItems.length === 0
-    ) {
+    if (isMounted && !isLoading && mode !== "repay") {
       const saved = sessionStorage.getItem("selected_checkout_ids");
-      if (!saved || JSON.parse(saved).length === 0) {
+      const parsedIds = saved ? JSON.parse(saved) : [];
+      if (
+        parsedIds.length === 0 &&
+        selectedItems.length === 0 &&
+        checkoutItems.length === 0
+      ) {
+        toast.error("ไม่มีสินค้าในรายการ");
         router.push("/shoppingcart");
       }
     }
@@ -256,7 +258,6 @@ export default function PaymentPage() {
         "Submitting Items:",
         checkoutItems.length > 0 ? checkoutItems : selectedItems,
       );
-      
     }
 
     const idsToSubmit =
@@ -293,7 +294,6 @@ export default function PaymentPage() {
         if (process.env.NODE_ENV === "development") {
           console.error("Mutation Error at PaymentPage:", error);
         }
-        
       },
     });
   };
