@@ -12,10 +12,11 @@ import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { useGetAddressesList } from "@/modules/account/hooks/useAddressesQuery";
 import { useAddressForm } from "@/modules/account/hooks/useAddressForm";
 import { Status } from "@/types/response.type";
+import { PreviousButton } from "@/components/commonui/PreviousButton";
 
 export default function CustomerAccountPage() {
   const router = useRouter();
-  const {data : addressesData} = useGetAddressesList();
+  const { data: addressesData } = useGetAddressesList();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [delAddressId, setDelAddressId] = useState<string | null>(null);
 
@@ -30,33 +31,26 @@ export default function CustomerAccountPage() {
   };
 
   const confirmDeleteAddress = async (id: string) => {
-  
-  if (!id) return;
+    if (!id) return;
 
-  try {
-    await deleteAddress.mutateAsync(id);
-    toast.success("ลบที่อยู่สำเร็จ");
-  } catch (error) {
-    const err = error as Status;
-    toast.error(err.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง");
-  }
+    try {
+      await deleteAddress.mutateAsync(id);
+      toast.success("ลบที่อยู่สำเร็จ");
+    } catch (error) {
+      const err = error as Status;
+      toast.error(
+        err.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง",
+      );
+    }
     setIsDeleteOpen(false);
-
-};
+  };
   return (
     <div>
       <div className="flex flex-col min-h-screen bg-white">
         <Header />
         <main className="mb-4">
           <div className="max-w-[1200px] mx-auto p-4 flex items-center ">
-            <Link href="/customerhome">
-              <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
-            </Link>
-            <span>
-              <p className="text-xl md:text-2xl font-black text-black">
-                บัญชีผู้ใช้
-              </p>
-            </span>
+            <PreviousButton isAccountCus={true} />
           </div>
 
           {/* 1. Profile Section  */}
@@ -68,7 +62,7 @@ export default function CustomerAccountPage() {
           <section className=" max-w-[1200px] mx-auto px-6 mt-4">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-black">ที่อยู่จัดส่ง</h2>
-              {addressesData && addressesData.length < 5  && (
+              {addressesData && addressesData.length < 5 && (
                 <Link
                   href={`/account/address`}
                   className="flex items-center gap-2 bg-cprojectone border-2 border-black text-black px-4 py-2 rounded-xl hover:bg-yellow-200 hover:translate-y-1  duration-400  transition-all cursor-pointer text-sm"
@@ -104,20 +98,20 @@ export default function CustomerAccountPage() {
           </section>
         </main>
         <Footer />
-         <ConfirmDialog
-                  open={isDeleteOpen}
-                  onClose={() => setIsDeleteOpen(false)}
-                  onConfirm={() =>confirmDeleteAddress(delAddressId as string)}
-                  title="ยืนยันการลบ"
-                  content={
-                    <>
-                      คุณแน่ใจหรือไม่ที่จะลบที่อยู่นี้?
-                      <br />
-                      การกระทำนี้ไม่สามารถย้อนกลับได้
-                    </>
-                  }
-                  variant="danger"
-          />
+        <ConfirmDialog
+          open={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+          onConfirm={() => confirmDeleteAddress(delAddressId as string)}
+          title="ยืนยันการลบ"
+          content={
+            <>
+              คุณแน่ใจหรือไม่ที่จะลบที่อยู่นี้?
+              <br />
+              การกระทำนี้ไม่สามารถย้อนกลับได้
+            </>
+          }
+          variant="danger"
+        />
       </div>
     </div>
   );

@@ -1,82 +1,57 @@
 import { create } from "zustand";
-import { cartService } from "@/modules/cart/services/cartService";
-import { ShoppingCartItem } from "@/modules/cart/types";
+import { CartItem } from "../shoppingcartInterface";
+import { Addresses } from "@/modules/account/addresses";
 
 interface CartState {
-  items: ShoppingCartItem[];
   totalItems: number;
   selectedIds: string[];
-  setTotalItems: (count: number) => void;
+  allCartItems: CartItem[];
+  checkoutItems: CartItem[];
+  selectedAddress: Addresses | null;
   setSelectedIds: (ids: string[]) => void;
-  setItems: (items: ShoppingCartItem[]) => void;
-  refreshCart: () => Promise<void>;
-  updateItem: (itemId: string, newQty: number) => Promise<void>;
-  getPrimaryImage: (item: ShoppingCartItem) => string;
+  setCheckoutItems: (items: CartItem[]) => void;
+  setAllCartItems: (items: CartItem[]) => void;
+  setSelectedAddress: (address: Addresses | null) => void;
+  setTotalItems: (total: number) => void;
+  getPrimaryImage: (item: CartItem) => string;
+  removeFromStore: (itemId: string) => void;
 }
 
 export const useCartStore = create<CartState>((set) => ({
-  totalItems: 0,
-  items: [],
   selectedIds: [],
-  setTotalItems: (count) => set({ totalItems: count }),
-  setSelectedIds: (ids) => set({ selectedIds: ids }),
-
-  setItems: (newItems) =>
-    set({
-      items: newItems,
-      totalItems: newItems.length,
+  checkoutItems: [],
+  allCartItems: [],
+  selectedAddress: null,
+  totalItems: 0,
+  setTotalItems: (total) =>
+    set((state) => {
+     
+      if (state.totalItems === total) return state;
+      return { totalItems: total };
     }),
-
-  getPrimaryImage: (item) => {
-    const images = item.product?.images;
-    if (Array.isArray(images)) {
-      const primary = images.find((img) => img.is_primary);
-      return (
-        primary?.product_img_slug ||
-        images[0]?.product_img_slug ||
-        "/placeholder-image.svg"
+  setSelectedIds: (ids) => set({ selectedIds: ids }),
+  setCheckoutItems: (items) => set({ checkoutItems: items }),
+  setAllCartItems: (newItems) =>
+    set((state) => {
+      const itemMap = new Map(
+        state.allCartItems.map((item) => [item.shoppingCartItemId, item]),
       );
-    }
-    return "/placeholder-image.svg";
-  },
-
-  refreshCart: async () => {
-    try {
-      const latestCart = await cartService.getCart();
-      const newItems = latestCart.items || [];
-      set((state) => {
-        const validSelectedIds = state.selectedIds.filter((id) =>
-          newItems.some((item) => item.Shopping_Cart_Item_id === id),
-        );
-        return {
-          items: newItems,
-          totalItems: newItems.length,
-          selectedIds: validSelectedIds,
-        };
+      newItems.forEach((item) => {
+        itemMap.set(item.shoppingCartItemId, item);
       });
-    } catch (error) {
-      console.error("Failed to refresh cart:", error);
-    }
+      return { allCartItems: Array.from(itemMap.values()) };
+    }),
+  setSelectedAddress: (address) => set({ selectedAddress: address }),
+  getPrimaryImage: (item: CartItem) => {
+    return item?.productImgPath || "/placeholder-image.svg";
   },
+  removeFromStore: (itemId: string) =>
+    set((state) => ({
+      allCartItems: state.allCartItems.filter(
+        (i) => i.shoppingCartItemId !== itemId,
+      ),
+      selectedIds: state.selectedIds.filter((id) => id !== itemId),
 
-  updateItem: async (itemId, newQty) => {
-    try {
-      await cartService.updateItemQuantity(itemId, newQty);
-
-      const latestCart = await cartService.getCart();
-      const newItems = latestCart.items || [];
-      set((state) => {
-        const validSelectedIds = state.selectedIds.filter((id) =>
-          newItems.some((item) => item.Shopping_Cart_Item_id === id),
-        );
-        return {
-          items: newItems,
-          totalItems: newItems.length,
-          selectedIds: validSelectedIds,
-        };
-      });
-    } catch (error) {
-      console.error("Failed to update item:", error);
-    }
-  },
+      totalItems: Math.max(0, state.totalItems - 1),
+    })),
 }));

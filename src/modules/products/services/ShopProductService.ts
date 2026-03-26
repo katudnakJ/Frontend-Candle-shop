@@ -1,15 +1,17 @@
 // services/product.service.ts
 import {
-  ProductHomeData,
+
+  ProductHomeItem,
+  ProductHomeResData,
+
 } from "@/modules/products/homeproduct";
 import { MOCK_PRODUCT_SHOP_DATA } from "../mockShopProductData";
 
 let localMockData = { ...MOCK_PRODUCT_SHOP_DATA };
-export const getShopProducts = async (): Promise<ProductHomeData> => {
+export const getShopProducts = async (): Promise<ProductHomeResData> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return localMockData;
-  //return MOCK_PRODUCT_SHOP_DATA;
 };
 
 export const deleteProduct = async (productId: string) => {

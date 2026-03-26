@@ -6,12 +6,12 @@ import { apiClient } from "@/utils/api";
 
 import { GenericResponse } from "@/types/response.type";
 
-import { ProductHomeData } from "@/modules/products/homeproduct";
-import { ProductDetailData } from "../detailproduct";
+import { ProductHomeResData } from "@/modules/products/homeproduct";
+import { ProductDetailResData } from "../detailproduct";
 
 
 export const fetchCusProducts = async (page: number, size: number) => {
-  const response = await apiClient.get<GenericResponse<ProductHomeData>>(
+  const response = await apiClient.get<GenericResponse<ProductHomeResData>>(
     "/v1/products",
     { params: { page, size } }
   );
@@ -25,8 +25,8 @@ export const fetchCusProducts = async (page: number, size: number) => {
 
 
 export const fetchCusProductsDetail = async (productId: string) => {
-  const response = await apiClient.get<GenericResponse<ProductDetailData>>(
-    `/v1/products/details/${productId}`,
+  const response = await apiClient.get<GenericResponse<ProductDetailResData>>(
+    `/v1/products/${productId}`,
   );
 
   if (!response || !response.data) {

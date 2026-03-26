@@ -7,7 +7,7 @@ import { ProductHomeItem } from "@/modules/products/homeproduct";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 interface ProductCardProps {
   product: ProductHomeItem;
   isRecommended?: boolean;
@@ -30,14 +30,17 @@ const ProductCard = ({ product, isRecommended = false, priority = false }: Produ
   //   }
   //   return slug;
   // };
+  const router = useRouter()
   const [isError, setIsError] = useState(false);
   const initialImage =
     product.productImgPath && product.productImgPath.trim() !== ""
       ? product.productImgPath
       : "/placeholder-image.svg";
   const imgSrc = isError ? "/placeholder-image.svg" : initialImage;
-  //console.log("PICProductPath: " + product.productImgPath);
- // console.log("Full Product Object:", product);
+
+  console.log("INITIALIMAGE: " + initialImage);
+  console.log("PICProductPath: " + product.productImgPath);
+ console.log("Full Product Object:", product);
   return (
     <Link 
     key={product.productId}
@@ -74,15 +77,15 @@ const ProductCard = ({ product, isRecommended = false, priority = false }: Produ
               <p className="text-red-500 font-bold text-lg">฿{product.price}</p>
 
               <p className="text-gray-400 text-xs mt-1">
-                ขายแล้ว {product.totalSelled}
+                ขายแล้ว {product.totalSold || 0 } 
               </p>
             </div>
             {!isRecommended && (
               <button
-                className="p-2 border border-black rounded-lg hover:bg-black hover:text-white transition-all group/btn"
-                onClick={(e) => {
-                  e.preventDefault(); 
-                  // ใส่ Logic Add to Cart ตรงนี้
+                className="p-2 border border-black rounded-lg hover:bg-black hover:text-white transition-all group/btn cursor-pointer"
+                onClick={() => {
+                  router.push(`/product/${product.productSlug}?id=${product.productId}`)
+                 
                 }}
               >
                 <ShoppingCart

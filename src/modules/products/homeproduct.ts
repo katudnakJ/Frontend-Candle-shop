@@ -4,12 +4,12 @@ export interface ProductHomeItem {
   price: number;
   isActive: boolean;
   productCreatedDate: string;
-  totalSelled: number;
+  totalSold: number;
   productImgPath: string;
   productSlug: string;
 }
 
-export interface ProductHomeData {
+export interface ProductHomeResData {
   allProducts: ProductHomeItem[];
   endAt: number;
   featuredProducts: ProductHomeItem[];

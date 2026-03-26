@@ -5,8 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ListFilter, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { GenericResponse } from "@/types/response.type";
-import { ProductHomeData } from "@/modules/products/homeproduct";
-import { useGetAllProducts, usePrefetchHomeProducts } from "@/modules/products/hooks/useGetAllProducts";
+import { ProductHomeResData } from "@/modules/products/homeproduct";
+import {
+  useGetAllProducts,
+  usePrefetchHomeProducts,
+} from "@/modules/products/hooks/useGetAllProducts";
 
 import { AllProductSkeleton } from "@/modules/products/components/AllProductSkeleton";
 import { RecommendedProductSkeleton } from "@/modules/products/components/RecommendedProductSkeleton";
@@ -15,7 +18,6 @@ import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";
 import CustomerWelcome from "@/modules/customers/components/CustomerWelcome";
 import ProductCard from "@/modules/products/components/ProductCard";
-
 
 export default function CustomerHome() {
   const router = useRouter();
@@ -26,17 +28,18 @@ export default function CustomerHome() {
   const pageParam = Number(searchParams.get("page")) || 1;
   const currentPage = pageParam - 1;
 
-// ตั้งค่า แสดง All Product ต่อ page เท่าไหร่
-  const pageSize = 4;
+  // ตั้งค่า แสดง All Product ต่อ page เท่าไหร่
+  const pageSize = 10;
 
   const { data, isLoading, isError } = useGetAllProducts(
     currentPage,
     pageSize,
   ) as {
-    data: GenericResponse<ProductHomeData> | undefined;
+    data: GenericResponse<ProductHomeResData> | undefined;
     isLoading: boolean;
     isError: boolean;
   };
+  //console.log("ALLPRODUCT:" , data)
 
   const handlePageChange = (newPage: number) => {
     const displayPage = newPage + 1;
@@ -48,10 +51,11 @@ export default function CustomerHome() {
   };
 
   useEffect(() => {
+    const currentPathWithQuery = window.location.search;
     if (pageParam > 1) {
-      sessionStorage.setItem("last_homeproduct_page", `?page=${pageParam}`);
+      sessionStorage.setItem("last_homeproduct_page", currentPathWithQuery);
     } else {
-      sessionStorage.setItem("last_homeproduct_page", "");
+      sessionStorage.setItem("last_homeproduct_page", "/");
     }
   }, [pageParam]);
 
@@ -65,23 +69,31 @@ export default function CustomerHome() {
   }, [currentPage]);
 
   // API : Get Products (All products)
-  const productData = data?.data || data;
+  const {
+    allProducts,
+    recommendedItems,
+    totalProducts,
+    nextPages,
+    productStartAt,
+    productEndAt,
+  } = useMemo(() => {
+    const productData = data?.data || data;
+    const typedData = productData as ProductHomeResData;
 
-  const allProducts = (productData as ProductHomeData)?.allProducts || [];
-  const recommendedItems =
-    (productData as ProductHomeData)?.featuredProducts || [];
-  const totalProducts = (productData as ProductHomeData)?.totalProducts || 0;
-  const nextPages = (productData as ProductHomeData)?.hasNext || false;
-  const productStartAt = (productData as ProductHomeData)?.startAt || 0;
-  const productEndAt = (productData as ProductHomeData)?.endAt || 0;
+    return {
+      allProducts: typedData?.allProducts || [],
+      recommendedItems: typedData?.featuredProducts || [],
+      totalProducts: typedData?.totalProducts || 0,
+      nextPages: typedData?.hasNext || false,
+      productStartAt: typedData?.startAt || 0,
+      productEndAt: typedData?.endAt || 0,
+    };
+  }, [data]);
 
   const totalPages =
     totalProducts > 0 ? Math.ceil(totalProducts / pageSize) : 1;
 
-  //const allProducts = [...recommendedItems, ...nonFeaturedItems];
-  //(recommendedItems.length || 0) + (productData?.nonFeaturedTotal || 0);
-
-  usePrefetchHomeProducts(currentPage + 1, pageSize, nextPages);
+  usePrefetchHomeProducts(currentPage + 1, pageSize, nextPages, totalPages);
 
   const sortedProducts = useMemo(() => {
     const products = [...allProducts];
@@ -114,7 +126,6 @@ export default function CustomerHome() {
     return pages;
   };
 
-
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header*/}
@@ -130,7 +141,7 @@ export default function CustomerHome() {
         </div>
 
         <div className="bg-cprojectone w-full min-h-screen">
-        <div className="max-w-[1200px] mx-auto p-6 space-y-8 bg-white rounded-3xl shadow-sm border border-gray-50/50">
+          <div className="max-w-[1200px] mx-auto p-6 space-y-8 bg-white rounded-3xl shadow-sm border border-gray-50/50">
             {/* สินค้าแนะนำ      */}
             <section ref={productSectionRef} className="scroll-mt-10">
               <h2 className="text-2xl font-bold mb-4 text-black">
@@ -212,7 +223,6 @@ export default function CustomerHome() {
                     ))}
                   </div>
                   <div className="flex flex-col md:flex-row mx-auto justify-center items-center gap-6 md:gap-x-12 mt-12 pb-10 border-t pt-8 border-gray-50">
-                 
                     <div className="text-gray-500 text-sm font-medium order-2 md:order-1">
                       Showing{" "}
                       <span className="text-black">{productStartAt}</span> to{" "}
@@ -221,19 +231,16 @@ export default function CustomerHome() {
                       results
                     </div>
 
-                
                     <nav className="flex items-center gap-1 order-1 md:order-2">
-                     
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 0}
-                        className="flex items-center gap-1 px-3 py-2 max-[400px]:text-[11px] text-sm font-medium text-gray-500 hover:text-amber-500 disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 px-3 py-2  text-sm font-medium text-gray-500 hover:text-amber-500 disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
                       >
                         <ChevronLeft size={18} />
                         <span>Previous</span>
                       </button>
 
-                     
                       <div className="flex items-center gap-1 mx-2">
                         {getPaginationGroup().map((page) => (
                           <button
@@ -250,7 +257,6 @@ export default function CustomerHome() {
                           </button>
                         ))}
 
-                       
                         {totalPages > 5 && pageParam < totalPages - 2 && (
                           <>
                             <span className="px-2 text-gray-400 text-sm">
@@ -266,11 +272,10 @@ export default function CustomerHome() {
                         )}
                       </div>
 
-                     
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={!nextPages || currentPage + 1 >= totalPages}
-                        className="flex items-center gap-1 px-3 py-2 max-[400px]:text-[11px] text-sm font-medium text-gray-500  hover:text-amber-500  disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 px-3 py-2  text-sm font-medium text-gray-500  hover:text-amber-500  disabled:opacity-30 disabled:hover:text-gray-500 transition-colors cursor-pointer disabled:cursor-not-allowed"
                       >
                         <span>Next Page</span>
                         <ChevronRight size={18} />

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { Order } from "@/modules/orders/type";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 
 interface VerificationModalProps {
   order: Order;
@@ -73,7 +74,7 @@ export const VerificationSlip = ({
                 <p className="font-bold text-sm text-gray-500 text-center">
                   ยอดที่ต้องชำระ:{" "}
                   <span className="text-red-600 text-lg">
-                    ฿{order.net_amount.toLocaleString()}
+                    ฿<CurrencyDisplay amount={order.net_amount} /> 
                   </span>
                 </p>
               </div>
@@ -182,7 +183,7 @@ export const VerificationSlip = ({
             <br />
             <span>ยอดเงิน: </span>
             <span className="font-bold text-black">
-              ฿{order.net_amount.toLocaleString()}
+              ฿<CurrencyDisplay amount={order.net_amount} /> 
             </span>{" "}
           </>
         }

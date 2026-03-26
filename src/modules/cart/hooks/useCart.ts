@@ -1,106 +1,182 @@
-import { useState, useMemo, useEffect } from "react";
-import { ShoppingCart, ShoppingCartItem } from "@/modules/cart/types";
-import { cartService } from "../services/cartService";
+import { useEffect, useMemo } from "react";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
+import {
+  useUpdateCartItem,
+  useDeleteCartItem,
+  useUpdateCartLocal,
+} from "./useCartMutations";
+import { useGetCartData } from "./useGetCartData";
+import { useDebouncedCallback } from "use-debounce";
 
-export const useCart = (initialCart: ShoppingCart) => {
-  const [items, setItems] = useState<ShoppingCartItem[]>(initialCart.items || []);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const setTotalItems = useCartStore((state) => state.setTotalItems);
+import { useQueryClient } from "@tanstack/react-query";
+
+
+export const useCart = () => {
+
+
+  const size = 1;
+  const queryClient = useQueryClient();
+
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    isPlaceholderData,
+  } = useGetCartData(size);
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("DATA IN useCart:", data);
+  }
+  const { cartItem, shoppingCartId, endAt, totalItemsFromApi } = useMemo(() => {
+    const pages = data?.pages || [];
+    const allItems = pages.flatMap((p) => {
+      const actualData = p?.data || p;
+      return actualData?.cartItems || [];
+    });
+    const lastPage = pages[pages.length - 1]?.data || pages[pages.length - 1];
+    const lastPageData = lastPage;
+    return {
+      cartItem: allItems,
+      shoppingCartId: lastPageData?.shoppingCartId,
+      totalItemsFromApi: lastPageData?.totalItems || 0,
+      endAt: allItems.length,
+    };
+  }, [data]);
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("ITEMS IN USECART:", cartItem);
+    console.log("ShoppingCartId:", shoppingCartId);
+    console.log("EndAt:", endAt);
+    // console.log("StartAt:", startAt);
+    // console.log("HasNext:", hasNext);
+    console.log("TotalItems:", totalItemsFromApi);
+  }
+
+  const {
+    selectedIds,
+    allCartItems,
+    setTotalItems,
+    setSelectedIds,
+    setAllCartItems,
+    setCheckoutItems,
+    removeFromStore,
+  } = useCartStore();
 
   useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const data = await cartService.getCart();
-        const newItems = data.items || [];
-        setItems(newItems);
-        setTotalItems(newItems.length);
+    if (!isLoading) {
+      setTotalItems(totalItemsFromApi);
+    }
+    if (!isLoading && cartItem.length > 0) {
+      setAllCartItems(cartItem);
+    }
+  }, [cartItem, totalItemsFromApi, isLoading, setTotalItems, setAllCartItems]);
 
-        //ถ้าอยากให้ตอนเริ่มต้นมีการเลือกสินค้าทั้งหมด
-        // setSelectedIds(newItems.map(item => item.Shopping_Cart_Item_id));
+  useEffect(() => {
+    const selectedItems = allCartItems.filter((item) =>
+      selectedIds.includes(item.shoppingCartItemId),
+    );
 
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCart();
-  }, []);
+    setCheckoutItems(selectedItems);
+  }, [allCartItems, selectedIds, setCheckoutItems]);
 
-  // คำนวณยอดรวม 
   const totals = useMemo(() => {
-    const selectedItems = items.filter(item => 
-      selectedIds.includes(item.Shopping_Cart_Item_id)
-    );  
+    const selectedItems = allCartItems.filter((item) =>
+      selectedIds.includes(item.shoppingCartItemId),
+    );
     return selectedItems.reduce(
       (acc, item) => ({
         totalQuantity: acc.totalQuantity + item.quantity,
-        totalPrice: acc.totalPrice + (item.product?.price || 0) * item.quantity,
+        totalPrice: acc.totalPrice + (item.price || 0) * item.quantity,
       }),
       { totalQuantity: 0, totalPrice: 0 },
     );
-  }, [items, selectedIds]);
+  }, [allCartItems, selectedIds]);
 
-  // ปรับจำนวนสินค้า 
-  const updateQuantity = async (itemId: string, delta: number) => {
-    const previousItems = [...items];
-    const item = items.find(i => i.Shopping_Cart_Item_id === itemId);
-    if (!item) return;
-
-    const newQty = Math.max(1, item.quantity + delta);
-
-    // Optimistic Update
-    setItems(prev => prev.map(i => 
-      i.Shopping_Cart_Item_id === itemId ? { ...i, quantity: newQty } : i
-    ));
-
-    try {
-      await cartService.updateItemQuantity(itemId, newQty);
-    } catch (error) {
-      console.error("Sync failed, rolling back...");
-      setItems(previousItems); 
-    }
-  };
-
-  const isAllSelected = items.length > 0 && selectedIds.length === items.length;
+  const isAllSelected = useMemo(
+    () =>
+      cartItem.length > 0 &&
+      cartItem.every((item) => selectedIds.includes(item.shoppingCartItemId)),
+    [cartItem, selectedIds],
+  );
 
   const toggleSelectAll = () => {
-    setSelectedIds(isAllSelected ? [] : items.map(i => i.Shopping_Cart_Item_id));
+    if (isAllSelected) {
+      const currentIds = cartItem.map((i) => i.shoppingCartItemId);
+      setSelectedIds(selectedIds.filter((id) => !currentIds.includes(id)));
+    } else {
+      const currentIds = cartItem.map((i) => i.shoppingCartItemId);
+      setSelectedIds(Array.from(new Set([...selectedIds, ...currentIds])));
+    }
   };
 
   const toggleSelect = (itemId: string) => {
-    setSelectedIds(prev =>
-      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
+    setSelectedIds(
+      selectedIds.includes(itemId)
+        ? selectedIds.filter((id) => id !== itemId)
+        : [...selectedIds, itemId],
     );
   };
 
-  const removeItem = async (itemId: string) => {
-    const previousItems = [...items];
-    const newItems = items.filter(item => item.Shopping_Cart_Item_id !== itemId);
-    setItems(newItems);
-    setTotalItems(newItems.length);
-    try {
-      await cartService.deleteItem(itemId);
-    } catch (error) {
-      setItems(previousItems); 
-    }
-  };
+  const updateLocal = useUpdateCartLocal();
+  const { mutate: updateQty } = useUpdateCartItem(size);
+  const { mutate: removeItem } = useDeleteCartItem(size);
 
-  const getPrimaryImage = (item: ShoppingCartItem) => {
-    const primary = item.product?.images?.find((img) => img.is_primary);
-    return primary?.product_img_slug || item.product?.images?.[0]?.product_img_slug || "";
-  };
+  const debouncedUpdate = useDebouncedCallback((payload) => {
+    updateQty(payload);
+  }, 800);
 
   return {
-    items,
+    cartItem,
     isLoading,
+    isFetchingNextPage,
+    isPlaceholderData,
+    totalItems: totalItemsFromApi,
+    hasNext: hasNextPage,
+    startAt: 1,
+    endAt,
+    pageSize: size,
     selectedIds,
     isAllSelected,
+    fetchNextPage,
     toggleSelectAll,
     toggleSelect,
-    updateQuantity,
-    removeItem,
-    getPrimaryImage,
+    updateQuantity: (itemId: string, delta: number) => {
+      const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
+      if (item && shoppingCartId) {
+        const newQty = Math.max(1, item.quantity + delta);
+        updateLocal(itemId, newQty);
+
+        const updatedAll = allCartItems.map((i) =>
+          i.shoppingCartItemId === itemId ? { ...i, quantity: newQty } : i,
+        );
+        setAllCartItems(updatedAll);
+
+        debouncedUpdate({
+          shoppingCartItemId: item.shoppingCartItemId,
+          productId: item.productId,
+          quantity: newQty,
+          shoppingCartId,
+        });
+      }
+    },
+    removeItem: (itemId: string) => {
+      const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
+      if (item) {
+        removeItem(
+          { shoppingCartId, shoppingCartItemId: item.shoppingCartItemId },
+          {
+            onSuccess: () => {
+              removeFromStore(itemId);
+              queryClient.invalidateQueries({
+                queryKey: ["shopping-cart", size],
+              });
+            },
+          },
+        );
+      }
+    },
     ...totals,
   };
 };

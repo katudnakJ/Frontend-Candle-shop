@@ -4,22 +4,22 @@ import { QrCode, ImagePlus, X, CheckCircle2, Download } from "lucide-react";
 import Image from "next/image";
 import { usePaymentSlip } from "@/modules/seller/hooks/usepaymentslip";
 import { PaymentService } from "@/modules/seller/services/payment.service";
-import { Seller } from "@/modules/seller/types";
+import { Seller, GetSignedFileResponse } from "@/modules/seller/types";
+import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 
 interface PaymentMethodCardProps {
-  seller: Seller | null;
+  ShopQrPayment: GetSignedFileResponse | null;
   totalAmount: number;
   onFileSelect: (file: File | null) => void;
   showError?: boolean;
 }
 
 export const PaymentMethodCard = ({
-  seller,
+  ShopQrPayment,
   totalAmount,
   onFileSelect,
   showError,
 }: PaymentMethodCardProps) => {
-
   const {
     slipPreview,
     fileError,
@@ -30,10 +30,9 @@ export const PaymentMethodCard = ({
     resetFile,
   } = usePaymentSlip(onFileSelect);
 
-
   const isInvalid = (showError && !slipPreview) || fileError;
 
-  if (!seller) return null;
+  if (!ShopQrPayment) return null;
 
   return (
     <section className="grid grid-cols-12 w-full mt-10 pb-10">
@@ -49,7 +48,7 @@ export const PaymentMethodCard = ({
             <div className="relative group">
               <div className="relative w-full h-[400px] md:h-[500px] flex flex-col items-center p-6 bg-gray-50 rounded-3xl border-2 border-black border-dashed overflow-hidden">
                 <Image
-                  src={seller.qr_payment_img_path}
+                  src={ShopQrPayment.signedFileUrl}
                   alt="QR Payment"
                   className="object-contain p-4 select-all touch-auto"
                   fill
@@ -60,7 +59,7 @@ export const PaymentMethodCard = ({
               <button
                 onClick={() =>
                   PaymentService.downloadQR(
-                    seller.qr_payment_img_path,
+                    ShopQrPayment.signedFileUrl,
                     "QR-Payment.png",
                   )
                 }
@@ -77,7 +76,7 @@ export const PaymentMethodCard = ({
                 <p className="text-sm font-bold text-blue-900">
                   โอนเงินจำนวน{" "}
                   <span className="text-lg underline font-black text-red-600">
-                    ฿{totalAmount.toLocaleString()}
+                    ฿<CurrencyDisplay amount={totalAmount} />
                   </span>{" "}
                   เรียบร้อยแล้ว โปรดแนบสลิปด้านข้าง
                 </p>
@@ -141,11 +140,11 @@ export const PaymentMethodCard = ({
               </div>
             ) : (
               <div className="relative w-full min-h-[200px] max-h-[500px] border-4 border-black rounded-[2rem] overflow-hidden group shadow-lg">
-                    <img
-                    src={slipPreview}
-                    alt="Slip Preview"
-                    className="w-full h-auto max-h-[500px] object-scale-down p-2"
-                    />
+                <img
+                  src={slipPreview}
+                  alt="Slip Preview"
+                  className="w-full h-auto max-h-[500px] object-scale-down p-2"
+                />
                 <button
                   onClick={resetFile}
                   className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 shadow-xl transition-all"
