@@ -24,15 +24,21 @@ import { useOrderCard } from "../hooks/index";
 interface OrderCardProps {
   order: OrdersResponse;
   role?: USER_ROLE | USER_ROLE.CUSTOMER;
+  defaultExpanded? : boolean;
 }
 
-export const OrderCard = ({ order, role }: OrderCardProps) => {
+export const OrderCard = (
+  { 
+    order, 
+    role, 
+    defaultExpanded 
+  }: OrderCardProps) => {
   const trackingList = order?.trackingNo?.join(", ").split(/[,\s]+/).filter(Boolean);
   const [showTrackkingnoInput, setShowTrackkingnoInput] = useState(false);
   const [isConfirmTrackingNoopen, setisConfirmTrackingNoopen] = useState(false);
   const [trackkingno, settrackkingno] = useState("");
   const [cleanTrackingList, setCleanTrackingList] = useState<string[]>([]);
-  const [isCardExpanded, setIsCardExpanded] = useState(false);
+  const [isCardExpanded, setIsCardExpanded] = useState(defaultExpanded ?? false);
   const [expandedItem, setExpandedItem] = useState<string[]>([]);
   const toggleAccordion = (id: string) => {
     setExpandedItem((prev) =>
@@ -41,9 +47,7 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
         : [...prev, id],
     );
   };
-
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
-  const includeRejectCard = role === USER_ROLE.CUSTOMER ? true : false;
 
   const { 
     handlePaymentAgain,
@@ -59,16 +63,21 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
     order.paymentStatus : order.orderStatus
   );
 
+  const isSeller = role?.toUpperCase() === USER_ROLE.SELLER;
+  const isCustomer = role?.toUpperCase() === USER_ROLE.CUSTOMER;
+  const isPaymentRejected = order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED;
+  const isOrderCompleted = order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED;
+  const isOrderToReceive = order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_RECEIVE;
+  const isOrderToShip = order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP;
+  const isOrderPending = order?.orderStatus.toUpperCase() === ORDER_STATUS.PENDING;
+  const isOrderExisting = order?.trackingNo && order?.trackingNo.length > 0;
+
   const pulseStyle = `
   @keyframes pulse-green-simple {
     0%, 100% { background-color: #f3f4f6; border-color: #e5e7eb; color: #9ca3af; }
     50% { background-color: #f0fdf4; border-color: #22c55e; color: #16a34a; }
   }
 `;
-
-  if (order.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED && !includeRejectCard) {
-    return;
-  }
 
   return (
     <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden mb-8 transition-all">
@@ -83,7 +92,6 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
           {statusInfo.label}
         </div>
 
-        {/* คลิกที่เลข Order เพื่อเปิด/ปิด Card ทั้งใบ */}
         <button
           onClick={() => setIsCardExpanded(!isCardExpanded)}
           className="w-full flex justify-between items-center font-black text-lg border-3 border-black border-b-0 px-6 py-5 rounded-t-[2rem] bg-white translate-y-[3px] hover:bg-gray-50 transition-colors"
@@ -96,9 +104,7 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
         </button>
       </div>
 
-      {/*Content Area */}
       <div className="p-5 space-y-3">
-        {/* Product Items (แสดงเสมอแต่เป็นแบบกะทัดรัด) */}
         <div className="space-y-3">
           {order?.orderItems?.map((item) => {
             const isItemExpanded = expandedItem.includes(item.orderItemId);
@@ -182,9 +188,8 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
           <div className="overflow-hidden">
             <div className="pt-4 space-y-4">
               {/* Info Section (Tracking / RJ / CP) */}
-              <div className="px-5 pb-2 space-y-3">
-                {/* กรณี RJ*/}
-                {order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED&& role?.toUpperCase() === USER_ROLE.CUSTOMER &&(
+              <div className="px-1 pb-2 space-y-3">
+                {isPaymentRejected && isCustomer &&(
                   <div className="p-4 bg-red-100 border-2 border-red-500 rounded-2xl flex items-start gap-3">
                     <AlertCircle className="text-red-600 shrink-0" />
                     <div className="text-sm">
@@ -198,9 +203,7 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
                   </div>
                 )}
 
-                {(order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED || 
-                order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_RECEIVE || 
-                order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP) && 
+                {(isOrderCompleted || isOrderToReceive || isOrderToShip) && 
                 (
                   <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
                     <div className="flex items-center gap-3">
@@ -232,10 +235,8 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
                 )}
 
                 {/* กรณี TS/TR*/}
-                {(order?.orderStatus?.toLocaleUpperCase() === ORDER_STATUS.TO_SHIP ||
-                  order?.orderStatus === ORDER_STATUS.TO_RECEIVE ||
-                  order?.orderStatus === ORDER_STATUS.COMPLETED) &&
-                  order?.trackingNo?.length > 0 && (
+                {(isOrderToShip || isOrderToReceive || isOrderCompleted) &&
+                  isOrderExisting && (
                     <div className="flex flex-col p-4 bg-blue-50 border-2 border-black rounded-2xl gap-3  ">
                       <div className="flex items-center gap-2">
                         <Truck className="text-blue-600" size={20} />
@@ -278,11 +279,9 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
                     </div>
                   )}
 
-                {/* สำหรับ TS ที่ยังไม่มีเลขพัสดุ */}
-                {order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP 
-                && order?.trackingNo.length === 0 && (
+                {isOrderToShip && !isOrderExisting && (
                   <>
-                    {role?.toUpperCase() === USER_ROLE.SELLER ? (
+                    { isSeller ? (
                       <div className="flex flex-col gap-3 p-4 bg-blue-50 border-2 border-black rounded-[2rem]">
                         <div className="flex items-center gap-2 text-blue-700 font-black text-xs px-2 uppercase">
                           <Truck size={16} />
@@ -391,50 +390,43 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <button className="flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
-            รายละเอียด
-          </button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button className="w-full sm:flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
+                    รายละเอียด
+                  </button>
 
-                  {order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED && 
-                  role?.toUpperCase() === USER_ROLE.CUSTOMER && 
-                  (
+                  {isPaymentRejected && isCustomer && (
                     <button
-                      onClick={handlePaymentAgain}
-                      className="flex-1 max-[340px]:text-sm py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
+                      onClick={() => handlePaymentAgain(order.orderId)}
+                      className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
                     >
-                      ชำระเงินใหม่
-                    </button>
-                  )}
+                        ชำระเงินใหม่
+                      </button>
+                    )}
 
-                  { role === USER_ROLE.CUSTOMER && order?.orderStatus?.toUpperCase() === ORDER_STATUS.TO_RECEIVE && (
-                    // ต้องทำตัว hadle api update status ว่า Complete ไป  backend
-                    <button className="flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
-                      ได้รับสินค้าแล้ว
-                    </button>
-                  )}
+                  {role === USER_ROLE.CUSTOMER &&
+                    isOrderToReceive && (
+                      <button className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
+                        ได้รับสินค้าแล้ว
+                      </button>
+                    )}
 
-                  {/* {order.orderStatus === "CP" && (
-             <button className="flex-1 py-3 bg-green-500 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-green-600 transition-all active:translate-y-1 active:shadow-none">
-                รีวิวสินค้า
-             </button>
-          )} */}
-                  {order?.orderStatus.toUpperCase() === ORDER_STATUS.PENDING && (
+                  {isOrderPending && (
                     <>
-                      {role?.toUpperCase() === USER_ROLE.SELLER ? (
+                      {isSeller ? (
                         <button
                           onClick={() => setIsVerifyOpen(true)}
-                          className="flex-1 py-3 max-[340px]:text-sm border-4 rounded-full font-black cursor-pointer transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-none"
+                          className="w-full sm:flex-1 py-3 max-[340px]:text-sm border-4 rounded-full font-black cursor-pointer transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-none"
                           style={{
                             animation: "pulse-green-simple 2s infinite",
                           }}
                         >
                           ทำการตรวจสอบ
                         </button>
-                      ) : (
+                      ) : !isPaymentRejected && (
                         <button
                           disabled
-                          className="flex-1 max-[340px]:text-[12px] py-3 border-4 rounded-full font-black cursor-not-allowed"
+                          className="w-full sm:flex-1 max-[340px]:text-[12px] py-3 border-4 rounded-full font-black cursor-not-allowed"
                           style={{
                             animation: "pulse-green-simple 2s infinite",
                           }}
@@ -444,7 +436,7 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
                       )}
                     </>
                   )}
-                </div>
+</div>
               </div>
             </div>
           </div>

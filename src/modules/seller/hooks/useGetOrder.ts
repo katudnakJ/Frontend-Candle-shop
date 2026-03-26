@@ -41,7 +41,7 @@ export const useGetOrdersByStatus = (status: string) => {
                     params: {
                         status: status,
                         page: pageParam,
-                        size : 2,
+                        size : 10,
                     }
                 }
             );

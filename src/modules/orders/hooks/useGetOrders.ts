@@ -15,7 +15,7 @@ export const useInfiniteOrdersByStatus = () => {
   } = useGetOrdersByStatus(activeTab.toUpperCase());
 
   const OrdersByTab = useMemo(() => {
-    const orders = data?.pages.flatMap((page) => page.data.orders) || [];
+    const orders = data?.pages?.flatMap((page) => page.data.orders) || [];
     const lastPage = data?.pages[data.pages.length - 1];
 
     return {

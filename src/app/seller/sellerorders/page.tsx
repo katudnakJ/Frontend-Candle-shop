@@ -10,7 +10,7 @@ import { useGetOrders } from "@/modules/orders/hooks/index";
 import { SELLER_ORDER_TAB } from "@/constants/status";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
 import { USER_ROLE } from "@/constants/userRole";
-import CustomerHome from "@/app/CustomerHome";
+import { ScrollToTop } from "@/utils/ScrollToTop";
 
 export default function Sellerorders (){
 
@@ -27,6 +27,8 @@ export default function Sellerorders (){
   const { userData } = useAuthStoreUserLogin();
 
   return (
+    <>
+    <ScrollToTop threshold={500} />
     <div className="flex flex-col w-full min-h-screen bg-white">
       <SellerHeader/>
       <main className="grow bg-white">
@@ -59,11 +61,12 @@ export default function Sellerorders (){
               <div className="space-y-2">
                 {
                   OrdersByTab.size > 0 ? (
-                    OrdersByTab.orders.map((order) => (
+                    OrdersByTab.orders.map((order, index) => (
                       <div key={order.orderId}>
                         <OrderCard 
                           order={order}
                           role={userData?.userRole.toLocaleUpperCase() as USER_ROLE}
+                          defaultExpanded={index===0}
                         />  
                       </div>
                     ))
@@ -97,5 +100,6 @@ export default function Sellerorders (){
       </main>
       <Footer />
     </div>
+    </>
   );
 }

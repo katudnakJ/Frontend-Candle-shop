@@ -15,7 +15,7 @@ export const useOrderHistory = () => {
     const fetchOrders = async () => {
       setIsLoading(true);
       try {
-        setOrders(data?.data.orders || []);
+        setOrders(data?.pages?.flatMap((page) => page.data.orders) || []);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {
