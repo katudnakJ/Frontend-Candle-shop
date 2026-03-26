@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { OrderByStatusResponse, useGetOrdersByStatus } from "@/modules/seller/hooks/useGetOrder";
 import { OrdersResponse } from "../type";
 
-export const useSellerOrders = () => {
+export const useGetOrders = () => {
  
   const [activeTab, setActiveTab] = useState<OrdersResponse["orderStatus"] | "ALL">("PD");
 
@@ -10,6 +10,7 @@ export const useSellerOrders = () => {
 
   
   const OrdersByTab: OrderByStatusResponse = useMemo(() => {
+    
     return orders?.data || {
       orders: [],
       page: 0,

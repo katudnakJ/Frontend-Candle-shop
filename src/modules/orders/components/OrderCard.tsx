@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { OrdersResponse } from "../type";
-import { useReceiptPDF } from "../hooks/useReceiptPDF";
 import { ReceiptTemplate } from "./ReceiptTemplate";
 import Image from "next/image";
 import {
@@ -45,11 +44,21 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
   };
 
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
+  const includeRejectCard = role === USER_ROLE.CUSTOMER ? true : false;
 
   const { 
     handlePaymentAgain,
-    handleAddTrackingNumber
+    handleAddTrackingNumber,
+    getStatusDisplay,
+    handleDowloadPDF,
+    isPDFCreating,
   } = useOrderCard(setIsVerifyOpen, order!);
+
+
+  const statusInfo = getStatusDisplay(
+    order.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED ? 
+    order.paymentStatus : order.orderStatus
+  );
 
   const pulseStyle = `
   @keyframes pulse-green-simple {
@@ -57,6 +66,11 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
     50% { background-color: #f0fdf4; border-color: #22c55e; color: #16a34a; }
   }
 `;
+
+  if (order.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED && !includeRejectCard) {
+    return;
+  }
+
   return (
     <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden mb-8 transition-all">
       <style>{pulseStyle}</style>
@@ -64,11 +78,11 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
 
       {/* Header & Main Accordion */}
       <div className="bg-cprojectone pt-5 pr-5 pl-5 border-b-3 border-black flex flex-col items-end">
-        {/* <div
+        <div
           className={`self-end px-4 py-1 rounded-full border-2 font-bold text-sm mb-2 whitespace-nowrap ${statusInfo.bg} ${statusInfo.color} ${statusInfo.border}`}
         >
           {statusInfo.label}
-        </div> */}
+        </div>
 
         {/* คลิกที่เลข Order เพื่อเปิด/ปิด Card ทั้งใบ */}
         <button
@@ -182,6 +196,39 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
                         : {order?.rejectionReason || "สลิปไม่ถูกต้อง"}
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {(order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED || 
+                order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_RECEIVE || 
+                order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP) && 
+                (
+                  <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
+                        <Panda size={24} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-gray-500 uppercase leading-none">
+                          ดาวน์โหลด PDF ใบเสร็จ Order
+                        </p>
+                        <p className="max-[350px]:text-[10px] font-black text-sm tracking-tight">
+                          {order.orderNo}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDowloadPDF(order.orderId)}
+                      className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+                    >
+                      <Download size={20} className="text-black" />
+                    </button>
+                  {isPDFCreating && (
+                    <div className="flex flex-col items-center py-20">
+                      <Loader2 className="animate-spin text-black mb-2" size={40} />
+                      <p className="font-bold text-gray-500">กำลังโหลดข้อมูล...</p>
+                    </div>
+                  )}
                   </div>
                 )}
 
@@ -301,31 +348,6 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
                     )}
                   </>
                 )}
-
-                {order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED && (
-                  <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
-                        <Panda size={24} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-gray-500 uppercase leading-none">
-                          ดาวน์โหลด PDF ใบเสร็จ Order
-                        </p>
-                        <p className="max-[350px]:text-[10px] font-black text-sm tracking-tight">
-                          {order.orderNo}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      //เดี๋ยวเปลี่ยนเป็นรับ มาจาก backend แทน
-                      // onClick={downloadPDF}
-                      className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
-                    >
-                      <Download size={20} className="text-black" />
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Total & Actions Section */}
@@ -375,7 +397,9 @@ export const OrderCard = ({ order, role }: OrderCardProps) => {
             รายละเอียด
           </button>
 
-                  {order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED && role?.toUpperCase() === USER_ROLE.CUSTOMER && (
+                  {order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED && 
+                  role?.toUpperCase() === USER_ROLE.CUSTOMER && 
+                  (
                     <button
                       onClick={handlePaymentAgain}
                       className="flex-1 max-[340px]:text-sm py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"

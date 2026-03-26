@@ -7,11 +7,21 @@ import { Loader2 } from "lucide-react";
 import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
-import { useOrderHistory } from "@/modules/orders/hooks/useOrderHistory";
+import { useAuthStoreUserLogin } from "@/store/userLogin";
+import { USER_ROLE } from "@/constants/userRole";
+import { useGetOrders } from "@/modules/orders/hooks/index";
+import { CUSTOMER_ORDER_TAB } from "@/constants/status";
 
 export default function OrderHistoryPage() {
-  const { activeTab, setActiveTab, filteredOrders, isLoading } =
-    useOrderHistory();
+  const { 
+    activeTab,
+    setActiveTab,
+    OrdersByTab,
+    isLoading,
+    orders 
+  } = useGetOrders();
+
+    const {userData} = useAuthStoreUserLogin();
 
   const tabs = [
     { key: "PD", label: "รอตรวจสอบ" },
@@ -19,7 +29,6 @@ export default function OrderHistoryPage() {
     { key: "TR", label: "ที่ต้องได้รับ" },
     { key: "CP", label: "สำเร็จแล้ว" },
   ];
-
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-white">
@@ -30,7 +39,7 @@ export default function OrderHistoryPage() {
 
           <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-6">
             <div className="flex bg-white border-4 border-black rounded-2xl overflow-hidden  mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  ">
-              {tabs.map((tab) => (
+                {CUSTOMER_ORDER_TAB.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as OrderStatus)}
@@ -42,7 +51,7 @@ export default function OrderHistoryPage() {
                 >
                   {tab.label}
                 </button>
-              ))}
+                ))}
             </div>
 
             {/* รายการการ์ดคำสั่งซื้อ */}
@@ -53,9 +62,13 @@ export default function OrderHistoryPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order) => (
-                    <OrderCard key={order.order_id} order={order} />
+                {OrdersByTab.orders.length > 0 ? (
+                  OrdersByTab.orders.map((order) => (
+                    <OrderCard 
+                      key={order.orderId}
+                      order={order}
+                      role={userData?.userRole?.toLocaleUpperCase() as USER_ROLE}
+                    />
                   ))
                 ) : (
                   /* กรณีไม่มีข้อมูลใน Tab นั้น */

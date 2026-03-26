@@ -1,6 +1,6 @@
-import { GetSignedFileResponse } from "@/modules/seller/types";
+import {GetSignedFileResponse} from "@/modules/orders/type";
 import { GenericResponse } from "@/types/response.type";
-import { apiClient } from "@/utils/api";
+import { apiClient } from"@/utils/api";
 import { useQuery } from "@tanstack/react-query"
 
 

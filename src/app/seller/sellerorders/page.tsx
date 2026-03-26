@@ -6,10 +6,11 @@ import { Loader2 } from "lucide-react";
 import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
-import { useSellerOrders } from "@/modules/orders/hooks/index";
+import { useGetOrders } from "@/modules/orders/hooks/index";
 import { SELLER_ORDER_TAB } from "@/constants/status";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
 import { USER_ROLE } from "@/constants/userRole";
+import CustomerHome from "@/app/CustomerHome";
 
 export default function Sellerorders (){
 
@@ -18,9 +19,15 @@ export default function Sellerorders (){
     setActiveTab, 
     OrdersByTab, 
     isLoading 
-  } = useSellerOrders();
+  } = useGetOrders();
 
   const { userData } = useAuthStoreUserLogin();
+
+  if (userData?.userRole.toLocaleUpperCase() !== USER_ROLE.SELLER.toLocaleUpperCase() && userData?.userRole.toLocaleUpperCase() !== USER_ROLE.ADMIN.toLocaleUpperCase()) {
+    return (
+      <CustomerHome />
+    );
+  }
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-white">

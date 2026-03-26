@@ -34,12 +34,12 @@ const Header = () => {
   const totalItemsCount = useMemo(() => {
     return cartcountItem.length;
   }, [cartcountItem]);
-  if (process.env.NODE_ENV === "development") {
-    console.group("🛒 Header Cart Status");
-    console.log("%c Count: ", "color: green", totalItemsCount);
-    console.log("Raw Data: ", cartcountItem);
-    console.groupEnd();
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   console.group("🛒 Header Cart Status");
+  //   console.log("%c Count: ", "color: green", totalItemsCount);
+  //   console.log("Raw Data: ", cartcountItem);
+  //   console.groupEnd();
+  // }
   return (
     <header className=" border border-cprojectone top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">
       <div className="max-w-300 mx-auto">

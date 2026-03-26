@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { OrdersResponse } from "../type";
 import { ORDER_STATUS } from "@/constants/status";
+import { useGetOrdersByStatus } from "@/modules/orders/hooks/index";
 
 export const useOrderHistory = () => {
  
@@ -8,14 +9,13 @@ export const useOrderHistory = () => {
   const [orders, setOrders] = useState<OrdersResponse[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  
+  const { data } = useGetOrdersByStatus(activeTab.toUpperCase())
+
   useEffect(() => {
     const fetchOrders = async () => {
       setIsLoading(true);
       try {
-       
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setOrders([]);
+        setOrders(data?.data.orders || []);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       } finally {

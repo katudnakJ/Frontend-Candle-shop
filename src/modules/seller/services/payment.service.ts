@@ -2,9 +2,7 @@ import { GenericResponse } from "@/types/response.type";
 import { apiClient } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import { GetSignedFileResponse } from "../types";
-import { fa } from "zod/v4/locales";
-import { HttpStatusCode } from "axios";
+import {GetSignedFileResponse} from "@/modules/orders/type";
 
 export const PaymentService = {
   // Logic การดาวน์โหลดรูป

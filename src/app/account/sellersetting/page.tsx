@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronLeft, Eye, EyeOff } from "lucide-react";
+import { Plus, ChevronLeft, EyeOff } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
-import { mockSellerAddresses } from "@/modules/account/mockaddressseller";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
 import { Seller } from "@/modules/seller/types";
-import { Addresses } from "@/modules/account/addresses";
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import SellerWelcome from "@/modules/seller/components/SellerWelcome";
