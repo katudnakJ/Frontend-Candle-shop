@@ -10,3 +10,4 @@ install react-number-format
 install browser-image-compression
 install jspdf html2canvas
 install use-debounce
+install react-intersection-observer

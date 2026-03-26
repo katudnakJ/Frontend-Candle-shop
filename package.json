@@ -30,6 +30,7 @@
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.1",
     "react-hot-toast": "^2.6.0",
+    "react-intersection-observer": "^10.0.3",
     "react-number-format": "^5.4.4",
     "use-debounce": "^10.1.0",
     "zod": "^4.3.6",

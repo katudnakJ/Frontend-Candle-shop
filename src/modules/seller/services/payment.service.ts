@@ -56,3 +56,17 @@ export const useGetQRPaymentImage = (enabled?: boolean) => useQuery({
   retry: 3,
   retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
 });
+
+
+export const useGetQRPaymentImageForCus = () => useQuery({
+  queryKey: ["getQRPaymentImageForCus"],
+  queryFn: async () => {
+    const response = await apiClient.get<void, GenericResponse<GetSignedFileResponse>>("/v1/seller/qr-payment");
+    return response.data ?? null;
+  },
+
+  staleTime: 5 * 60 * 1000 ,
+  gcTime: 10 * 60 *1000 ,
+  retry: 3,
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+});

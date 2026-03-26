@@ -181,7 +181,7 @@ apiClient.interceptors.response.use(
       remark: statusNode?.remark,
     };
     if (process.env.NODE_ENV === "development") {
-      console.warn("⚠️ [Interceptor] Other Error:", error.message ?? err.message ?? "Unknown error");
+      console.error("⚠️ [Interceptor] Other Error:", error.response?.data || error.message);
     }
     return Promise.reject(err);
   },

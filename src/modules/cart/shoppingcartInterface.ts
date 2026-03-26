@@ -16,8 +16,12 @@ export interface CartItem {
 }
 
 export interface ShoppingCartData {
-  shoppingCartId: string;
   cartItems: CartItem[];
+  shoppingCartId: string;
+  endAt: number;
+  startAt: number;
+  hasNext: boolean;
+  totalItems: number;
 }
 
 // สำหรับตอนแอดสำเร็จ

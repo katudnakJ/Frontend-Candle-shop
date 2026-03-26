@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import {
   useUpdateCartItem,
@@ -7,35 +7,82 @@ import {
 } from "./useCartMutations";
 import { useGetCartData } from "./useGetCartData";
 import { useDebouncedCallback } from "use-debounce";
-import { GenericResponse } from "@/types/response.type";
-import { ShoppingCartData } from "../shoppingcartInterface";
+
+import { useQueryClient } from "@tanstack/react-query";
+
 
 export const useCart = () => {
-  const page = 0;
-  const size = 10;
 
-  const { data, isLoading } = useGetCartData(page, size) as {
-    data: GenericResponse<ShoppingCartData> | undefined;
-    isLoading: boolean;
-  };
-const { cartItem, shoppingCartId } = useMemo(() => {
-    const rawData = data?.data || data; 
-    const cartData = rawData as ShoppingCartData;
-    
+
+  const size = 1;
+  const queryClient = useQueryClient();
+
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    isPlaceholderData,
+  } = useGetCartData(size);
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("DATA IN useCart:", data);
+  }
+  const { cartItem, shoppingCartId, endAt, totalItemsFromApi } = useMemo(() => {
+    const pages = data?.pages || [];
+    const allItems = pages.flatMap((p) => {
+      const actualData = p?.data || p;
+      return actualData?.cartItems || [];
+    });
+    const lastPage = pages[pages.length - 1]?.data || pages[pages.length - 1];
+    const lastPageData = lastPage;
     return {
-      cartItem: cartData?.cartItems || [],
-      shoppingCartId: cartData?.shoppingCartId
+      cartItem: allItems,
+      shoppingCartId: lastPageData?.shoppingCartId,
+      totalItemsFromApi: lastPageData?.totalItems || 0,
+      endAt: allItems.length,
     };
   }, [data]);
 
   if (process.env.NODE_ENV === "development") {
     console.log("ITEMS IN USECART:", cartItem);
+    console.log("ShoppingCartId:", shoppingCartId);
+    console.log("EndAt:", endAt);
+    // console.log("StartAt:", startAt);
+    // console.log("HasNext:", hasNext);
+    console.log("TotalItems:", totalItemsFromApi);
   }
 
-  const { selectedIds, setSelectedIds } = useCartStore();
+  const {
+    selectedIds,
+    allCartItems,
+    setTotalItems,
+    setSelectedIds,
+    setAllCartItems,
+    setCheckoutItems,
+    removeFromStore,
+  } = useCartStore();
+
+  useEffect(() => {
+    if (!isLoading) {
+      setTotalItems(totalItemsFromApi);
+    }
+    if (!isLoading && cartItem.length > 0) {
+      setAllCartItems(cartItem);
+    }
+  }, [cartItem, totalItemsFromApi, isLoading, setTotalItems, setAllCartItems]);
+
+  useEffect(() => {
+    const selectedItems = allCartItems.filter((item) =>
+      selectedIds.includes(item.shoppingCartItemId),
+    );
+
+    setCheckoutItems(selectedItems);
+  }, [allCartItems, selectedIds, setCheckoutItems]);
 
   const totals = useMemo(() => {
-    const selectedItems = cartItem.filter((item) =>
+    const selectedItems = allCartItems.filter((item) =>
       selectedIds.includes(item.shoppingCartItemId),
     );
     return selectedItems.reduce(
@@ -45,15 +92,23 @@ const { cartItem, shoppingCartId } = useMemo(() => {
       }),
       { totalQuantity: 0, totalPrice: 0 },
     );
-  }, [cartItem, selectedIds]);
+  }, [allCartItems, selectedIds]);
 
-  const isAllSelected =
-    cartItem.length > 0 && selectedIds.length === cartItem.length;
+  const isAllSelected = useMemo(
+    () =>
+      cartItem.length > 0 &&
+      cartItem.every((item) => selectedIds.includes(item.shoppingCartItemId)),
+    [cartItem, selectedIds],
+  );
 
   const toggleSelectAll = () => {
-    setSelectedIds(
-      isAllSelected ? [] : cartItem.map((i) => i.shoppingCartItemId),
-    );
+    if (isAllSelected) {
+      const currentIds = cartItem.map((i) => i.shoppingCartItemId);
+      setSelectedIds(selectedIds.filter((id) => !currentIds.includes(id)));
+    } else {
+      const currentIds = cartItem.map((i) => i.shoppingCartItemId);
+      setSelectedIds(Array.from(new Set([...selectedIds, ...currentIds])));
+    }
   };
 
   const toggleSelect = (itemId: string) => {
@@ -65,8 +120,8 @@ const { cartItem, shoppingCartId } = useMemo(() => {
   };
 
   const updateLocal = useUpdateCartLocal();
-  const { mutate: updateQty } = useUpdateCartItem(page, size);
-  const { mutate: removeItem } = useDeleteCartItem(page, size);
+  const { mutate: updateQty } = useUpdateCartItem(size);
+  const { mutate: removeItem } = useDeleteCartItem(size);
 
   const debouncedUpdate = useDebouncedCallback((payload) => {
     updateQty(payload);
@@ -75,31 +130,51 @@ const { cartItem, shoppingCartId } = useMemo(() => {
   return {
     cartItem,
     isLoading,
+    isFetchingNextPage,
+    isPlaceholderData,
+    totalItems: totalItemsFromApi,
+    hasNext: hasNextPage,
+    startAt: 1,
+    endAt,
+    pageSize: size,
     selectedIds,
     isAllSelected,
+    fetchNextPage,
     toggleSelectAll,
     toggleSelect,
     updateQuantity: (itemId: string, delta: number) => {
       const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
       if (item && shoppingCartId) {
         const newQty = Math.max(1, item.quantity + delta);
+        updateLocal(itemId, newQty);
 
-        updateLocal(itemId, newQty, page, size);
+        const updatedAll = allCartItems.map((i) =>
+          i.shoppingCartItemId === itemId ? { ...i, quantity: newQty } : i,
+        );
+        setAllCartItems(updatedAll);
+
         debouncedUpdate({
           shoppingCartItemId: item.shoppingCartItemId,
           productId: item.productId,
           quantity: newQty,
-          shoppingCartId: shoppingCartId,
+          shoppingCartId,
         });
       }
     },
     removeItem: (itemId: string) => {
       const item = cartItem.find((i) => i.shoppingCartItemId === itemId);
       if (item) {
-        removeItem({
-          shoppingCartId: shoppingCartId,
-          shoppingCartItemId: item.shoppingCartItemId,
-        });
+        removeItem(
+          { shoppingCartId, shoppingCartItemId: item.shoppingCartItemId },
+          {
+            onSuccess: () => {
+              removeFromStore(itemId);
+              queryClient.invalidateQueries({
+                queryKey: ["shopping-cart", size],
+              });
+            },
+          },
+        );
       }
     },
     ...totals,

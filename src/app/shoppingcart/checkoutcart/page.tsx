@@ -41,6 +41,7 @@ export default function CheckoutPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const {
+    allCartItems,
     selectedIds,
     getPrimaryImage,
     setSelectedIds,
@@ -94,8 +95,10 @@ export default function CheckoutPage() {
 
   const selectedItems = useMemo(
     () =>
-      cartItem.filter((item) => selectedIds.includes(item.shoppingCartItemId)),
-    [cartItem, selectedIds],
+      allCartItems.filter((item) =>
+        selectedIds.includes(item.shoppingCartItemId),
+      ),
+    [allCartItems, selectedIds],
   );
 
   useEffect(() => {
@@ -107,7 +110,7 @@ export default function CheckoutPage() {
     ) {
       const saved = sessionStorage.getItem("selected_checkout_ids");
       if (!saved || JSON.parse(saved).length === 0) {
-        router.push("/shoppingcart");
+        router.replace("/shoppingcart");
       }
     }
   }, [isMounted, isLoading, selectedItems.length, cartItem.length, router]);
@@ -199,7 +202,6 @@ export default function CheckoutPage() {
               <div className="col-start-1 col-span-12 md:col-start-2 md:col-span-10 space-y-4">
                 {selectedItems.length > 0 ? (
                   selectedItems.map((item) => (
-                   
                     <CartItemCard
                       key={item.shoppingCartItemId}
                       item={item}
@@ -210,7 +212,6 @@ export default function CheckoutPage() {
                       onUpdateQty={() => {}}
                       onRemove={() => {}}
                     />
-                    
                   ))
                 ) : (
                   <div className="text-center py-10 border-2 border-dashed border-gray-200 rounded-3xl">
