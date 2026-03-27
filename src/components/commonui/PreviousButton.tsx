@@ -2,6 +2,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export const PreviousButton = ({
@@ -11,6 +12,8 @@ export const PreviousButton = ({
   isRepay = false,
   isDetailProduct = false,
   isAccountCus = false,
+  isEditAddressForShipment = false,
+  isCusOrderHistory = false,
 }: {
   itemCount?: number;
   isShopingcart?: boolean;
@@ -18,9 +21,11 @@ export const PreviousButton = ({
   isRepay?: boolean;
   isDetailProduct?: boolean;
   isAccountCus?: boolean;
+  isEditAddressForShipment?: boolean;
+  isCusOrderHistory?: boolean;
 }) => {
   const [backUrl, setBackUrl] = useState("/");
-
+  const router = useRouter();
   useEffect(() => {
     const savedPath = sessionStorage.getItem("last_homeproduct_page");
 
@@ -64,6 +69,20 @@ export const PreviousButton = ({
         </div>
       )}
 
+      {isEditAddressForShipment && (
+        <div className="flex items-center">
+          <button onClick={() => router.back()} className="flex items-center">
+            <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
+          </button>
+
+          <span>
+            <p className="text-xl md:text-2xl font-black text-black truncate max-w-[400px] md:max-w-none">
+              รายละเอียดสินค้าที่รอยืนยัน
+            </p>
+          </span>
+        </div>
+      )}
+
       {isShopingcart && (
         <div className="flex items-center">
           <Link href={backUrl}>
@@ -93,6 +112,16 @@ export const PreviousButton = ({
           </Link>
           <h1 className="text-xl md:text-2xl font-black text-black truncate max-w-[200px] md:max-w-none">
             บัญชีผู้ใช้
+          </h1>
+        </div>
+      )}
+         {isCusOrderHistory && (
+        <div className="flex items-center">
+          <Link href={backUrl}>
+            <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
+          </Link>
+          <h1 className="text-xl md:text-2xl font-black text-black truncate max-w-[200px] md:max-w-none">
+            ประวัติคำสั่งซื้อ
           </h1>
         </div>
       )}
