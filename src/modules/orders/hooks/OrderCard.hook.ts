@@ -61,9 +61,9 @@ export const useOrderCard = (
     const [isPDFCreating, setIsPDFCreating] = useState(false);
 
     const handlePaymentAgain = (orderId: string) => {
-        router.push(
-          `/shoppingcart/checkoutcart/paymentcart?addressid=`,
-        );
+        // router.push(
+        //   `/shoppingcart/checkoutcart/paymentcart?addressid=`,
+        // );
     };  
     
     const handleAddTrackingNumber = async (orderId: string, trackingNumber: string[]) => {
@@ -76,7 +76,7 @@ export const useOrderCard = (
     setIsPDFCreating(true);
     const fileUrl = await getOrderReceiptWithStale(orderId);
 
-    if (fileUrl === null) {
+    if (fileUrl === null ) {
         toast.error("ไม่พบไฟล์ใบเสร็จ กรุณาลองใหม่อีกครั้ง");
         setIsPDFCreating(false);
         return;

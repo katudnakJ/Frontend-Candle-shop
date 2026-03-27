@@ -1,6 +1,7 @@
 
 import { apiClient } from "@/utils/api";
 import { PDFResponse } from "../type";
+import toast from "react-hot-toast";
 
 const pdfExpiredAt : Record<string, PDFResponse> = {};
 
@@ -12,20 +13,24 @@ export const getOrderReceiptWithStale = async (orderId: string) => {
        return cached.pdfSignedUrl;
      }
 
-     const res = await apiClient.get<PDFResponse>(`/v1/order/${orderId}/receipt`);
-     const data = res?.data ?? null;
-     
-     if (data === null) return null;
+     try{
+      const res = await apiClient.get<PDFResponse>(`/v1/order/${orderId}/receipt`);
+      const data = res?.data ?? null;
+      
+      if (data === null) return null;
 
-     const expireAt = new Date(data?.pdfSignedUrl.expiresAt).getTime();
+      const expireAt = new Date(data?.pdfSignedUrl.expiresAt).getTime();
 
-     pdfExpiredAt[orderId] = {
-       pdfName: data?.pdfName,
-       pdfSignedUrl: {
-            signedFileUrl: data?.pdfSignedUrl.signedFileUrl,
-            expiresAt: expireAt.toString(),
-       },
-     };
+      pdfExpiredAt[orderId] = {
+        pdfName: data?.pdfName,
+        pdfSignedUrl: {
+             signedFileUrl: data?.pdfSignedUrl.signedFileUrl,
+             expiresAt: expireAt.toString(),
+        },
+      };
 
-    return data?.pdfSignedUrl || null;
+      return data?.pdfSignedUrl || null;
+     }catch(error){
+        return null;
+     }
 }
