@@ -1,4 +1,5 @@
 import { Plus, X } from "lucide-react";
+import Image from "next/image";
 
 interface ProductImage {
   file: File;
@@ -34,7 +35,8 @@ export const ImageUploadSection = ({
             key={index}
             className="relative aspect-square rounded-2xl border-2 border-black overflow-hidden group"
           >
-            <img
+            <Image 
+              key={img.preview}
               src={img.preview}
               alt="preview"
               className="w-full h-full object-cover"

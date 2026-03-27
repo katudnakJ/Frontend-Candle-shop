@@ -1,6 +1,4 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
 import { ProductDetailImage } from "@/modules/products/detailproduct";
 import { SmartImage } from "@/components/commonui/SmartImage";
 

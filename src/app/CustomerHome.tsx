@@ -28,7 +28,6 @@ export default function CustomerHome() {
   const pageParam = Number(searchParams.get("page")) || 1;
   const currentPage = pageParam - 1;
 
-  // ตั้งค่า แสดง All Product ต่อ page เท่าไหร่
   const pageSize = 10;
 
   const { data, isLoading, isError } = useGetAllProducts(
@@ -39,7 +38,6 @@ export default function CustomerHome() {
     isLoading: boolean;
     isError: boolean;
   };
-  //console.log("ALLPRODUCT:" , data)
 
   const handlePageChange = (newPage: number) => {
     const displayPage = newPage + 1;
@@ -68,7 +66,6 @@ export default function CustomerHome() {
     }
   }, [currentPage]);
 
-  // API : Get Products (All products)
   const {
     allProducts,
     recommendedItems,
@@ -128,11 +125,8 @@ export default function CustomerHome() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header*/}
       <Header />
-
       <main className="flex-grow bg-white font-sans">
-        {/* Welcome Customer*/}
 
         <div className="bg-cprojectone">
           <section>
@@ -288,8 +282,6 @@ export default function CustomerHome() {
           </div>
         </div>
       </main>
-      {/* Footer*/}
-
       <Footer />
     </div>
   );

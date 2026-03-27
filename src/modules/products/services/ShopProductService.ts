@@ -1,9 +1,6 @@
 // services/product.service.ts
 import {
-
-  ProductHomeItem,
   ProductHomeResData,
-
 } from "@/modules/products/homeproduct";
 import { MOCK_PRODUCT_SHOP_DATA } from "../mockShopProductData";
 

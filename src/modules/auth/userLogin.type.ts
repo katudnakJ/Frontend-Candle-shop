@@ -7,6 +7,6 @@ export interface LineProfileResponse {
 export interface UserLoginResponse {
     userId : string
     userRole : string
-    isOwner : boolean
+    owner : boolean
     lineProfile : LineProfileResponse
 }

@@ -4,8 +4,8 @@ import { QrCode, ImagePlus, X, CheckCircle2, Download } from "lucide-react";
 import Image from "next/image";
 import { usePaymentSlip } from "@/modules/seller/hooks/usepaymentslip";
 import { PaymentService } from "@/modules/seller/services/payment.service";
-import { Seller, GetSignedFileResponse } from "@/modules/seller/types";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
+import { GetSignedFileResponse } from "@/modules/orders/type";
 
 interface PaymentMethodCardProps {
   ShopQrPayment: GetSignedFileResponse | null;
@@ -140,7 +140,7 @@ export const PaymentMethodCard = ({
               </div>
             ) : (
               <div className="relative w-full min-h-[200px] max-h-[500px] border-4 border-black rounded-[2rem] overflow-hidden group shadow-lg">
-                <img
+                <Image 
                   src={slipPreview}
                   alt="Slip Preview"
                   className="w-full h-auto max-h-[500px] object-scale-down p-2"

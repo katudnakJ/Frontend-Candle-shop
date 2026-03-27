@@ -12,14 +12,6 @@ import {
   productSchema,
   ProductFormValues,
 } from "@/modules/products/schemas/productSchema";
-
-import {
-  TextField,
-  Autocomplete,
-  Switch,
-  FormControlLabel,
-  Typography,
-} from "@mui/material";
 import { useProductImages } from "@/modules/products/hooks/useProductImages";
 import { toast } from "react-hot-toast";
 import SellerHeader from "@/components/layout/SellerHeader";

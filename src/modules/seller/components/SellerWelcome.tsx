@@ -42,22 +42,14 @@ export default function SellerWelcome({ mode }: SellerWelcomeProps) {
     return () => clearTimeout(timer);
     
   }, [storeLoading]);
+console.log("userDtaatatata : ", userData);
 
   return (
     <div className="bg-cprojectone border border-cprojectone">
       {mode === "welcome" ? (
         <section className="max-w-[1200px] m-10 xl:mx-auto py-6 px-4 md:px-10 bg-white rounded-2xl drop-shadow-md ">
           <div className="container mx-auto px-4 flex flex-col  items-center gap-4">
-            <Link
-              href="/account/sellersetting/"
-              className="relative p-1  text-black hover:text-yellow-500 transition-colors"
-            >
-              <User size={60} />
-              <div className="absolute -right-3 -bottom-2 ">
-              <Settings size={25} />
-              </div>
-            </Link>
-            {/* {userData?.isOwner ? (
+            {userData?.owner ? (
               <>
               <Link
               href="/account/sellersetting/"
@@ -65,13 +57,13 @@ export default function SellerWelcome({ mode }: SellerWelcomeProps) {
             >
               <User size={60} />
               <div className="absolute -right-3 -bottom-2 ">
-                {userData?.isOwner && (<Settings size={25} />)}
+                <Settings size={25} />
               </div>
             </Link>
               </>
             ) : (
               <User size={60} />
-            )} */}
+            )}
             <div>
               {showSkeleton ? (
                 <div className="h-8 w-32 bg-gray-200 animate-pulse rounded"></div>

@@ -15,7 +15,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, isRecommended = false, priority = false }: ProductCardProps) => {
-  //const displayImage =
+  // if unused just delete na ⚠️
+  // const displayImage =
 
   //   product.images?.find((img) => img.is_primary)?.product_img_slug ||
   //   product.images?.[0]?.product_img_slug ||

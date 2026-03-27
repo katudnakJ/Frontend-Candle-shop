@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronLeft } from "lucide-react";
+import { Plus } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
 import Header from "@/components/layout/CustomerHeader";
 import Footer from "@/components/layout/Footer";

@@ -232,7 +232,8 @@ export default function SellerSettingPage() {
 
 
               
-            { userData?.isOwner &&(!slipPreview || isShowQR) ? (
+            { userData?.owner && 
+            ((!slipPreview || isShowQR) ? (
               <div className="animate-in fade-in zoom-in-90 ">
                 <QRpaymentshop
                   qrCodeImage={slipPreview}
@@ -281,12 +282,14 @@ export default function SellerSettingPage() {
                   <EyeOff size={16} strokeWidth={2} />
                 </button>
               </div>
+            ))}
+            {userData?.owner && (
+              <h1 className="text-sm text-gray-500 w-full text-left">
+              * คลิกที่กล่องด้านบนเพื่ออัปโหลดรูป QR Code สำหรับการรับชำระเงินผ่านธนาคาร <br />
+              * รองรับไฟล์รูปภาพประเภท JPG, JPEG, PNG ขนาดไม่เกิน 2MB <br />
+              * หากต้องการเปลี่ยนรูป สามารถคลิกที่รูปเพื่อเลือกใหม่ หรือกด ใช้รูปเดิม เพื่อใช้รูปเดิม
+            </h1>
             )}
-            <h1 className="text-sm text-gray-500 w-full text-left">
-        * คลิกที่กล่องด้านบนเพื่ออัปโหลดรูป QR Code สำหรับการรับชำระเงินผ่านธนาคาร <br />
-        * รองรับไฟล์รูปภาพประเภท JPG, JPEG, PNG ขนาดไม่เกิน 2MB <br />
-        * หากต้องการเปลี่ยนรูป สามารถคลิกที่รูปเพื่อเลือกใหม่ หรือกด ใช้รูปเดิม เพื่อใช้รูปเดิม
-      </h1>
           </section>
         </main>
         <Footer />

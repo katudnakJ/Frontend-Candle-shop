@@ -18,9 +18,7 @@ import { Order, OrderItem } from "@/modules/orders/type";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
 import { mockOrders } from "@/modules/orders/mockOrderData";
 import { toast } from "react-hot-toast";
-import { GenericResponse, Status } from "@/types/response.type";
 import {
-  ShoppingCartData,
   CartItem,
 } from "@/modules/cart/shoppingcartInterface";
 import { useQueryClient } from "@tanstack/react-query";
