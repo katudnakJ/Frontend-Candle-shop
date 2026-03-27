@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import { ProductHeader } from "@/modules/products/components/ProductHeader";

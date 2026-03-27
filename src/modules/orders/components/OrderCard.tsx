@@ -389,10 +389,6 @@ export const OrderCard = (
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button className="w-full sm:flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
-                    รายละเอียด
-                  </button>
-
                   {isPaymentRejected && isCustomer && (
                     <button
                       onClick={() => handlePaymentAgain(order.orderId)}
