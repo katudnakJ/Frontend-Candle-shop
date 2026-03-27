@@ -1,0 +1,42 @@
+import { apiClient } from "@/utils/api"
+import { useMutation } from "@tanstack/react-query"
+import toast from "react-hot-toast";
+import { OrderRejectPayload } from "../type";
+
+
+export const usePaymentSlipService = () => {
+
+    const confirmPayment = useMutation({
+        mutationKey: ["confirmPayment"],
+        mutationFn: async (orderId: string) => {
+            await apiClient.patch(`/v1/order/${orderId}/confirm`);
+        },
+        onSuccess: () => {        
+            toast.success("ยืนยันการชำระเงินเรียบร้อยแล้ว");
+        },
+        onError: () => {
+            toast.error("เกิดข้อผิดพลาดในการยืนยันการชำระเงิน กรุณาลองใหม่อีกครั้ง");
+        },
+
+    })
+
+    const rejectPayment = useMutation({
+        mutationKey: ["rejectPayment"],
+        mutationFn: async ({ orderId, reason }: OrderRejectPayload) => {
+            await apiClient.patch(`/v1/order/${orderId}/reject`, {
+                reason: reason,
+            });
+        },
+        onSuccess: () => {
+            toast.success("ปฏิเสธการชำระเงินเรียบร้อยแล้ว");
+        },
+        onError: () => {
+            toast.error("เกิดข้อผิดพลาดในการปฏิเสธการชำระเงิน กรุณาลองใหม่อีกครั้ง");
+        }
+    })
+
+    return {
+        confirmPayment,
+        rejectPayment,
+    }
+}

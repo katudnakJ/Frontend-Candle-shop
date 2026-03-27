@@ -3,11 +3,14 @@
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import { Loader2 } from "lucide-react";
-// import { OrderCard } from "@/modules/orders/components/OrderCard";
+import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
-import { useSellerOrders } from "@/modules/orders/hooks/useSellerOrders";
+import { useGetOrders } from "@/modules/orders/hooks/index";
 import { SELLER_ORDER_TAB } from "@/constants/status";
+import { useAuthStoreUserLogin } from "@/store/userLogin";
+import { USER_ROLE } from "@/constants/userRole";
+import { ScrollToTop } from "@/utils/ScrollToTop";
 
 export default function Sellerorders (){
 
@@ -15,11 +18,17 @@ export default function Sellerorders (){
     activeTab, 
     setActiveTab, 
     OrdersByTab, 
-    isLoading 
-  } = useSellerOrders();
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    handleLoadMoreRef,
+  } = useGetOrders();
 
+  const { userData } = useAuthStoreUserLogin();
 
   return (
+    <>
+    <ScrollToTop threshold={500} />
     <div className="flex flex-col w-full min-h-screen bg-white">
       <SellerHeader/>
       <main className="grow bg-white">
@@ -43,7 +52,6 @@ export default function Sellerorders (){
               ))}
             </div>
 
-            {/* รายการการ์ดคำสั่งซื้อ */}
             {isLoading ? (
               <div className="flex flex-col items-center py-20">
                 <Loader2 className="animate-spin text-black mb-2" size={40} />
@@ -52,19 +60,38 @@ export default function Sellerorders (){
             ) : (
               <div className="space-y-2">
                 {
-                  OrdersByTab.length > 0 ? (
-                    OrdersByTab.map((order) => (
-                      <div key={order.order_id} className="border border-gray-300 rounded-lg p-4">
-                        {/* Order content goes here */}
+                  OrdersByTab.size > 0 ? (
+                    OrdersByTab.orders.map((order, index) => (
+                      <div key={order.orderId}>
+                        <OrderCard 
+                          order={order}
+                          role={userData?.userRole.toLocaleUpperCase() as USER_ROLE}
+                          defaultExpanded={index===0}
+                        />  
                       </div>
                     ))
                   ) : (
-                    /* กรณีไม่มีข้อมูลใน Tab นั้น */
                     <div className="text-center py-20 bg-white border-4 border-dashed border-gray-300 rounded-[2rem]">
                       <p className="text-gray-400 font-black text-xl">
                         ไม่พบรายการสั่งซื้อในหน้านี้
                     </p>
                   </div>
+                )}
+                <div ref={handleLoadMoreRef} className="h-8" />
+
+                {isFetchingNextPage && (
+                  <div className="flex justify-center py-4">
+                    <Loader2 className="animate-spin text-black mr-2" size={24} />
+                    <span className="font-bold text-gray-500">
+                      กำลังโหลดเพิ่มเติม...
+                    </span>
+                  </div>
+                )}
+
+                {!hasNextPage && OrdersByTab.size > 0 && (
+                  <p className="text-center text-gray-400 py-4 font-bold">
+                    คุณได้ดูรายการทั้งหมดแล้ว
+                  </p>
                 )}
               </div>
             )}
@@ -73,5 +100,6 @@ export default function Sellerorders (){
       </main>
       <Footer />
     </div>
+    </>
   );
 }

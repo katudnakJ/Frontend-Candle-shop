@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Order } from "../type";
-import { useReceiptPDF } from "../hooks/useReceiptPDF";
-import { ReceiptTemplate } from "./ReceiptTemplate";
+import { Loader2 } from "lucide-react";
+import { OrdersResponse } from "../type";
 import Image from "next/image";
 import {
   Truck,
@@ -19,19 +17,28 @@ import { toast } from "react-hot-toast";
 import { VerificationSlip } from "@/modules/payments/components/VerificationSlip";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
+import { USER_ROLE } from "@/constants/userRole";
+import { ORDER_STATUS, PAYMENT_STATUS } from "@/constants/status";
+import { useOrderCard } from "../hooks/index";
 
 interface OrderCardProps {
-  order: Order;
-  mode?: "Customer" | "Seller";
+  order: OrdersResponse;
+  role?: USER_ROLE | USER_ROLE.CUSTOMER;
+  defaultExpanded? : boolean;
 }
 
-export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
-  const trackingList = order.tracking_number?.split(/[,\s]+/).filter(Boolean);
+export const OrderCard = (
+  { 
+    order, 
+    role, 
+    defaultExpanded 
+  }: OrderCardProps) => {
+  const trackingList = order?.trackingNo?.join(", ").split(/[,\s]+/).filter(Boolean);
   const [showTrackkingnoInput, setShowTrackkingnoInput] = useState(false);
   const [isConfirmTrackingNoopen, setisConfirmTrackingNoopen] = useState(false);
   const [trackkingno, settrackkingno] = useState("");
   const [cleanTrackingList, setCleanTrackingList] = useState<string[]>([]);
-  const [isCardExpanded, setIsCardExpanded] = useState(false);
+  const [isCardExpanded, setIsCardExpanded] = useState(defaultExpanded ?? false);
   const [expandedItem, setExpandedItem] = useState<string[]>([]);
   const toggleAccordion = (id: string) => {
     setExpandedItem((prev) =>
@@ -40,94 +47,30 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
         : [...prev, id],
     );
   };
-
-  const router = useRouter();
-
-  const getStatusDisplay = (status: Order["order_status"]) => {
-    switch (status) {
-      case "PD":
-        return {
-          label: "รอตรวจสอบชำระเงิน",
-          color: "text-purple-600",
-          bg: "bg-purple-50",
-          border: "border-purple-600",
-        };
-      case "RJ":
-        return {
-          label: "การชำระเงินถูกปฏิเสธ",
-          color: "text-red-600",
-          bg: "bg-red-50",
-          border: "border-red-600",
-        };
-      case "TS":
-        return {
-          label: "ที่ต้องจัดส่ง",
-          color: "text-blue-600",
-          bg: "bg-blue-50",
-          border: "border-blue-600",
-        };
-      case "TR":
-        return {
-          label: "ที่ต้องได้รับ",
-          color: "text-amber-600",
-          bg: "text-amber-50",
-          border: "border-amber-600",
-        };
-      case "CP":
-        return {
-          label: "สำเร็จแล้ว",
-          color: "text-green-600",
-          bg: "bg-green-50",
-          border: "border-green-600",
-        };
-      default:
-        return { label: status, color: "text-gray-600", bg: "bg-gray-50" };
-    }
-  };
-  const handlepaymentagain = () => {
-    router.push(
-      `/shoppingcart/checkoutcart/paymentcart?orderId=${order.order_no}&mode=repay`,
-    );
-  };
-  const { receiptRef, downloadPDF } = useReceiptPDF(order);
-  const statusInfo = getStatusDisplay(order.order_status);
-
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
 
-  const handleConfirmPayment = async () => {
-    toast.success(
-      <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight"> ยืนยันการชำระเงินสำเร็จ!</span>
-      </div>,
-      {
-        className:
-          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-        duration: 3000,
-      },
-    );
+  const { 
+    handlePaymentAgain,
+    handleAddTrackingNumber,
+    getStatusDisplay,
+    handleDowloadPDF,
+    isPDFCreating,
+  } = useOrderCard(setIsVerifyOpen);
 
-    setIsVerifyOpen(false);
-  };
 
-  const handleRejectPayment = async (reason: string) => {
-    toast.success(
-      <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight"> ยืนยันการปฏิเสธสำเร็จแล้ว!</span>
-      </div>,
-      {
-        className:
-          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-        duration: 3000,
-      },
-    );
-    setIsVerifyOpen(false);
-  };
+  const statusInfo = getStatusDisplay(
+    order.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED ? 
+    order.paymentStatus : order.orderStatus
+  );
 
-  const handleConfirmTracking = (finalList: string[]) => {
-    const finalPayload = finalList.join(",");
-    console.log("ส่งไป Backend =>", finalPayload);
-    // ต้องมาทำตัว finalPayload ส่งไปให้ API
-  };
+  const isSeller = role?.toUpperCase() === USER_ROLE.SELLER;
+  const isCustomer = role?.toUpperCase() === USER_ROLE.CUSTOMER;
+  const isPaymentRejected = order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED;
+  const isOrderCompleted = order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED;
+  const isOrderToReceive = order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_RECEIVE;
+  const isOrderToShip = order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP;
+  const isOrderPending = order?.orderStatus.toUpperCase() === ORDER_STATUS.PENDING;
+  const isOrderExisting = order?.trackingNo && order?.trackingNo.length > 0;
 
   const pulseStyle = `
   @keyframes pulse-green-simple {
@@ -139,7 +82,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
   return (
     <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden mb-8 transition-all">
       <style>{pulseStyle}</style>
-      <ReceiptTemplate ref={receiptRef} order={order} />
+      {/* <ReceiptTemplate ref={receiptRef} order={order} /> */}
 
       {/* Header & Main Accordion */}
       <div className="bg-cprojectone pt-5 pr-5 pl-5 border-b-3 border-black flex flex-col items-end">
@@ -149,12 +92,11 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
           {statusInfo.label}
         </div>
 
-        {/* คลิกที่เลข Order เพื่อเปิด/ปิด Card ทั้งใบ */}
         <button
           onClick={() => setIsCardExpanded(!isCardExpanded)}
           className="w-full flex justify-between items-center font-black text-lg border-3 border-black border-b-0 px-6 py-5 rounded-t-[2rem] bg-white translate-y-[3px] hover:bg-gray-50 transition-colors"
         >
-          <span>Order #{order.order_no}</span>
+          <span>Order #{order?.orderNo}</span>
           <ChevronDown
             className={`transition-transform duration-500 ${isCardExpanded ? "rotate-180" : ""}`}
             size={24}
@@ -162,35 +104,33 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
         </button>
       </div>
 
-      {/*Content Area */}
       <div className="p-5 space-y-3">
-        {/* Product Items (แสดงเสมอแต่เป็นแบบกะทัดรัด) */}
         <div className="space-y-3">
-          {order.items?.map((item) => {
-            const isItemExpanded = expandedItem.includes(item.order_item_id);
+          {order?.orderItems?.map((item) => {
+            const isItemExpanded = expandedItem.includes(item.orderItemId);
             return (
               <div
-                key={item.order_item_id}
+                key={item.orderItemId}
                 className="border-2 border-black rounded-2xl overflow-hidden bg-white"
               >
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // กันไม่ให้ไปโดน Toggle ของ Card ใหญ่
-                    toggleAccordion(item.order_item_id);
+                    toggleAccordion(item.orderItemId);
                   }}
                   className="w-full flex gap-4 items-center p-3 hover:bg-gray-50 transition-colors text-left"
                 >
                   <div className="relative w-12 h-12 border-2 border-black rounded-lg overflow-hidden shrink-0">
                     <Image
-                      src={item.product_img_path || "/placeholder-image.svg"}
-                      alt={item.product_name_at_purchase}
+                      src={item.productImagePath || "/placeholder-image.svg"}
+                      alt={item.pricePerUnit.toString()}
                       fill
                       className="object-cover"
                     />
                   </div>
                   <div className="flex-grow">
                     <h4 className="font-bold text-sm line-clamp-1">
-                      {item.product_name_at_purchase}
+                      {item.productName}
                     </h4>
                     {!isCardExpanded && (
                       <p className="text-[10px] font-bold text-gray-500">
@@ -213,14 +153,14 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                       <span className="text-gray-500 font-bold">
                         รหัสสินค้า:
                       </span>{" "}
-                      <span className="font-mono">{item.product_id}</span>
+                      <span className="font-mono">{item.orderItemId}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500 font-bold">
                         ราคาสินค้า/ชิ้น:
                       </span>{" "}
                       <span className="font-black">
-                        <CurrencyDisplay amount={item.price_at_purchase} /> ฿
+                        <CurrencyDisplay amount={item.pricePerUnit} /> ฿
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -248,32 +188,60 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
           <div className="overflow-hidden">
             <div className="pt-4 space-y-4">
               {/* Info Section (Tracking / RJ / CP) */}
-              <div className="px-5 pb-2 space-y-3">
-                {/* กรณี RJ*/}
-                {order.order_status === "RJ" && (
+              <div className="px-1 pb-2 space-y-3">
+                {isPaymentRejected && isCustomer &&(
                   <div className="p-4 bg-red-100 border-2 border-red-500 rounded-2xl flex items-start gap-3">
                     <AlertCircle className="text-red-600 shrink-0" />
                     <div className="text-sm">
                       <p className="font-black text-red-700">
-                        ชำระเงินไม่สำเร็จ:
+                        ชำระเงินไม่สำเร็จเนื่องจาก
                       </p>
                       <p className="text-red-600 font-bold">
-                        {order.rejection_reason || "สลิปไม่ถูกต้อง"}
+                        : {order?.rejectionReason || "สลิปไม่ถูกต้อง"}
                       </p>
                     </div>
                   </div>
                 )}
 
+                {(isOrderCompleted || isOrderToReceive || isOrderToShip) && 
+                (
+                  <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
+                        <Panda size={24} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-gray-500 uppercase leading-none">
+                          ดาวน์โหลด PDF ใบเสร็จ Order
+                        </p>
+                        <p className="max-[350px]:text-[10px] font-black text-sm tracking-tight">
+                          {order.orderNo}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDowloadPDF(order.orderId)}
+                      className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+                    >
+                      <Download size={20} className="text-black" />
+                    </button>
+                  {isPDFCreating && (
+                    <div className="flex flex-col items-center py-20">
+                      <Loader2 className="animate-spin text-black mb-2" size={40} />
+                      <p className="font-bold text-gray-500">กำลังโหลดข้อมูล...</p>
+                    </div>
+                  )}
+                  </div>
+                )}
+
                 {/* กรณี TS/TR*/}
-                {(order.order_status === "TS" ||
-                  order.order_status === "TR" ||
-                  order.order_status === "CP") &&
-                  order.tracking_number && (
+                {(isOrderToShip || isOrderToReceive || isOrderCompleted) &&
+                  isOrderExisting && (
                     <div className="flex flex-col p-4 bg-blue-50 border-2 border-black rounded-2xl gap-3  ">
                       <div className="flex items-center gap-2">
                         <Truck className="text-blue-600" size={20} />
                         <p className="left-0 text-[10px] font-black text-gray-500 uppercase leading-none">
-                          {order.carrier || "พัสดุ"}
+                          {order.deliveryMethod || "พัสดุ"}
                         </p>
                       </div>
 
@@ -311,21 +279,9 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                     </div>
                   )}
 
-                {/* คัดลอกเลขพัสดุทั้งหมด ทีเดียว <button
-                disabled
-                onClick={() => {
-                  navigator.clipboard.writeText(order.tracking_number!);
-                  toast.success("คัดลอกเลขพัสดุแล้ว");
-                }}
-                className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer hidden"
-              >
-                <Copy size={16} />
-              </button> */}
-
-                {/* สำหรับ TS ที่ยังไม่มีเลขพัสดุ */}
-                {order.order_status === "TS" && !order.tracking_number && (
+                {isOrderToShip && !isOrderExisting && (
                   <>
-                    {mode === "Seller" ? (
+                    { isSeller ? (
                       <div className="flex flex-col gap-3 p-4 bg-blue-50 border-2 border-black rounded-[2rem]">
                         <div className="flex items-center gap-2 text-blue-700 font-black text-xs px-2 uppercase">
                           <Truck size={16} />
@@ -390,31 +346,6 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                     )}
                   </>
                 )}
-
-                {order.order_status === "CP" && (
-                  <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
-                        <Panda size={24} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-gray-500 uppercase leading-none">
-                          ดาวน์โหลด PDF ใบเสร็จ Order
-                        </p>
-                        <p className="max-[350px]:text-[10px] font-black text-sm tracking-tight">
-                          {order.order_no}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      //เดี๋ยวเปลี่ยนเป็นรับ มาจาก backend แทน
-                      onClick={downloadPDF}
-                      className="p-3 bg-white border-2 border-black rounded-xl hover:bg-green-100 transition-all active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
-                    >
-                      <Download size={20} className="text-black" />
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Total & Actions Section */}
@@ -424,7 +355,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                     <span className="text-gray-500 font-bold text-sm whitespace-nowrap">
                       สั่งสินค้าเมื่อ:{" "}
-                      {new Date(order.order_created_date).toLocaleDateString(
+                      {new Date(order?.orderCreatedAt).toLocaleDateString(
                         "th-TH",
                       )}
                     </span>
@@ -434,7 +365,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                           จำนวนสินค้าทั้งหมด:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right max-[350px]:text-left">
-                          {(order.total_quantity || 0).toLocaleString()} ชิ้น
+                          {(order?.totalQuantity || 0).toLocaleString()} ชิ้น
                         </span>
                       </div>
 
@@ -443,7 +374,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                           ค่าจัดส่ง:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right">
-                          ฿<CurrencyDisplay amount={order.shipping_fee || 0} /> 
+                          ฿<CurrencyDisplay amount={order?.netAmount - order?.totalAmount || 0} /> 
                         </span>
                       </div>
 
@@ -452,55 +383,50 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                           ยอดสุทธิ:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right">
-                          ฿<CurrencyDisplay amount={order.net_amount} /> 
+                          ฿<CurrencyDisplay amount={order.netAmount} /> 
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  {/* <button className="flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
-            รายละเอียด
-          </button> */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button className="w-full sm:flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
+                    รายละเอียด
+                  </button>
 
-                  {order.order_status === "RJ" && (
+                  {isPaymentRejected && isCustomer && (
                     <button
-                      onClick={handlepaymentagain}
-                      className="flex-1 max-[340px]:text-sm py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
+                      onClick={() => handlePaymentAgain(order.orderId)}
+                      className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
                     >
-                      ชำระเงินใหม่
-                    </button>
-                  )}
+                        ชำระเงินใหม่
+                      </button>
+                    )}
 
-                  {order.order_status === "TR" && (
-                    // ต้องทำตัว hadle api update status ว่า Complete ไป  backend
-                    <button className="flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
-                      ได้รับสินค้าแล้ว
-                    </button>
-                  )}
+                  {role === USER_ROLE.CUSTOMER &&
+                    isOrderToReceive && (
+                      <button className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
+                        ได้รับสินค้าแล้ว
+                      </button>
+                    )}
 
-                  {/* {order.order_status === "CP" && (
-             <button className="flex-1 py-3 bg-green-500 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-green-600 transition-all active:translate-y-1 active:shadow-none">
-                รีวิวสินค้า
-             </button>
-          )} */}
-                  {order.order_status === "PD" && (
+                  {isOrderPending && (
                     <>
-                      {mode === "Seller" ? (
+                      {isSeller ? (
                         <button
                           onClick={() => setIsVerifyOpen(true)}
-                          className="flex-1 py-3 max-[340px]:text-sm border-4 rounded-full font-black cursor-pointer transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-none"
+                          className="w-full sm:flex-1 py-3 max-[340px]:text-sm border-4 rounded-full font-black cursor-pointer transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-none"
                           style={{
                             animation: "pulse-green-simple 2s infinite",
                           }}
                         >
                           ทำการตรวจสอบ
                         </button>
-                      ) : (
+                      ) : !isPaymentRejected && (
                         <button
                           disabled
-                          className="flex-1 max-[340px]:text-[12px] py-3 border-4 rounded-full font-black cursor-not-allowed"
+                          className="w-full sm:flex-1 max-[340px]:text-[12px] py-3 border-4 rounded-full font-black cursor-not-allowed"
                           style={{
                             animation: "pulse-green-simple 2s infinite",
                           }}
@@ -510,7 +436,7 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
                       )}
                     </>
                   )}
-                </div>
+</div>
               </div>
             </div>
           </div>
@@ -518,18 +444,16 @@ export const OrderCard = ({ order, mode = "Customer" }: OrderCardProps) => {
       </div>
       {isVerifyOpen && (
         <VerificationSlip
-          order={order}
+          order={order as OrdersResponse}
           onClose={() => setIsVerifyOpen(false)}
-          onConfirm={handleConfirmPayment}
-          onReject={handleRejectPayment}
         />
       )}
       <ConfirmDialog
-        open={isConfirmTrackingNoopen}
+        open={isConfirmTrackingNoopen}  
         onClose={() => setisConfirmTrackingNoopen(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
+          await handleAddTrackingNumber(order?.orderId, cleanTrackingList);
           setisConfirmTrackingNoopen(false);
-          handleConfirmTracking(cleanTrackingList);
         }}
         title="ยืนยันหมายเลข Tracking No."
         content={

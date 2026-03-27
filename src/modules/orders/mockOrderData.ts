@@ -1,6 +1,5 @@
-import { Order } from "./type";
 
-export const mockOrders: Order[] = [
+export const mockOrders = [
   {
     order_id: "uuid-1",
     customer_id: "cus-123",

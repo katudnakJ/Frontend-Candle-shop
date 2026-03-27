@@ -30,6 +30,7 @@ export default function ConfirmDialog({
   const hoverColor = variant === "danger" ? "#dc2626" : "#d4d386";
   const textColor = variant === "danger" ? "white" : "black";
 
+  
   return (
     <Dialog
       className="font-sans"

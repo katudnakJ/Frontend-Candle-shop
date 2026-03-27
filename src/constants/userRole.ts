@@ -2,7 +2,7 @@
 
 
 export const enum USER_ROLE {
-  CUSTOMER = "cust",
-  ADMIN = "admin",
-  SELLER = "seller",
+  CUSTOMER = "CUST",
+  ADMIN = "ADMIN",
+  SELLER = "SELLER",
 }

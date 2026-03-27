@@ -9,7 +9,7 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { Fragment, useEffect, useMemo } from "react";
+import { Fragment, useEffect} from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -21,8 +21,6 @@ import {
 } from "lucide-react";
 import { Button } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { ShoppingCartData } from "@/modules/cart/shoppingcartInterface";
-import { GenericResponse } from "@/types/response.type";
 
 const Header = () => {
   const queryClient = useQueryClient();

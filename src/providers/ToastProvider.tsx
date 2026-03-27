@@ -9,8 +9,9 @@ export const ToastProvider = () => {
   return (
     <Toaster
       position={toastPosition}
+      containerStyle={{ zIndex: 20050 }}
       toastOptions={{
-       
+       style: { zIndex: 20050 },
         className: "bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
         duration: 3000,
       }}

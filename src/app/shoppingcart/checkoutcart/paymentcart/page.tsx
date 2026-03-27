@@ -301,7 +301,7 @@ export default function PaymentPage() {
   const handleConfirmOrder = () => {
     if (!slipFile) {
       setShowPaymentError(true);
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      window.scrollTo({ top: document.body.scrollHeight});
       return;
     }
     setIsOpen(true);

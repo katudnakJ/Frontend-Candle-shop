@@ -7,34 +7,40 @@ import { Loader2 } from "lucide-react";
 import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { OrderHeader } from "@/modules/orders/components/OrderHeader";
-import { useOrderHistory } from "@/modules/orders/hooks/useOrderHistory";
+import { useAuthStoreUserLogin } from "@/store/userLogin";
+import { USER_ROLE } from "@/constants/userRole";
+import { useGetOrders } from "@/modules/orders/hooks/index";
+import { CUSTOMER_ORDER_TAB } from "@/constants/status";
+import { ScrollToTop } from "@/utils/ScrollToTop";
 
 export default function OrderHistoryPage() {
-  const { activeTab, setActiveTab, filteredOrders, isLoading } =
-    useOrderHistory();
+  const { 
+    activeTab,
+    setActiveTab,
+    OrdersByTab,
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    handleLoadMoreRef
+  } = useGetOrders();
 
-  const tabs = [
-    { key: "PD", label: "รอตรวจสอบ" },
-    { key: "TS", label: "ที่ต้องจัดส่ง" },
-    { key: "TR", label: "ที่ต้องได้รับ" },
-    { key: "CP", label: "สำเร็จแล้ว" },
-  ];
-
+    const {userData} = useAuthStoreUserLogin();
 
   return (
+    <>
+    <ScrollToTop threshold={500} />
     <div className="flex flex-col w-full min-h-screen bg-white">
       <Header />
       <main className="grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
           <OrderHeader namemode="ประวัติคำสั่งซื้อ"/>
-
           <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-6">
             <div className="flex bg-white border-4 border-black rounded-2xl overflow-hidden  mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  ">
-              {tabs.map((tab) => (
+                {CUSTOMER_ORDER_TAB.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as OrderStatus)}
-                  className={`flex-1 py-4 text-sm font-black transition-all cursor-pointer ${
+                  className={` flex-1 py-4 text-sm font-black transition-all cursor-pointer ${
                     activeTab === tab.key
                       ? "bg-cprojectone text-black"
                       : "bg-white text-black hover:bg-gray-100"
@@ -42,10 +48,9 @@ export default function OrderHistoryPage() {
                 >
                   {tab.label}
                 </button>
-              ))}
+                ))}
             </div>
 
-            {/* รายการการ์ดคำสั่งซื้อ */}
             {isLoading ? (
               <div className="flex flex-col items-center py-20">
                 <Loader2 className="animate-spin text-black mb-2" size={40} />
@@ -53,9 +58,14 @@ export default function OrderHistoryPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order) => (
-                    <OrderCard key={order.order_id} order={order} />
+                {OrdersByTab.orders.length > 0 ? (
+                  OrdersByTab.orders.map((order, index) => (
+                    <OrderCard 
+                      key={order.orderId}
+                      order={order}
+                      role={userData?.userRole?.toLocaleUpperCase() as USER_ROLE}
+                      defaultExpanded={index === 0}
+                    />
                   ))
                 ) : (
                   /* กรณีไม่มีข้อมูลใน Tab นั้น */
@@ -65,6 +75,22 @@ export default function OrderHistoryPage() {
                     </p>
                   </div>
                 )}
+                <div ref={handleLoadMoreRef} className="h-8" />
+
+                {isFetchingNextPage && (
+                  <div className="flex justify-center py-4">
+                    <Loader2 className="animate-spin text-black mr-2" size={24} />
+                    <span className="font-bold text-gray-500">
+                      กำลังโหลดเพิ่มเติม...
+                    </span>
+                  </div>
+                )}
+
+                {!hasNextPage && OrdersByTab.size > 0 && (
+                  <p className="text-center text-gray-400 py-4 font-bold">
+                    คุณได้ดูรายการทั้งหมดแล้ว
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -72,5 +98,6 @@ export default function OrderHistoryPage() {
       </main>
       <Footer />
     </div>
+    </>
   );
 }

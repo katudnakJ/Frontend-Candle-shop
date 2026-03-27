@@ -10,13 +10,7 @@ import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { useRouter } from "next/navigation";
 import { useMemo, useEffect, useState } from "react";
 import { useGetCartData } from "@/modules/cart/hooks/useGetCartData";
-import { useSearchParams } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
-
-import { GenericResponse } from "@/types/response.type";
-import { ShoppingCartData } from "@/modules/cart/shoppingcartInterface";
-
 import { CartItemCard } from "@/modules/cart/components/CartItemCard";
 import { CartSummaryBar } from "@/modules/cart/components/CartSummaryBar";
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";

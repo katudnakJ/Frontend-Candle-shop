@@ -93,6 +93,7 @@ apiClient.interceptors.response.use(
     const currentPath = window.location.pathname;
     const originalConfig = error.config as RetryConfig | undefined;
     const is401 = error.response?.status === 401;
+
     if (process.env.NODE_ENV === "development") {
       console.log("🔍 [Interceptor] Error Status:", error.response?.status);
     }

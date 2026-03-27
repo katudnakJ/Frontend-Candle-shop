@@ -48,6 +48,41 @@ export interface OrdersResponse {
   addressLabel: string | null;
   deliveryMethod: string | null;
   netAmount: number;
+  orderNo: string;
+  orderStatus: string;
+  rejectionReason: string | null;
+  paymentStatus: string;
+  orderCreatedAt: string;
+  totalAmount: number;
+  totalQuantity: number;
+  trackingNo: string[];
   orderItems: OrderItemsResponse[];
+}
 
+export interface OrderRejectPayload {
+  orderId: string;
+  reason: string;
+}
+
+export interface AddTrackingNumberPayload {
+  orderId: string;
+  trackingNumber: string[];
+}
+export interface TrackOrderReq {
+  trackingNumber: string[];
+}
+
+export interface GetSignedFileResponse {
+  signedFileUrl: string;
+  expiresAt: string;
+}
+
+export interface PDFSignedUrlResponse {
+  signedFileUrl: string;
+  expiresAt: string;
+}
+
+export type PDFResponse = {
+  pdfName: string;
+  pdfSignedUrl: PDFSignedUrlResponse;
 }
