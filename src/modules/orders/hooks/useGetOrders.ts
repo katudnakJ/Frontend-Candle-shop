@@ -15,17 +15,17 @@ export const useInfiniteOrdersByStatus = () => {
   } = useGetOrdersByStatus(activeTab.toUpperCase());
 
   const OrdersByTab = useMemo(() => {
-    const orders = data?.pages?.flatMap((page) => page.data.orders) || [];
-    const lastPage = data?.pages[data.pages.length - 1];
+    const orders = data?.pages?.flatMap((page) => page.data?.orders || []).filter(Boolean) || [];
+    const lastPage = data?.pages ? data.pages[data.pages.length - 1] : null;
 
     return {
       orders: orders,
-      page: lastPage?.data.page || 0,
-      size: lastPage?.data.size || 0,
-      startAt: lastPage?.data.startAt || 0,
-      endAt: lastPage?.data.endAt || 0,
-      hasNext: lastPage?.data.hasNext || false,
-      totalOrders: lastPage?.data.totalOrders || 0,
+      page: lastPage?.data?.page ?? 0,
+      size: lastPage?.data?.size ?? 0,
+      startAt: lastPage?.data?.startAt ?? 0,
+      endAt: lastPage?.data?.endAt ?? 0,
+      hasNext: lastPage?.data?.hasNext ?? false,
+      totalOrders: lastPage?.data?.totalOrders ?? 0,
     };
   }, [data]);
 

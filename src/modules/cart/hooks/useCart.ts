@@ -10,10 +10,8 @@ import { useDebouncedCallback } from "use-debounce";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-
 export const useCart = () => {
-
-
+  //ถ้าปรับ size ต้องไปปรับ sizesameinusecart ที่ useCartMutations ด้วยให้้เท่ากัน
   const size = 10;
   const queryClient = useQueryClient();
 
@@ -31,16 +29,25 @@ export const useCart = () => {
   }
   const { cartItem, shoppingCartId, endAt, totalItemsFromApi } = useMemo(() => {
     const pages = data?.pages || [];
+
+    if (pages.length === 0) {
+      return {
+        cartItem: [],
+        shoppingCartId: "",
+        totalItemsFromApi: 0,
+        endAt: 0,
+      };
+    }
     const allItems = pages.flatMap((p) => {
       const actualData = p?.data || p;
       return actualData?.cartItems || [];
     });
-    const lastPage = pages[pages.length - 1]?.data || pages[pages.length - 1];
-    const lastPageData = lastPage;
+    const lastPage = pages[pages.length - 1];
+    const lastPageData = lastPage?.data || lastPage;
     return {
       cartItem: allItems,
-      shoppingCartId: lastPageData?.shoppingCartId,
-      totalItemsFromApi: lastPageData?.totalItems || 0,
+      shoppingCartId: lastPageData?.shoppingCartId ?? "",
+      totalItemsFromApi: lastPageData?.totalItems ?? 0,
       endAt: allItems.length,
     };
   }, [data]);
@@ -87,8 +94,8 @@ export const useCart = () => {
     );
     return selectedItems.reduce(
       (acc, item) => ({
-        totalQuantity: acc.totalQuantity + item.quantity,
-        totalPrice: acc.totalPrice + (item.price || 0) * item.quantity,
+        totalQuantity: acc.totalQuantity + (item.quantity || 0),
+        totalPrice: acc.totalPrice + (item.price || 0) * (item.quantity || 0),
       }),
       { totalQuantity: 0, totalPrice: 0 },
     );

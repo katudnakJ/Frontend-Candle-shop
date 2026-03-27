@@ -61,7 +61,7 @@ export default function OrderHistoryPage() {
                 {OrdersByTab.orders.length > 0 ? (
                   OrdersByTab.orders.map((order, index) => (
                     <OrderCard 
-                      key={order.orderId}
+                      key={order?.orderId}
                       order={order}
                       role={userData?.userRole?.toLocaleUpperCase() as USER_ROLE}
                       defaultExpanded={index === 0}
