@@ -11,31 +11,24 @@ import { PreviousButton } from "@/components/commonui/PreviousButton";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 import { QRpaymentSkeletonpage } from "@/modules/cart/components/skeletoncart/QRpaymentSkeletonpage";
 import { CartOrderSummaryCard } from "@/modules/cart/components/CartOrderSummaryCard";
-import { Seller } from "@/modules/seller/types";
 import { PaymentMethodCard } from "@/modules/seller/components/PaymentMethodCard";
-import { Order, OrderItem } from "@/modules/orders/type";
 
-import { mockSellerData } from "@/modules/seller/mockSellerData";
-import { mockOrders } from "@/modules/orders/mockOrderData";
 import { toast } from "react-hot-toast";
-import { GenericResponse, Status } from "@/types/response.type";
-import {
-  ShoppingCartData,
-  CartItem,
-} from "@/modules/cart/shoppingcartInterface";
-import { useQueryClient } from "@tanstack/react-query";
+import { CartItem } from "@/modules/cart/shoppingcartInterface";
 import { useCartStore } from "@/modules/cart/hooks/useCartstore";
 import { useGetAddressDetail } from "@/modules/account/hooks/useAddressesQuery";
 import { useGetQRPaymentImageForCus } from "@/modules/seller/services/payment.service";
 import { useCheckoutMutation } from "@/modules/cart/hooks/useCheckoutMutation";
 import { CheckoutRequest } from "@/modules/cart/checkoutInterface";
+import { useGetOrderDetail } from "@/modules/orders/hooks/useGetOrderDetail";
+import { useRepayUpdatePaymentSlip } from "@/modules/orders/hooks/useRepayUpdatePaymentSlip";
 
 interface DisplayPaymentItem {
   id: string | number;
   name: string;
   price: number;
   quantity: number;
-  image?: string;
+  image?: string | null;
 }
 
 interface PaymentData {
@@ -49,7 +42,7 @@ interface PaymentData {
 export default function PaymentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryClient = useQueryClient();
+
 
   const {
     selectedIds,
@@ -80,14 +73,34 @@ export default function PaymentPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isSuccessCheckout, setSuccessCheckout] = useState(false);
-  const size = Number(searchParams.get("size")) || 100;
-  const [seller, setSeller] = useState<Seller | null>(null);
-  const [isLoadingSeller, setIsLoadingSeller] = useState(true);
+  const size = 100;
+
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [showPaymentError, setShowPaymentError] = useState(false);
-  const [repayOrder, setRepayOrder] = useState<Order | null>(null);
+  //const [repayOrder, setRepayOrder] = useState<Order | null>(null);
 
-  const { data, isLoading } = useGetCartData();
+  const {
+    data: orderDetailResponse,
+    isLoading: isLoadingOrderDetail,
+    isError: isOrderDetailError,
+  } = useGetOrderDetail(orderId || "", {
+    enabled: mode === "repay" && !!orderId,
+  });
+  const rawData =
+    orderDetailResponse && "data" in orderDetailResponse
+      ? orderDetailResponse.data
+      : orderDetailResponse;
+  const orderDetail = rawData?.orderDetail;
+  const orderItems = rawData?.orderItems || [];
+  if (process.env.NODE_ENV === "development") {
+    console.log("RawDataorderDetailResponse:", rawData);
+    console.log("FinalOrderDetail:", orderDetail);
+    console.log("FinalOrderItem:", orderItems);
+  }
+  const { mutate: repayMutate, isPending: isRepaying } =
+    useRepayUpdatePaymentSlip();
+
+  const { data, isLoading } = useGetCartData(size);
   if (process.env.NODE_ENV === "development") {
     console.log("CheckoutPRODUCT:", data);
   }
@@ -139,6 +152,16 @@ export default function PaymentPage() {
     return [];
   }, [cartItem, selectedIds, checkoutItems]);
 
+  //=============================================================================================================================
+  // ดีดกลับถ้าไม่ตรงเงื่อนไข
+
+  useEffect(() => {
+   if (mode === "repay" && (isOrderDetailError || (isMounted && !isLoadingOrderDetail && (!orderDetail || !orderItems)))) {
+      toast.error("ไม่พบข้อมูลคำสั่งซื้อเดิม กรุณาลองใหม่");
+      router.replace("/account/orderhistory");
+    }
+  }, [mode, isOrderDetailError, orderDetail, orderItems, isLoadingOrderDetail, isMounted, router]);
+
   useEffect(() => {
     if (isMounted && !isLoading && mode !== "repay") {
       const saved = sessionStorage.getItem("selected_checkout_ids");
@@ -162,55 +185,24 @@ export default function PaymentPage() {
     mode,
     router,
   ]);
-
-  useEffect(() => {
-    const fetchSellerData = async () => {
-      try {
-        setIsLoadingSeller(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setSeller(mockSellerData[0]);
-      } catch (error) {
-        console.error("Failed to fetch seller:", error);
-      } finally {
-        setIsLoadingSeller(false);
-      }
-    };
-    fetchSellerData();
-  }, []);
-
-  // อีกหน่อยปรับเป็นเรียกจาก api ไม่ก็เก็บใน zustand และ ต้องเพิ่มกัน เช็คว่า orderID ใช่ของลูกค้าคนนี้ไหม
-  // อย่าลืมเปลี่ยน seller เพราะ อันนี้ใช้  mock
-  useEffect(() => {
-    if (mode === "repay" && orderId) {
-      setIsLoadingSeller(true);
-
-      const foundOrder = mockOrders.find((o) => o.order_no === orderId);
-      if (foundOrder) {
-        setRepayOrder(foundOrder);
-      } else {
-      }
-
-      setIsLoadingSeller(false);
-    }
-  }, [mode, orderId]);
+  //=============================================================================================================================
 
   const paymentData = useMemo<PaymentData>(() => {
-    // กรณี Repay (จาก Order History)
-    if (mode === "repay" && repayOrder) {
-      const items = (repayOrder.items || []).map((item: OrderItem) => ({
-        id: item.product_id,
-        name: item.product_name_at_purchase,
-        price: item.price_at_purchase,
+    if (mode === "repay" && orderDetail && orderItems) {
+      const items = orderItems.map((item) => ({
+        id: item.orderItemId,
+        name: item.productName,
+        price: item.pricePerUnit,
         quantity: item.quantity,
-        image: item.product_img_path,
+        image: item.productImagePath,
       }));
 
       return {
         displayItems: items,
-        subtotal: repayOrder.total_amount,
-        shippingFee: repayOrder.shipping_fee || 0,
-        totalAmount: repayOrder.net_amount,
-        totalQuantity: items.reduce((acc, item) => acc + item.quantity, 0),
+        subtotal: orderDetail.totalAmount,
+        shippingFee: orderDetail.netAmount - orderDetail.totalAmount || 0,
+        totalAmount: orderDetail.netAmount,
+        totalQuantity: orderDetail.totalQuantity,
       };
     }
 
@@ -240,68 +232,96 @@ export default function PaymentPage() {
       totalAmount: sub + ship,
       totalQuantity: qty,
     };
-  }, [checkoutItems, selectedItems, mode, repayOrder, getPrimaryImage]);
+  }, [
+    mode,
+    orderDetail,
+    orderItems,
+    checkoutItems,
+    selectedItems,
+    getPrimaryImage,
+  ]);
 
+  console.log("PaymentData", paymentData);
   const handleConfirm = () => {
     setIsOpen(false);
 
-    const addressId = selectedAddress?.addressId || selectAddressId;
-
-    if (!addressId || !slipFile) {
-      toast.error("ข้อมูลที่อยู่หรือสลิปไม่ครบถ้วน");
+    if (!slipFile) {
+      toast.error("กรุณาแนบสลิปชำระเงิน");
       return;
     }
-
-    if (process.env.NODE_ENV === "development") {
-      console.log("Submitting with Address:", selectedAddress?.addressId);
-      console.log(
-        "Submitting Items:",
-        checkoutItems.length > 0 ? checkoutItems : selectedItems,
-      );
-    }
-
-    const idsToSubmit =
-      checkoutItems.length > 0
-        ? checkoutItems.map((item) => item.shoppingCartItemId)
-        : selectedIds;
-
-    const payload: CheckoutRequest = {
-      shoppingCartItemIds: idsToSubmit,
-      addressId: addressId,
-      imageData: slipFile,
-    };
 
     if (mode === "repay") {
-      // เรียก API: updatePaymentSlip(orderId, slipFile)
-      toast.error("ระบบ Repay กำลังพัฒนา");
+      if (!orderId) {
+        toast.error("ข้อมูล Order ไม่ครบถ้วน");
+        return;
+      }
+      repayMutate(
+        { orderId, imageData: slipFile },
+        {
+          onSuccess: () => {
+            handleSuccessNavigation();
+          },
+        },
+      );
       return;
+    } else {
+      const addressId = selectedAddress?.addressId || selectAddressId;
+
+      if (!addressId) {
+        toast.error("ข้อมูลที่อยู่หรือสลิปไม่ครบถ้วน");
+        return;
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("Submitting with Address:", selectedAddress?.addressId);
+        console.log(
+          "Submitting Items:",
+          checkoutItems.length > 0 ? checkoutItems : selectedItems,
+        );
+      }
+
+      const idsToSubmit =
+        checkoutItems.length > 0
+          ? checkoutItems.map((item) => item.shoppingCartItemId)
+          : selectedIds;
+
+      const payload: CheckoutRequest = {
+        shoppingCartItemIds: idsToSubmit,
+        addressId: addressId,
+        imageData: slipFile,
+      };
+
+      checkoutMutate(payload, {
+        onSuccess: () => {
+          handleSuccessNavigation();
+        },
+        onError: (error) => {
+          if (process.env.NODE_ENV === "development") {
+            console.error("Mutation Error at PaymentPage:", error);
+          }
+        },
+      });
     }
-    checkoutMutate(payload, {
-      onSuccess: () => {
-        setSuccessCheckout(true);
-        toast.success("ยืนยันการชำระเงินเรียบร้อย");
+  };
 
-        setTimeout(() => {
-          setSelectedIds([]);
-          setCheckoutItems([]);
-          setSelectedAddress(null);
-          sessionStorage.removeItem("selected_checkout_ids");
-        }, 300);
+  const handleSuccessNavigation = () => {
+    setSuccessCheckout(true);
+    toast.success("ยืนยันการชำระเงินเรียบร้อย");
 
-        router.replace("/account/orderhistory");
-      },
-      onError: (error) => {
-        if (process.env.NODE_ENV === "development") {
-          console.error("Mutation Error at PaymentPage:", error);
-        }
-      },
-    });
+    setTimeout(() => {
+      setSelectedIds([]);
+      setCheckoutItems([]);
+      setSelectedAddress(null);
+      sessionStorage.removeItem("selected_checkout_ids");
+    }, 300);
+
+    router.replace("/account/orderhistory");
   };
 
   const handleConfirmOrder = () => {
     if (!slipFile) {
       setShowPaymentError(true);
-      window.scrollTo({ top: document.body.scrollHeight});
+      window.scrollTo({ top: document.body.scrollHeight });
       return;
     }
     setIsOpen(true);
@@ -309,9 +329,12 @@ export default function PaymentPage() {
 
   const isDataReady =
     mode === "repay"
-      ? !!repayOrder
+      ? !!orderDetail && !!orderItems
       : checkoutItems.length > 0 || selectedItems.length > 0;
-  const isAddressReady = !!selectedAddress;
+
+  const isAddressReady =
+    mode === "repay" ? !!orderDetailResponse : !!selectedAddress;
+
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
       console.log("=== Zustand Store Monitor ===");
@@ -325,9 +348,9 @@ export default function PaymentPage() {
   if (
     !isMounted ||
     isLoading ||
-    isLoadingQR || // <--- เพิ่มตรงนี้
-    isLoadingSeller ||
-    (selectAddressId && isLoadingAddr && !isAddressReady) ||
+    isLoadingQR ||
+    (mode === "repay" && isLoadingOrderDetail) ||
+    (mode !== "repay" && selectAddressId && isLoadingAddr && !isAddressReady) ||
     !isDataReady
   ) {
     return (
@@ -352,7 +375,9 @@ export default function PaymentPage() {
                   isRepay={true}
                 />
                 <h1 className="text-2xl font-black">
-                  ชำระเงินใหม่ Order #{orderId}
+                  ชำระเงินใหม่ OrderNo: 
+                  <span className="text-blue-500"> {orderDetail?.orderNo}</span>
+                  
                 </h1>
                 <p className="text-gray-500 font-bold">
                   รายการสินค้าจากคำสั่งซื้อเดิม
@@ -377,7 +402,7 @@ export default function PaymentPage() {
             </section>
           )}
 
-          {isLoadingSeller ? (
+          {isLoadingQR || (mode === "repay" && isLoadingOrderDetail) ? (
             <div className="w-full h-64 bg-gray-50 animate-pulse rounded-[2rem] border-4 border-gray-200 flex items-center justify-center">
               <p className="font-bold text-gray-400 italic">
                 กำลังโหลดข้อมูลผู้ขาย...
@@ -395,7 +420,7 @@ export default function PaymentPage() {
             />
           )}
 
-          {!isLoadingSeller && (
+          {isDataReady && (
             <div className="mt-10 pb-20 flex flex-col items-center">
               {slipFile && (
                 <div className="mb-4 flex items-center gap-2 text-amber-600 animate-in fade-in slide-in-from-bottom-2">
@@ -407,20 +432,24 @@ export default function PaymentPage() {
               )}
               <button
                 onClick={handleConfirmOrder}
-                disabled={!slipFile || isCheckingOut || isLoadingAddr}
+                disabled={
+                  !slipFile || isCheckingOut || isLoadingAddr || isRepaying
+                }
                 className={`w-full py-5 text-2xl font-black rounded-full transition-all mt-6 ${
                   !slipFile || isCheckingOut || isLoadingAddr
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-black text-white shadow-[8px_8px_0px_0px_rgba(220,38,38,1)]"
                 }`}
               >
-                {isLoadingAddr
+                {isLoadingAddr && mode !== "repay"
                   ? "กำลังโหลดข้อมูลที่อยู่..."
-                  : isCheckingOut
+                  : isCheckingOut || isRepaying
                     ? "กำลังดำเนินการ..."
-                    : slipFile
-                      ? "ยืนยันการชำระเงิน"
-                      : "กรุณาแนบสลิปก่อนยืนยัน"}
+                    : mode === "repay"
+                      ? "ยืนยันการส่งสลิปใหม่"
+                      : slipFile
+                        ? "ยืนยันการชำระเงิน"
+                        : "กรุณาแนบสลิปก่อนยืนยัน"}
               </button>
               {!slipFile && showPaymentError && (
                 <p className="text-red-500 font-bold mt-2 text-sm">
