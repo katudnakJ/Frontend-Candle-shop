@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ChevronLeft, EyeOff } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
-import { Seller } from "@/modules/seller/types";
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import SellerWelcome from "@/modules/seller/components/SellerWelcome";
@@ -22,7 +21,6 @@ import { useAuthStoreUserLogin } from "@/store/userLogin";
 
 export default function SellerSettingPage() {
   const router = useRouter();
-  const [seller, setSeller] = useState<Seller | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(false);
@@ -38,12 +36,13 @@ export default function SellerSettingPage() {
   } = useAddressForm();
 
   const { data : existingQRCode} = useGetQRPaymentImage(
-    Boolean(isShowQR && !selectedFile) || Boolean(isShowQR)
+    Boolean(isShowQR && !selectedFile) || Boolean(!isShowQR)
   );
 
   const handleFileSelect = (file: File | null) => {
     setSelectedFile(file);
   };
+console.log("data : ", existingQRCode);
 
   const handleConfirm = () => {
     if (!selectedFile) {
@@ -95,42 +94,6 @@ export default function SellerSettingPage() {
     userData,
   } = useAuthStoreUserLogin();
 
-  useEffect(() => {
-    let isMounted = true;
-    let timer: NodeJS.Timeout | undefined = undefined;
-    const fetchSellerData = async () => {
-      try {
-        setIsImageLoading(true);
-        await new Promise((resolve) => {
-          timer = setTimeout(resolve, 1000);
-        });
-
-        if (!isMounted) return;
-
-        const data = mockSellerData[0];
-        setSeller(data);
-
-        if (data.qr_payment_img_path) {
-          setSlipPreview(data.qr_payment_img_path);
-        } else {
-          if (isMounted) {
-            setIsImageLoading(false);
-          }
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error("Failed to fetch seller:", error);
-        }
-      }
-    };
-    fetchSellerData();
-    return () => {
-      isMounted = false;
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [setSlipPreview]);
 
   useEffect(() => {
     if (existingQRCode && !selectedFile) {
@@ -263,7 +226,7 @@ export default function SellerSettingPage() {
                   </button>
                 )}
               </div>
-            ) : (
+            ) : (existingQRCode && !isShowQR && !selectedFile) &&(
               <div className="p-6 border-2  rounded-[2rem] bg-white  flex justify-between items-center  hover:-translate-y-1 transition-transform  duration-300 ">
                 <div className="space-y-1">
                   <h2 className="text-xl font-black text-black">

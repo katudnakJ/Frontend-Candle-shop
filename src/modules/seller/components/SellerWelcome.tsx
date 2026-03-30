@@ -42,7 +42,6 @@ export default function SellerWelcome({ mode }: SellerWelcomeProps) {
     return () => clearTimeout(timer);
     
   }, [storeLoading]);
-console.log("userDtaatatata : ", userData);
 
   return (
     <div className="bg-cprojectone border border-cprojectone">
