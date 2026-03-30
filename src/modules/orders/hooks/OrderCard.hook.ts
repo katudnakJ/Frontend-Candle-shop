@@ -61,10 +61,15 @@ export const useOrderCard = (
     const [isPDFCreating, setIsPDFCreating] = useState(false);
 
     const handlePaymentAgain = (orderId: string) => {
-        // router.push(
-        //   `/shoppingcart/checkoutcart/paymentcart?addressid=`,
-        // );
-    };  
+
+      if (!orderId ) {
+        toast.error("ข้อมูลคำสั่งซื้อไม่สมบูรณ์");
+        return;
+    }
+    router.push(
+        `/shoppingcart/checkoutcart/paymentcart?orderId=${orderId}&mode=repay`
+    );
+};  
     
     const handleAddTrackingNumber = async (orderId: string, trackingNumber: string[]) => {
     await addTrackingNumber.mutateAsync({ orderId, trackingNumber });

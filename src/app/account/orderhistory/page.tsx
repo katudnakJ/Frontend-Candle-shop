@@ -12,6 +12,7 @@ import { USER_ROLE } from "@/constants/userRole";
 import { useGetOrders } from "@/modules/orders/hooks/index";
 import { CUSTOMER_ORDER_TAB } from "@/constants/status";
 import { ScrollToTop } from "@/utils/ScrollToTop";
+import { PreviousButton } from "@/components/commonui/PreviousButton";
 
 export default function OrderHistoryPage() {
   const { 
@@ -33,7 +34,7 @@ export default function OrderHistoryPage() {
       <Header />
       <main className="grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
-          <OrderHeader namemode="ประวัติคำสั่งซื้อ"/>
+          <PreviousButton isCusOrderHistory={true} />
           <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-6">
             <div className="flex bg-white border-4 border-black rounded-2xl overflow-hidden  mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  ">
                 {CUSTOMER_ORDER_TAB.map((tab) => (
@@ -61,7 +62,7 @@ export default function OrderHistoryPage() {
                 {OrdersByTab.orders.length > 0 ? (
                   OrdersByTab.orders.map((order, index) => (
                     <OrderCard 
-                      key={order.orderId}
+                      key={order?.orderId}
                       order={order}
                       role={userData?.userRole?.toLocaleUpperCase() as USER_ROLE}
                       defaultExpanded={index === 0}

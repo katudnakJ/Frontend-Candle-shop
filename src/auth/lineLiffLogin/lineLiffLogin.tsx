@@ -36,7 +36,7 @@ return (
             ) : userData?.userRole?.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
               <SellerHome />
 
-            ) : userData?.userRole.toLowerCase() === USER_ROLE.ADMIN.toLowerCase() ? (
+            ) : userData?.userRole?.toLowerCase() === USER_ROLE.ADMIN.toLowerCase() ? (
               <SellerHome /> // for workaround admin login to access seller dashboard
 
             ) : (

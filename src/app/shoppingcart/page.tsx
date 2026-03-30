@@ -131,7 +131,7 @@ export default function ShoppingCartPage() {
                 <div ref={ref} className="h-20 flex justify-center items-center">
                   {isFetchingNextPage ? (
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-6 h-6 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-6 h-6 border-4 border-cprojectthree border-t-transparent rounded-full animate-spin"></div>
                       <p className="text-sm text-gray-500">กำลังโหลดรายการเพิ่มเติม...</p>
                     </div>
                   ) : hasNext ? (

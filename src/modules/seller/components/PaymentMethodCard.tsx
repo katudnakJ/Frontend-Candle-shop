@@ -4,6 +4,7 @@ import { QrCode, ImagePlus, X, CheckCircle2, Download } from "lucide-react";
 import Image from "next/image";
 import { usePaymentSlip } from "@/modules/seller/hooks/usepaymentslip";
 import { PaymentService } from "@/modules/seller/services/payment.service";
+import {GetSignedFileResponse } from "@/modules/seller/types";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
 import { GetSignedFileResponse } from "@/modules/orders/type";
 

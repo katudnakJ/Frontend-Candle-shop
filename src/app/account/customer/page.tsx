@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Plus } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
 import Header from "@/components/layout/CustomerHeader";
@@ -16,6 +16,8 @@ import { PreviousButton } from "@/components/commonui/PreviousButton";
 
 export default function CustomerAccountPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode");
   const { data: addressesData } = useGetAddressesList();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [delAddressId, setDelAddressId] = useState<string | null>(null);
@@ -50,7 +52,14 @@ export default function CustomerAccountPage() {
         <Header />
         <main className="mb-4">
           <div className="max-w-[1200px] mx-auto p-4 flex items-center ">
-            <PreviousButton isAccountCus={true} />
+            {mode === "editaddressforshipment" ? (
+              <PreviousButton
+                
+                isEditAddressForShipment={true}
+              />
+            ) : (
+              <PreviousButton isAccountCus={true} />
+            )}
           </div>
 
           {/* 1. Profile Section  */}

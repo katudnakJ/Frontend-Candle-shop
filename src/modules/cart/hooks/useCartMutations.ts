@@ -19,13 +19,13 @@ type UpdateCartMutationPayload = AddShoppingCartItemReq & {
 };
 
 //ต้องตรงกับ size ที่ useCart
-const samesizeinuseCart = 10;
+const sizesameinuseCart = 10;
 
 export const useUpdateCartLocal = () => {
   const queryClient = useQueryClient();
 
   return (itemId: string, newQty: number) => {
-    const queryKey = ["shopping-cart", samesizeinuseCart];
+    const queryKey = ["shopping-cart", sizesameinuseCart];
     queryClient.setQueryData<InfiniteData<GenericResponse<ShoppingCartData>>>(
       queryKey,
       (old) => {
@@ -68,7 +68,7 @@ export const useUpdateCartLocal = () => {
   };
 };
 
-export const useUpdateCartItem = (size: number = samesizeinuseCart) => {
+export const useUpdateCartItem = (size: number = sizesameinuseCart) => {
   const queryClient = useQueryClient();
   const queryKey = ["shopping-cart", size];
 
@@ -143,7 +143,7 @@ export const useUpdateCartItem = (size: number = samesizeinuseCart) => {
   });
 };
 
-export const useDeleteCartItem = (size: number = samesizeinuseCart) => {
+export const useDeleteCartItem = (size: number = sizesameinuseCart) => {
   const queryClient = useQueryClient();
   const queryKey = ["shopping-cart", size];
 

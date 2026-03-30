@@ -152,8 +152,9 @@ export default function CheckoutPage() {
               จัดส่งไปที่
             </div>
             <div className="grid grid-cols-12 w-full mb-5 ">
+   
               <button
-                onClick={() => router.push("/account/customer")}
+                onClick={() => router.push("/account/customer?mode=editaddressforshipment")}
                 className="col-start-1 col-span-11 md:col-start-2 md:col-span-10 text-left transition-all active:scale-[0.97] shadow-amber-100  hover:shadow-lg hover:translate-y-1 cursor-pointer "
               >
                 {selectedAddress ? (
