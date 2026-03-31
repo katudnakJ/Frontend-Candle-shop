@@ -2,11 +2,11 @@ export interface ProductHomeItem {
   productId: string;
   productName: string;
   price: number;
-  isActive: boolean;
+  active: boolean;
   productCreatedDate: string;
   totalSold: number;
-  productImgPath: string;
   productSlug: string;
+  productImgPath: string;
 }
 
 export interface ProductHomeResData {
@@ -15,6 +15,17 @@ export interface ProductHomeResData {
   featuredProducts: ProductHomeItem[];
   hasNext: boolean;
   page: number;
+  size: number;
+  startAt: number;
+  totalProducts: number;
+}
+
+
+export interface SearchProductResData {
+  endAt: number;
+  hasNext: boolean;
+  page: number;
+  products: ProductHomeItem[];
   size: number;
   startAt: number;
   totalProducts: number;

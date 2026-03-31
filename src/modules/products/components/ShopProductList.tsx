@@ -12,13 +12,25 @@ import FullscreenLoader from "@/modules/products/components/FullscreenLoaderfors
 import toast from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
+
 export default function ShopProductList() {
+  const router = useRouter();
+  const { ref, inView } = useInView();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
-
-  const router = useRouter();
-  const { featuredProducts, nonFeaturedProducts, isLoading, deleteProduct } =
-    useShopProducts();
+  const {
+    nonFeaturedProducts,
+    // featuredProducts,
+    isFetchingNextPage,
+    isInitialLoading,
+    hasNextPage,
+    isDeleting,
+    isError,
+    fetchNextPage,
+    deleteProduct,
+  } = useShopProducts();
 
   const searchQuery = useShopProductStore((state) => state.searchQuery);
 
@@ -30,11 +42,12 @@ export default function ShopProductList() {
     setProductToDelete(id);
     setIsDeleteOpen(true);
   };
+
   const confirmDeleteProduct = async () => {
     if (productToDelete) {
       try {
         await deleteProduct(productToDelete); // เรียกใช้ deleteProduct จาก hook
-       console.log("ลบสินค้าสำเร็จ");
+        console.log("ลบสินค้าสำเร็จ");
       } catch (error) {
         toast.error("ไม่สามารถลบสินค้าได้");
       } finally {
@@ -44,7 +57,26 @@ export default function ShopProductList() {
     }
   };
 
-  if (isLoading) {
+  useEffect(() => {
+    if (
+      inView &&
+      hasNextPage &&
+      !isFetchingNextPage &&
+      !isInitialLoading &&
+      !isError
+    ) {
+      fetchNextPage();
+    }
+  }, [
+    inView,
+    hasNextPage,
+    isFetchingNextPage,
+    isInitialLoading,
+    isError,
+    fetchNextPage,
+  ]);
+
+  if (isInitialLoading) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
@@ -59,11 +91,11 @@ export default function ShopProductList() {
     );
   }
 
-  if (featuredProducts.length === 0 && nonFeaturedProducts.length === 0) {
+  if ( nonFeaturedProducts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-gray-400">
         <Search size={48} className="mb-2 opacity-20" />
-        <p className="">{`ไม่พบสินค้าที่ตรงกับ "${searchQuery}"`}</p>
+        <p className="">{`ไม่พบสินค้าที่ตรงกับ ${searchQuery}`}</p>
         <button
           onClick={() => useShopProductStore.getState().setSearchQuery("")}
           className="mt-2 text-blue-600 text-sm underline"
@@ -76,9 +108,9 @@ export default function ShopProductList() {
 
   return (
     <>
-      {/* {isLoading && <FullscreenLoader message="กำลังจัดการข้อมูลสินค้า..." />} */}
+      {isDeleting && <FullscreenLoader />}
       <div className="flex flex-col gap-6 pb-24">
-        {featuredProducts.length > 0 && (
+        {/* {featuredProducts.length > 0 && (
           <section>
             <h2 className="text-sm font-bold text-blue-600 mt-3 mb-3 font-prompt">
               ⭐ สินค้าที่ขายดีของร้านวันนี้
@@ -95,10 +127,10 @@ export default function ShopProductList() {
               ))}
             </div>
           </section>
-        )}
+        )} */}
 
         <section>
-          <h2 className="text-sm font-bold text-gray-500 mb-3 font-prompt">
+          <h2 className="text-sm font-bold text-gray-500 mt-5 mb-3 font-prompt">
             สินค้าที่มีจำหน่ายในร้านทั้งหมด
           </h2>
           <div className="flex flex-col gap-3">
@@ -113,7 +145,7 @@ export default function ShopProductList() {
           </div>
         </section>
 
-        {featuredProducts.length === 0 && nonFeaturedProducts.length === 0 && (
+        {nonFeaturedProducts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <Package size={48} className="mb-2 opacity-20" />
             <p className="font-prompt">ยังไม่มีสินค้าในร้านค้าของคุณ</p>
@@ -127,6 +159,32 @@ export default function ShopProductList() {
             </button>
           </div>
         )}
+        <div
+          ref={hasNextPage && !isError ? ref : undefined}
+          className="py-4 flex justify-center"
+        >
+          {isError ? (
+            <div className="text-center">
+              <p className="text-yellow-500 text-sm">
+                🚧 การโหลดข้อมูลติดขัด 🚧
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-green-500 underline text-xs"
+              >
+                คลิกเพื่อ Refresh อีกครั้ง
+              </button>
+            </div>
+          ) : isFetchingNextPage ? (
+            <div className="flex flex-col gap-2 w-full">
+              <Skeleton variant="rounded" height={100} />
+            </div>
+          ) : hasNextPage ? (
+            <p className="text-gray-400 text-sm">กำลังโหลดเพิ่มเติม...</p>
+          ) : (
+            <p className="text-blue-400 text-sm">แสดงสินค้าทั้งหมดแล้ว</p>
+          )}
+        </div>
       </div>
       <ConfirmDialog
         open={isDeleteOpen}

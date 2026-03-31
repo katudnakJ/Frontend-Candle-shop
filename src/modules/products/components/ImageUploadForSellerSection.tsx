@@ -39,6 +39,7 @@ export const ImageUploadSection = ({
               key={img.preview}
               src={img.preview}
               alt="preview"
+              fill
               className="w-full h-full object-cover"
             />
             <button

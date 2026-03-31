@@ -16,6 +16,7 @@ export default function ShopProductCard({
   onEdit,
   onDelete,
 }: ShopProductCardProps) {
+  console.log("SELLERSHOPPRODUCT",product)
   return (
     <div
       className={`relative bg-white rounded-2xl p-4 mb-3 flex gap-4 border transition-all ${
@@ -24,7 +25,7 @@ export default function ShopProductCard({
           : "border-gray-100 shadow-sm"
       }`}
     >
-      {!product.isActive && (
+      {!product.active && (
         <div className="absolute top-2 right-2 bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full font-bold">
           หยุดการขายชั่วคราว
         </div>
@@ -42,10 +43,10 @@ export default function ShopProductCard({
           unoptimized
           sizes="80px"
           className={`object-cover transition-all duration-300 ${
-      !product.isActive ? "grayscale opacity-60" : "hover:scale-105"
+      !product.active ? "grayscale opacity-60" : "hover:scale-105"
     }`} 
         />
-        {!product.isActive && (
+        {!product.active && (
           <div className="absolute inset-0 bg-black/5 flex items-center justify-center">
             <span className="text-[10px] font-bold bg-white/80 px-1 rounded text-gray-500">
               <EyeOff/>
@@ -74,13 +75,13 @@ export default function ShopProductCard({
           <div className="flex gap-2">
             <button
               onClick={() => onEdit(product.productSlug)}
-              className="p-2 text-blue-600 bg-blue-50 rounded-lg"
+              className="p-2 text-blue-600 bg-blue-50 rounded-lg cursor-pointer"
             >
               <Pencil size={18} />
             </button>
             <button
               onClick={() => onDelete(product.productId)}
-              className="p-2 text-red-600 bg-red-50 rounded-lg"
+              className="p-2 text-red-600 bg-red-50 rounded-lg cursor-pointer"
             >
               <Trash2 size={18} />
             </button>

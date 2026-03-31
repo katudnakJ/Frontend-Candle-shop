@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export default function SellerProducts() {
   const { searchQuery, setSearchQuery } = useShopProductStore();
-  const { totalAll, isLoading } = useShopProducts();
+  const { totalAll, isInitialLoading } = useShopProducts();
 
 
 
@@ -20,7 +20,7 @@ export default function SellerProducts() {
       <SellerHeader />
       <main className="grow bg-white">
         <div className="max-w-[1200px] mx-auto p-4">
-          <ProductHeader mode="sellerproducs" namemode="จัดการสินค้า" />
+          <ProductHeader  namemode="จัดการสินค้า" issellerProduct={true} />
 
           <div className="relative">
             <Search
@@ -37,7 +37,7 @@ export default function SellerProducts() {
           </div>
           <div className="max-w-2xl md:max-w-7xl px-4 mt-6">
             <div className="flex justify-between items-center">
-              {isLoading ? (
+              {isInitialLoading ? (
                 <div className="h-8 w-32 bg-gray-200 animate-pulse rounded mb-5"></div>
               ) : (
                 <>
