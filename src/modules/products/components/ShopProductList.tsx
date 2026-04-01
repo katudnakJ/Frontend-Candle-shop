@@ -27,6 +27,7 @@ export default function ShopProductList() {
     isInitialLoading,
     hasNextPage,
     isDeleting,
+    deletingId,
     isError,
     fetchNextPage,
     deleteProduct,
@@ -39,20 +40,25 @@ export default function ShopProductList() {
   };
 
   const handleDelete = (id: string) => {
+    if (isDeleting) {
+      return;
+    }
     setProductToDelete(id);
     setIsDeleteOpen(true);
   };
 
   const confirmDeleteProduct = async () => {
     if (productToDelete) {
+      const id = productToDelete;
+      setIsDeleteOpen(false);
+      setProductToDelete(null);
       try {
-        await deleteProduct(productToDelete); // เรียกใช้ deleteProduct จาก hook
-        console.log("ลบสินค้าสำเร็จ");
+        await deleteProduct(id);
+        if (process.env.NODE_ENV === "development") {
+          console.log("ลบสินค้าสำเร็จ");
+        }
       } catch (error) {
-        toast.error("ไม่สามารถลบสินค้าได้");
-      } finally {
-        setIsDeleteOpen(false);
-        setProductToDelete(null);
+        console.error("Failed to delete:", error);
       }
     }
   };
@@ -91,7 +97,7 @@ export default function ShopProductList() {
     );
   }
 
-  if ( nonFeaturedProducts.length === 0) {
+  if (nonFeaturedProducts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-gray-400">
         <Search size={48} className="mb-2 opacity-20" />
@@ -140,6 +146,7 @@ export default function ShopProductList() {
                 product={product}
                 onDelete={(id) => handleDelete(id)}
                 onEdit={(id) => handleEditRedirect(id)}
+                isBeingDeleted={isDeleting && deletingId === product.productId}
               />
             ))}
           </div>

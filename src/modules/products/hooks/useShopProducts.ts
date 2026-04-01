@@ -14,6 +14,7 @@ import { useShopProductStore } from "@/modules/products/hooks/useShopProductStor
 import { toast } from "react-hot-toast";
 import { ProductHomeResData, SearchProductResData } from "../homeproduct";
 import { useDebounce } from "use-debounce";
+import { GenericResponse, Status } from "@/types/response.type";
 
 export const useShopProducts = () => {
   const queryClient = useQueryClient();
@@ -43,8 +44,8 @@ export const useShopProducts = () => {
         : getAllShopProducts({ pageParam, size: 10 });
     },
     initialPageParam: 0,
-    staleTime: 5*60*1000,
-    gcTime: 10*60*1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     retry: 2,
     retryDelay: 1000,
     getNextPageParam: (lastPage) => {
@@ -61,17 +62,39 @@ export const useShopProducts = () => {
       return (page as ProductHomeResData).allProducts || [];
     }) || [];
 
-  // สำหรับ รับค่าที่ เป็นสินค้าขายดี  
+  // สำหรับ รับค่าที่ เป็นสินค้าขายดี
   // const allFeaturedProducts = !isSearchMode
   //   ? (data?.pages[0] as ProductHomeResData)?.featuredProducts || []
   //   : [];
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
-      toast.success("ลบสินค้าสำเร็จ");
+    retry: (failureCount, error: Status) => {
+    if ((error?.statusCode === "500" ) && failureCount < 1) {
+      console.log(`[Retry] กำลังลองลบใหม่อีกครั้ง... รอบที่ ${failureCount + 1}`);
+      return true;
+    }
+    return false;
+  },
+  retryDelay: 1000,
+    onSuccess: (res : GenericResponse<null>) => {
+      console.log("RESPRODUCT",res);
+      if (res.status.statusCode === "200 OK") {
+        queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
+        toast.success("ลบสินค้าสำเร็จ");
+      } else {
+        toast.error(res.status.message || "ไม่สามารถลบสินค้าได้");
+      }
     },
+
+    onError: (error: Status) => {
+      console.log("ERRORPRODUCT",error);
+      const errorMessage =
+        error?.message || "ไม่สามารถติดต่อ Server ได้";
+      toast.error(errorMessage);
+    },
+
+
   });
 
   const editMutation = useMutation({
@@ -98,6 +121,7 @@ export const useShopProducts = () => {
     isError,
     isFetching,
     isDeleting: deleteMutation.isPending,
+    deletingId: deleteMutation.variables,
     isEditing: editMutation.isPending,
     refetch,
     fetchNextPage,

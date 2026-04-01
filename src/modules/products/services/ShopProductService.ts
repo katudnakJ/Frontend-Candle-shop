@@ -1,12 +1,11 @@
 // services/product.service.ts
 
-import { MOCK_PRODUCT_SHOP_DATA } from "../mockShopProductData";
 
 import { apiClient } from "@/utils/api";
 import { GenericResponse } from "@/types/response.type";
 import { ProductHomeResData,SearchProductResData } from "@/modules/products/homeproduct";
 
-let localMockData = { ...MOCK_PRODUCT_SHOP_DATA };
+
 
 export const getAllShopProducts = async ({pageParam, size}:{ pageParam?: number , size?:number }): Promise<ProductHomeResData> => {
 
@@ -30,19 +29,17 @@ export const getShopProductsBySearch = async ({pageParam, size, q}:{ pageParam?:
 
 
 
-export const deleteProduct = async (productId: string) => {
-  console.log(`Deleting product: ${productId}`);
-  localMockData = {
-    ...localMockData, 
-    featuredProducts: localMockData.featuredProducts.filter(
-      (p) => p.productId !== productId,
-    ),
-    allProducts: localMockData.allProducts.filter(
-      (p) => p.productId !== productId,
-    ),
-  };
+export const deleteProduct = async (productId: string): Promise<GenericResponse<null>> => {
+  console.log(`Sending DELETE request for product: ${productId}`);
 
-  return { success: true };
+const response = await apiClient.delete(`/v1/products/${productId}`);
+
+  if (!response) {
+    throw new Error("Delete failed: No response from server");
+  }
+  console.log("DELETERESPRODUCT",response);
+  console.log("DELETEPRODUCT",response.data);
+ return response as unknown as GenericResponse<null>;
 };
 
 export const toggleProductStatus = async (
