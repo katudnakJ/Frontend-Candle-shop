@@ -5,7 +5,7 @@ import Image from "next/image";
 
 interface ShopProductCardProps {
   product: ProductHomeItem;
-  onEdit: (id: string) => void;
+  onEdit: (slug: string, id: string) => void;
   onDelete: (id: string) => void;
   isFeatured?: boolean;
   isBeingDeleted?: boolean;
@@ -84,7 +84,7 @@ export default function ShopProductCard({
         <div className="flex flex-col justify-between items-end">
           <div className="flex gap-2">
             <button
-              onClick={() => onEdit(product.productSlug)}
+              onClick={() => onEdit(product.productSlug, product.productId)}
               className="p-2 text-blue-600 bg-blue-50 rounded-lg cursor-pointer"
             >
               <Pencil size={18} />

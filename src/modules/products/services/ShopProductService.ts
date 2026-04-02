@@ -4,6 +4,7 @@
 import { apiClient } from "@/utils/api";
 import { GenericResponse } from "@/types/response.type";
 import { CreateProductRequest, CreateProductResData, ProductHomeResData,SearchProductResData } from "@/modules/products/homeproduct";
+import { ProductDetailResData } from "../detailproduct";
 
 
 
@@ -107,7 +108,12 @@ console.log(formFields);
 };
 
 
-
+export const getProductDetailById = async (productId: string): Promise<ProductDetailResData> => {
+  const response = await apiClient.get<void, GenericResponse<ProductDetailResData>>(
+    `/v1/products/${productId}`
+  );
+  return response.data;
+};
 
 
 export const toggleProductStatus = async (

@@ -46,6 +46,7 @@ export const ImageUploadSection = ({
                 src={images[0].preview}
                 alt="Main preview"
                 fill
+                priority
                 unoptimized
                 className="object-cover"
               />

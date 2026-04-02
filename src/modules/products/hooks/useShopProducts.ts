@@ -1,5 +1,5 @@
 // hooks/useProducts.ts
-import { InfiniteData } from "@tanstack/react-query";
+import { InfiniteData, useQuery } from "@tanstack/react-query";
 import {
   useInfiniteQuery,
   useMutation,
@@ -9,6 +9,7 @@ import {
   getAllShopProducts,
   deleteProduct,
   getShopProductsBySearch,
+  getProductDetailById,
 } from "@/modules/products/services/ShopProductService";
 import { useShopProductStore } from "@/modules/products/hooks/useShopProductStore";
 import { toast } from "react-hot-toast";
@@ -70,15 +71,17 @@ export const useShopProducts = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     retry: (failureCount, error: Status) => {
-    if ((error?.statusCode === "500" ) && failureCount < 1) {
-      console.log(`[Retry] กำลังลองลบใหม่อีกครั้ง... รอบที่ ${failureCount + 1}`);
-      return true;
-    }
-    return false;
-  },
-  retryDelay: 1000,
-    onSuccess: (res : GenericResponse<null>) => {
-      console.log("RESPRODUCT",res);
+      if (error?.statusCode === "500" && failureCount < 1) {
+        console.log(
+          `[Retry] กำลังลองลบใหม่อีกครั้ง... รอบที่ ${failureCount + 1}`,
+        );
+        return true;
+      }
+      return false;
+    },
+    retryDelay: 1000,
+    onSuccess: (res: GenericResponse<null>) => {
+      console.log("RESPRODUCT", res);
       if (res.status.statusCode.includes("200")) {
         queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
         toast.success("ทำการลบสินค้าสำเร็จ");
@@ -88,13 +91,10 @@ export const useShopProducts = () => {
     },
 
     onError: (error: Status) => {
-      console.log("ERRORPRODUCT",error);
-      const errorMessage =
-        error?.message || "ไม่สามารถติดต่อ Server ได้";
+      console.log("ERRORPRODUCT", error);
+      const errorMessage = error?.message || "ไม่สามารถติดต่อ Server ได้";
       toast.error(errorMessage);
     },
-
-
   });
 
   const editMutation = useMutation({
@@ -128,4 +128,15 @@ export const useShopProducts = () => {
     deleteProduct: deleteMutation.mutateAsync,
     editProduct: editMutation.mutate,
   };
+};
+
+export const useShopProductDetail = (productId: string) => {
+  return useQuery({
+    queryKey: ["seller-shop-product-detail", productId],
+    queryFn: () => getProductDetailById(productId),
+    enabled: !!productId,
+    staleTime: 0,
+    retry: 2,
+    retryDelay: 1000,
+  });
 };

@@ -35,8 +35,9 @@ export default function ShopProductList() {
 
   const searchQuery = useShopProductStore((state) => state.searchQuery);
 
-  const handleEditRedirect = (productSlug: string) => {
-    router.push(`/seller/sellerproducts/manageproducts/${productSlug}`);
+  const handleEditRedirect = (productSlug: string, productId: string) => {
+
+    router.push(`/seller/sellerproducts/manageproducts/${productSlug}?productId=${productId}`);
   };
 
   const handleDelete = (id: string) => {
@@ -145,7 +146,7 @@ export default function ShopProductList() {
                 key={product.productId}
                 product={product}
                 onDelete={(id) => handleDelete(id)}
-                onEdit={(id) => handleEditRedirect(id)}
+                onEdit={(slug,id) => handleEditRedirect(slug,id)}
                 isBeingDeleted={isDeleting && deletingId === product.productId}
               />
             ))}

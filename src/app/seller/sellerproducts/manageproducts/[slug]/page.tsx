@@ -16,25 +16,28 @@ import { toast } from "react-hot-toast";
 import { ProductHeader } from "@/modules/products/components/ProductHeader";
 import { useCreateProduct } from "@/modules/products/hooks/useCreateProduct";
 import { CreateProductRequest } from "@/modules/products/homeproduct";
+import { useSearchParams } from "next/navigation";
+import { useShopProductDetail } from "@/modules/products/hooks/useShopProducts";
 
 import Footer from "@/components/layout/Footer";
 import SellerHeader from "@/components/layout/SellerHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 
 export default function ManageProductsPage() {
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("productId");
   const router = useRouter();
   const params = useParams();
 
   const productSlug = params.slug;
   const isEditMode = useMemo(
-    () => productSlug && productSlug !== "add",
-    [productSlug],
+    () => !!(productSlug && productSlug !== "add" && productId),
+    [productSlug, productId],
   );
 
   const [isOpen, setIsOpen] = useState(false);
   const [isRMOpen, setIsRMOpen] = useState(false);
   const { handleCreate, isSubmitting } = useCreateProduct();
-  const [isLoadingData, setIsLoadingData] = useState(isEditMode);
   const [tempData, setTempData] = useState<ProductFormValues | null>(null);
   const [imageIndexToDelete, setImageIndexToDelete] = useState<number | null>(
     null,
@@ -51,6 +54,48 @@ export default function ManageProductsPage() {
     resetAll,
     setImages,
   } = useProductImages(3);
+
+  const {
+    data: detailData,
+    isLoading: isFetchingDetail,
+    isError: isDetailError,
+    error,
+  } = useShopProductDetail(productId || "");
+
+  if (isDetailError) {
+    if (process.env.NODE_ENV === "development") {
+      console.log("สาเหตุการพัง:", error);
+    }
+  }
+
+  useEffect(() => {
+    if (productSlug && productSlug !== "add" && !productId) {
+      router.replace("/seller/sellerproducts");
+    }
+  }, [productSlug, productId, router]);
+
+  useEffect(() => {
+    if (isDetailError) {
+      toast.error("ไม่พบข้อมูลสินค้า");
+      router.replace("/seller/sellerproducts");
+    }
+  }, [isDetailError, router]);
+
+  useEffect(() => {
+    if (isEditMode && detailData && productSlug) {
+      const actualSlug = detailData.product.slug;
+
+      if (actualSlug !== productSlug) {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Slug mismatch detected. Redirecting to correct URL.");
+        }
+  
+        router.replace(
+          `/seller/sellerproducts/manageproducts/${actualSlug}?productId=${productId}`,
+        );
+      }
+    }
+  }, [detailData, isEditMode, productSlug, productId, router]);
 
   const {
     register,
@@ -81,48 +126,28 @@ export default function ManageProductsPage() {
   // ====================================================================
 
   useEffect(() => {
-    if (isEditMode && productSlug) {
-      const fetchInitialData = async () => {
-        if (!isEditMode) {
-          setIsLoadingData(false);
-          return;
-        }
-        try {
-          const mockData = {
-            productName: "สินค้าเดิมจากระบบ",
-            description: "รายละเอียดเดิม...",
-            weight: "1.5",
-            price: "500",
-            images: ["https://example.com/photo1.jpg"], // URL รูปเดิม
-          };
+    if (isEditMode && detailData) {
+      const { product, productImages } = detailData;
 
-          // ยัดข้อมูลใส่ฟอร์ม
-          reset({
-            productName: mockData.productName,
-            description: mockData.description,
-            weight: mockData.weight,
-            price: mockData.price,
-            isActive: true,
-          });
+      reset({
+        productName: product.productName,
+        description: product.description,
+        weight: String(product.weight),
+        price: String(product.price),
+        isActive: product.isActive === "true" || product.isActive === "active",
+      });
 
-          // ยัดรูปเดิมเข้า useProductImages Hook
-          if (mockData.images) {
-            const prevImages = mockData.images.map((url) => ({
-              file: new File([], "existing-file"), // สร้าง File หลอกไว้
-              preview: url,
-            }));
-            setImages(prevImages);
-          }
-        } catch (error) {
-          toast.error("ไม่สามารถโหลดข้อมูลสินค้าได้");
-          router.push("/seller/sellerproducts");
-        } finally {
-          setIsLoadingData(false);
-        }
-      };
-      fetchInitialData();
+      if (productImages) {
+        const prevImages = productImages.map((img) => ({
+          file: new File([], "existing-file"),
+          preview: img.productImgPath,
+          isPrimary: img.isPrimary,
+          productImgId: img.productImgId,
+        }));
+        setImages(prevImages);
+      }
     }
-  }, [isEditMode, productSlug, reset, setImages, router]);
+  }, [detailData, isEditMode, reset, setImages]);
 
   useEffect(() => {
     return () => resetAll();
@@ -159,22 +184,21 @@ export default function ManageProductsPage() {
 
     setIsOpen(false);
     try {
-         const existingImages = images
+      const existingImages = images
         .filter((img) => img.file.size === 0)
         .map((img) => img.preview);
 
-
       const payload: CreateProductRequest = {
-      productName: tempData.productName,
-      description: tempData.description,
-      price: Number(tempData.price),
-      weight: Number(tempData.weight),
-      active: tempData.isActive,
-      featured: false, 
-      primary_index: 0,
-      imagesData: images.map((img) => img.file),
-      existingImages: existingImages,
-    };
+        productName: tempData.productName,
+        description: tempData.description,
+        price: Number(tempData.price),
+        weight: Number(tempData.weight),
+        active: tempData.isActive,
+        featured: false,
+        primary_index: 0,
+        imagesData: images.map((img) => img.file),
+        existingImages: existingImages,
+      };
 
       await handleCreate(payload);
 
@@ -192,20 +216,17 @@ export default function ManageProductsPage() {
       // await productService.create(formData);
 
       if (isEditMode) {
-        console.log("Edit Product Success")
+        console.log("Edit Product Success");
         toast.success("ทำการแก้ไขสินค้าสำเร็จ!");
       } else {
-        console.log("Add Product Success")
-        
+        console.log("Add Product Success");
       }
-
-      
     } catch (error) {
       console.error("Submission failed in Page:", error);
-    } 
+    }
   };
 
-  if (isLoadingData) {
+  if (isFetchingDetail) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
@@ -213,6 +234,8 @@ export default function ManageProductsPage() {
       </div>
     );
   }
+
+  if (isEditMode && !detailData) return null;
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-white">
