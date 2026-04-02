@@ -7,13 +7,13 @@ import { useRouter } from "next/navigation";
 import { useShopProducts } from "@/modules/products/hooks/useShopProducts";
 import { useShopProductStore } from "@/modules/products/hooks/useShopProductStore";
 import { Skeleton } from "@mui/material";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
+
 import ShopProductCard from "./ShopProductCard";
 import FullscreenLoader from "@/modules/products/components/FullscreenLoaderforshopproduct";
-import toast from "react-hot-toast";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 
-import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
 
 export default function ShopProductList() {
   const router = useRouter();

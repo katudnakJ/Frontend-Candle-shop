@@ -30,3 +30,20 @@ export interface SearchProductResData {
   startAt: number;
   totalProducts: number;
 }
+
+export interface CreateProductRequest {
+  productName: string;
+  price: number;
+  weight: number;
+  description: string;
+  active: boolean;
+  featured: boolean;
+  primary_index: number; 
+  imagesData: File[];
+  existingImages?: string[];    
+}
+
+
+export interface CreateProductResData {
+  product_id: string;
+}

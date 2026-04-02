@@ -3,7 +3,7 @@
 
 import { apiClient } from "@/utils/api";
 import { GenericResponse } from "@/types/response.type";
-import { ProductHomeResData,SearchProductResData } from "@/modules/products/homeproduct";
+import { CreateProductRequest, CreateProductResData, ProductHomeResData,SearchProductResData } from "@/modules/products/homeproduct";
 
 
 
@@ -42,6 +42,74 @@ const response = await apiClient.delete(`/v1/products/${productId}`);
  return response as unknown as GenericResponse<null>;
 };
 
+export const createProduct = async (
+  payload: CreateProductRequest
+): Promise<GenericResponse<CreateProductResData>> => {
+  const formData = new FormData();
+  formData.append("productName", payload.productName);
+  formData.append("description", payload.description);
+  formData.append("price", String(payload.price));
+  formData.append("weight", String(payload.weight));
+  formData.append("active", String(payload.active));
+  formData.append("featured", String(payload.featured));
+  formData.append("primary_index", String(payload.primary_index));
+
+  payload.imagesData.forEach((file) => {
+    if (file.size > 0) {
+      formData.append("imagesData", file);
+    }
+  });
+
+ if(process.env.NODE_ENV === "development"){ 
+  console.log("--- 🖼️ Image Data Inspection ---");
+
+formData.getAll("imagesData").forEach((file, index) => {
+  if (file instanceof File) {
+    const sizeInBytes = file.size;
+    const sizeInKB = (sizeInBytes / 1024 ).toFixed(2);
+    
+    console.log(`[Image ${index}]`);
+    console.log(`- Name: ${file.name}`);
+    console.log(`- Type: ${file.type}`);
+    console.log(`- Size: ${sizeInBytes} bytes (${sizeInKB} KB)`);
+  }
+});
+
+console.log("--- 📝 Form Fields Check ---");
+const formFields = Object.fromEntries(
+  Array.from(formData.entries()).filter(([_, value]) => !(value instanceof File))
+);
+console.log(formFields);
+ }
+
+
+
+  const response = await apiClient.post<FormData, GenericResponse<CreateProductResData>>(
+    `/v1/products`,
+    formData,
+    {
+      params: {
+        productName: payload.productName,
+        price: payload.price,
+        weight: payload.weight,
+        description: payload.description,
+        active: payload.active,
+        featured: payload.featured,
+        primary_index: payload.primary_index,
+      },
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response;
+};
+
+
+
+
+
 export const toggleProductStatus = async (
   productId: string,
   currentStatus: boolean,
@@ -51,3 +119,6 @@ export const toggleProductStatus = async (
   );
   return { success: true };
 };
+
+
+

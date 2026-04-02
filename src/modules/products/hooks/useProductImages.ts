@@ -29,7 +29,7 @@ export const useProductImages = (maxFiles = 3) => {
     if (selectedFiles.length === 0) return;
 
     if (images.length + selectedFiles.length > maxFiles) {
-      toast.error(`ลงรูปได้สูงสุด ${maxFiles} รูปครับ`, {
+      toast.error(`ลงรูปได้สูงสุด ${maxFiles} รูป`, {
         className:
           "font-bold rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
       });

@@ -68,6 +68,9 @@ export const ProductFormFields = ({
             <div className="relative">
               <input
                 {...register("weight")}
+                  type="number"
+                min="0"
+                step="1"
                 placeholder="0"
                 className={`w-full p-3 max-[440px]:text-[12px] border-2 rounded-xl pr-10 outline-none transition-all ${
                   errors.weight
@@ -91,7 +94,10 @@ export const ProductFormFields = ({
             <div className="relative">
               <input
                 {...register("price")}
-                placeholder="0"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
                 className={`w-full p-3 max-[440px]:text-[12px] border-2 rounded-xl pr-10 outline-none transition-all ${
                   errors.price
                     ? "border-red-500 bg-red-50"

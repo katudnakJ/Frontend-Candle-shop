@@ -1,13 +1,14 @@
 "use client";
 
-import SellerHeader from "@/components/layout/SellerHeader";
-import Footer from "@/components/layout/Footer";
 import { ProductHeader } from "@/modules/products/components/ProductHeader";
-import ShopProductList from "@/modules/products/components/ShopProductList";
 import { useShopProductStore } from "@/modules/products/hooks/useShopProductStore";
 import { useShopProducts } from "@/modules/products/hooks/useShopProducts";
 import { Plus, Search } from "lucide-react";
+
 import Link from "next/link";
+import SellerHeader from "@/components/layout/SellerHeader";
+import Footer from "@/components/layout/Footer";
+import ShopProductList from "@/modules/products/components/ShopProductList";
 
 export default function SellerProducts() {
   const { searchQuery, setSearchQuery } = useShopProductStore();

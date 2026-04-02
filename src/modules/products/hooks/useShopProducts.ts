@@ -79,9 +79,9 @@ export const useShopProducts = () => {
   retryDelay: 1000,
     onSuccess: (res : GenericResponse<null>) => {
       console.log("RESPRODUCT",res);
-      if (res.status.statusCode === "200 OK") {
+      if (res.status.statusCode.includes("200")) {
         queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
-        toast.success("ลบสินค้าสำเร็จ");
+        toast.success("ทำการลบสินค้าสำเร็จ");
       } else {
         toast.error(res.status.message || "ไม่สามารถลบสินค้าได้");
       }

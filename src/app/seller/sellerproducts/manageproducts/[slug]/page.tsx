@@ -5,18 +5,20 @@ import { ProductFormFields } from "@/modules/products/components/ProductFormFiel
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image as ImageIcon, Plus, X } from "lucide-react";
 import {
   productSchema,
   ProductFormValues,
 } from "@/modules/products/schemas/productSchema";
 import { useProductImages } from "@/modules/products/hooks/useProductImages";
 import { toast } from "react-hot-toast";
-import SellerHeader from "@/components/layout/SellerHeader";
-import Footer from "@/components/layout/Footer";
 import { ProductHeader } from "@/modules/products/components/ProductHeader";
+import { useCreateProduct } from "@/modules/products/hooks/useCreateProduct";
+import { CreateProductRequest } from "@/modules/products/homeproduct";
+
+import Footer from "@/components/layout/Footer";
+import SellerHeader from "@/components/layout/SellerHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
 
 export default function ManageProductsPage() {
@@ -31,7 +33,7 @@ export default function ManageProductsPage() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isRMOpen, setIsRMOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { handleCreate, isSubmitting } = useCreateProduct();
   const [isLoadingData, setIsLoadingData] = useState(isEditMode);
   const [tempData, setTempData] = useState<ProductFormValues | null>(null);
   const [imageIndexToDelete, setImageIndexToDelete] = useState<number | null>(
@@ -156,28 +158,25 @@ export default function ManageProductsPage() {
     if (!tempData) return;
 
     setIsOpen(false);
-    setIsSubmitting(true);
     try {
-      const formData = new FormData();
-
-      Object.entries(tempData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
-
-      images.forEach((imgObj) => {
-        if (imgObj.file.size > 0) {
-          formData.append("images", imgObj.file);
-        }
-      });
-
-      const existingImages = images
+         const existingImages = images
         .filter((img) => img.file.size === 0)
         .map((img) => img.preview);
 
-      formData.append("existingImages", JSON.stringify(existingImages));
 
+      const payload: CreateProductRequest = {
+      productName: tempData.productName,
+      description: tempData.description,
+      price: Number(tempData.price),
+      weight: Number(tempData.weight),
+      active: tempData.isActive,
+      featured: false, 
+      primary_index: 0,
+      imagesData: images.map((img) => img.file),
+      existingImages: existingImages,
+    };
+
+      await handleCreate(payload);
 
       //   console.log("=== Check FormData Content ===");
       //   formData.forEach((value, key) => {
@@ -193,18 +192,17 @@ export default function ManageProductsPage() {
       // await productService.create(formData);
 
       if (isEditMode) {
-        toast.success("แก้ไขสินค้าสำเร็จ!");
+        console.log("Edit Product Success")
+        toast.success("ทำการแก้ไขสินค้าสำเร็จ!");
       } else {
-        toast.success("เพิ่มสินค้าสำเร็จ!");
+        console.log("Add Product Success")
+        
       }
 
-      router.push("/seller/sellerproducts/");
-      router.refresh();
+      
     } catch (error) {
-      toast.error("เกิดข้อผิดพลาดในการบันทึก");
-    } finally {
-      setIsSubmitting(false);
-    }
+      console.error("Submission failed in Page:", error);
+    } 
   };
 
   if (isLoadingData) {
@@ -260,14 +258,14 @@ export default function ManageProductsPage() {
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="flex-1 py-4 bg-[#E5B6A9] border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                  className="flex-1 py-4 bg-[#E5B6A9] border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all cursor-pointer"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || isCompressing}
-                  className="flex-1 py-4 bg-green-400 border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                  className="flex-1 py-4 bg-green-400 border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all cursor-pointer"
                 >
                   {isSubmitting
                     ? "กำลังบันทึก..."
