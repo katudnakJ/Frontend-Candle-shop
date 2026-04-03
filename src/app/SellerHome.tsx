@@ -1,6 +1,6 @@
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
-import { ClipboardList, LayoutGrid } from "lucide-react";
+import { BarChart3, ClipboardList, LayoutGrid } from "lucide-react";
 import SellerWelcome from "@/modules/seller/components/SellerWelcome";
 import Link from "next/link";
 
@@ -59,7 +59,7 @@ export default function SellerHome() {
               </section>
 
     
-              {/* <section>
+              <section>
            <Link
                   href="/seller/reports"
                   className="flex items-center justify-center gap-4 bg-[#FDF8F1] border border-black rounded-2xl p-8 
@@ -75,7 +75,7 @@ export default function SellerHome() {
                       Report / สรุปยอดขายสินค้า
                   </span>
                 </Link>
-              </section> */}
+              </section>
             </section>
           </div>
         </div>

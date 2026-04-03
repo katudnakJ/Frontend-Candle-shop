@@ -14,7 +14,6 @@ export const useAuthService = () => {
                 'Authorization': `Bearer ${lineToken}`
             }
         });
-        console.log("LOGIN?????");
         
         return response.data ?? null;
     }
