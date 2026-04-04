@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html lang="th" data-scroll-behavior="smooth">
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${prompt.variable} ${k2d.variable} antialiased overflow-x-hidden`}

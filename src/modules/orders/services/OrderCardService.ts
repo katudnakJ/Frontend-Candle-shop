@@ -1,4 +1,4 @@
-import { Status, GenericResponse } from "@/types/response.type";
+import { Status } from "@/types/response.type";
 import { apiClient } from "@/utils/api";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";

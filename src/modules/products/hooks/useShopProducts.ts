@@ -1,69 +1,191 @@
 // hooks/useProducts.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useQuery } from "@tanstack/react-query";
 import {
-  getShopProducts,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  getAllShopProducts,
+  getProductDetailById,
+  getShopProductsBySearch,
   deleteProduct,
+  updateProduct,
 } from "@/modules/products/services/ShopProductService";
 import { useShopProductStore } from "@/modules/products/hooks/useShopProductStore";
 import { toast } from "react-hot-toast";
+import {
+  CreateProductRequest,
+  ProductHomeResData,
+  SearchProductResData,
+} from "../homeproduct";
+import { useDebounce } from "use-debounce";
+import { GenericResponse, Status } from "@/types/response.type";
+import { useRouter } from "next/navigation";
 
 export const useShopProducts = () => {
   const queryClient = useQueryClient();
-  const searchQuery = useShopProductStore((state) => state.searchQuery);
-
+  const rawSearchQuery = useShopProductStore((state) => state.searchQuery);
+  const [debouncedSearch] = useDebounce(rawSearchQuery, 800);
+  const isSearchMode = debouncedSearch.trim().length > 0;
   const {
     data,
+    hasNextPage,
+    isFetchingNextPage,
     isLoading: isFetching,
     isError,
-  } = useQuery({
-    queryKey: ["shop-products"],
-    queryFn: getShopProducts,
+    refetch,
+    fetchNextPage,
+  } = useInfiniteQuery<
+    SearchProductResData | ProductHomeResData,
+    Error,
+    InfiniteData<SearchProductResData | ProductHomeResData>,
+    string[],
+    number
+  >({
+    queryKey: ["seller-shop-products", debouncedSearch],
+    queryFn: ({ pageParam = 0 }) => {
+      return isSearchMode
+        ? getShopProductsBySearch({ pageParam, size: 10, q: debouncedSearch })
+        : getAllShopProducts({ pageParam, size: 10 });
+    },
+    initialPageParam: 0,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 2,
+    retryDelay: 1000,
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasNext ? lastPage.page + 1 : undefined;
+    },
   });
 
-  //const featuredCount = data?.featuredProduct?.length || 0;
+  const allFetchedProducts =
+    data?.pages.flatMap((page) => {
+      if (isSearchMode) {
+        return (page as SearchProductResData).products || [];
+      }
 
-  const filteredFeatured = (data?.featuredProducts || []).filter((product) =>
-    product.productName.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+      return (page as ProductHomeResData).allProducts || [];
+    }) || [];
 
- // const nonFeaturedCount = data?.nonFeaturedProduct?.length || 0;
-
-  const filteredallproduct = (data?.allProducts|| []).filter(
-    (product) =>
-      product.productName.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-  const totalAll = filteredFeatured.length + filteredallproduct.length;
+  // สำหรับ รับค่าที่ เป็นสินค้าขายดี
+  // const allFeaturedProducts = !isSearchMode
+  //   ? (data?.pages[0] as ProductHomeResData)?.featuredProducts || []
+  //   : [];
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["shop-products"] });
-      toast.success("ลบสินค้าสำเร็จ");
+    retry: (failureCount, error: Status) => {
+      if (error?.statusCode === "500" && failureCount < 1) {
+        console.log(
+          `[Retry] กำลังลองลบใหม่อีกครั้ง... รอบที่ ${failureCount + 1}`,
+        );
+        return true;
+      }
+      return false;
     },
-    onError: () => toast.error("ไม่สามารถลบสินค้าได้"),
+    retryDelay: 1000,
+    onSuccess: (res: GenericResponse<null>) => {
+      console.log("RESPRODUCT", res);
+      if (res.status.statusCode.includes("200")) {
+        queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
+        toast.success("ทำการลบสินค้าสำเร็จ");
+      } else {
+        toast.error(res.status.message || "ไม่สามารถลบสินค้าได้");
+      }
+    },
+
+    onError: (error: Status) => {
+      console.log("ERRORPRODUCT", error);
+      const errorMessage = error?.message || "ไม่สามารถติดต่อ Server ได้";
+      toast.error(errorMessage);
+    },
   });
+
   const editMutation = useMutation({
     mutationFn: async (id: string) => {
       console.log("Editing...", id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["shop-products"] });
+      queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
       toast.success("แก้ไขข้อมูลสำเร็จ");
     },
     onError: () => toast.error("แก้ไขไม่สำเร็จ"),
   });
-  const isLoading =
-    isFetching || deleteMutation.isPending || editMutation.isPending;
+
+  // const isLoading =
+  //   isFetching || deleteMutation.isPending || editMutation.isPending;
   return {
-    featuredProducts: filteredFeatured, 
-    nonFeaturedProducts: filteredallproduct,
-    totalCount: data?.totalProducts || 0,
-    totalAll,
-    isLoading,
+    // featuredProducts: allFeaturedProducts,
+    nonFeaturedProducts: allFetchedProducts,
+    totalAll: data?.pages[0]?.totalProducts || 0,
+    isInitialLoading: isFetching && !data,
+    isSearchMode,
+    isFetchingNextPage,
+    hasNextPage,
     isError,
+    isFetching,
+    isDeleting: deleteMutation.isPending,
+    deletingId: deleteMutation.variables,
+    isEditing: editMutation.isPending,
+    refetch,
+    fetchNextPage,
     deleteProduct: deleteMutation.mutateAsync,
     editProduct: editMutation.mutate,
-    isDeleting: deleteMutation.isPending,
-    isEditing: editMutation.isPending,
   };
+};
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const mutation = useMutation({
+    mutationFn: ({
+      id,
+      payload,
+      deleteImageIds,
+      existIntoPrimary,
+    }: {
+      id: string;
+      payload: CreateProductRequest;
+      deleteImageIds?: string[];
+      existIntoPrimary?: string;
+    }) => updateProduct(id, payload, deleteImageIds, existIntoPrimary),
+
+    onSuccess: async (res) => {
+      if (res.status.statusCode.includes("200")) {
+        await queryClient.refetchQueries({
+          queryKey: ["seller-shop-product-detail"],
+          exact: false,
+        });
+        queryClient.refetchQueries({
+          queryKey: ["seller-shop-products"],
+        });
+
+        toast.success("ทำการแก้ไขสินค้าสำเร็จ");
+         window.location.reload();
+      } else {
+        toast.error(res.status.message || "ไม่สามารถแก้ไขข้อมูลได้");
+      }
+    },
+    onError: (error: Status) => {
+      console.error("UPDATE_ERROR", error);
+      toast.error(error?.message || "แก้ไขไม่สำเร็จ");
+    },
+  });
+  return {
+    handleUpdate: mutation.mutateAsync,
+    isUpdating: mutation.isPending,
+  };
+};
+
+export const useShopProductDetail = (productId: string) => {
+  return useQuery({
+    queryKey: ["seller-shop-product-detail", productId],
+    queryFn: () => getProductDetailById(productId),
+    enabled: !!productId,
+    staleTime: 0,
+    retry: 2,
+    retryDelay: 1000,
+  });
 };

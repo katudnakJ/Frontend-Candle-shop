@@ -25,7 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const Header = () => {
   const queryClient = useQueryClient();
   const { totalItems: storeTotalItems, setTotalItems } = useCartStore();
-  const { data, isLoading } = useGetCartData(100 , "checkout") 
+  const { data } = useGetCartData(100 , "checkout") 
   useEffect(() => {
     if (data) {
       const pages = data?.pages || [];

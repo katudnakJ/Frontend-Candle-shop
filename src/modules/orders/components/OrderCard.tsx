@@ -34,7 +34,6 @@ export const OrderCard = (
     defaultExpanded 
   }: OrderCardProps) => {
   const trackingList = order?.trackingNo?.join(", ").split(/[,\s]+/).filter(Boolean);
-  const [showTrackkingnoInput, setShowTrackkingnoInput] = useState(false);
   const [isConfirmTrackingNoopen, setisConfirmTrackingNoopen] = useState(false);
   const [trackkingno, settrackkingno] = useState("");
   const [cleanTrackingList, setCleanTrackingList] = useState<string[]>([]);
@@ -115,7 +114,7 @@ export const OrderCard = (
               >
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // กันไม่ให้ไปโดน Toggle ของ Card ใหญ่
+                    e.stopPropagation();
                     toggleAccordion(item.orderItemId);
                   }}
                   className="w-full flex gap-4 items-center p-3 hover:bg-gray-50 transition-colors text-left"
@@ -329,7 +328,6 @@ export const OrderCard = (
                           </button>
                           <button
                             onClick={() => {
-                              setShowTrackkingnoInput(false);
                               settrackkingno("");
                             }}
                             className="flex font-bold text-[12px] underline cursor-pointer"
@@ -391,10 +389,6 @@ export const OrderCard = (
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button className="w-full sm:flex-1 py-3 border-4 border-black rounded-full font-black hover:bg-gray-100 transition-all active:translate-y-1">
-                    รายละเอียด
-                  </button>
-
                   {isPaymentRejected && isCustomer && (
                     <button
                       onClick={() => handlePaymentAgain(order.orderId)}

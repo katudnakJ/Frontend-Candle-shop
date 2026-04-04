@@ -1,5 +1,4 @@
 import { UserLoginResponse } from "@/modules/auth/userLogin.type"
-import { useAuthService } from "@/services/useAuthLogin"
 import { Status } from "@/types/response.type"
 import { apiClient } from "@/utils/api"
 import { create } from "zustand"

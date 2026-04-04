@@ -15,21 +15,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, isRecommended = false, priority = false }: ProductCardProps) => {
-  //const displayImage =
 
-  //   product.images?.find((img) => img.is_primary)?.product_img_slug ||
-  //   product.images?.[0]?.product_img_slug ||
-  //   "";
-
-  // const getFinalSrc = (slug: string) => {
-  //   if (!slug) return "/placeholder-image.svg";
-
-  //   if (slug.startsWith("http://") || slug.startsWith("https://")) {
-  //       const separator = slug.includes("?") ? "&" : "?";
-  //     return `${slug}${separator}w=400&q=80&auto=format&fit=crop`;
-  //   }
-  //   return slug;
-  // };
   const router = useRouter()
   const [isError, setIsError] = useState(false);
   const initialImage =

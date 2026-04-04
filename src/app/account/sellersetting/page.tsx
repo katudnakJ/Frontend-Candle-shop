@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ChevronLeft, EyeOff } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
 import { mockSellerData } from "@/modules/seller/mockSellerData";
-import { Seller } from "@/modules/seller/types";
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import SellerWelcome from "@/modules/seller/components/SellerWelcome";
@@ -22,7 +21,6 @@ import { useAuthStoreUserLogin } from "@/store/userLogin";
 
 export default function SellerSettingPage() {
   const router = useRouter();
-  const [seller, setSeller] = useState<Seller | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(false);
@@ -32,18 +30,17 @@ export default function SellerSettingPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isShowQR, setIsShowQR] = useState(false);
 
-  const { data : addressesData } = useGetAddressesList();
-  const {
-    deleteAddress
-  } = useAddressForm();
+  const { data: addressesData } = useGetAddressesList();
+  const { deleteAddress } = useAddressForm();
 
-  const { data : existingQRCode} = useGetQRPaymentImage(
-    Boolean(isShowQR && !selectedFile) || Boolean(isShowQR)
+  const { data: existingQRCode } = useGetQRPaymentImage(
+    Boolean(isShowQR && !selectedFile) || Boolean(!isShowQR),
   );
 
   const handleFileSelect = (file: File | null) => {
     setSelectedFile(file);
   };
+  console.log("data : ", existingQRCode);
 
   const handleConfirm = () => {
     if (!selectedFile) {
@@ -67,7 +64,7 @@ export default function SellerSettingPage() {
       } else {
         await uploadSellerQrPayment.mutateAsync(selectedFile);
       }
-      
+
       setSelectedFile(null);
     } catch (error) {
       const err = error as Status;
@@ -91,52 +88,13 @@ export default function SellerSettingPage() {
     reUploadSellerQrPayment,
   } = usePaymentSlip(handleFileSelect);
 
-  const {
-    userData,
-  } = useAuthStoreUserLogin();
-
-  useEffect(() => {
-    let isMounted = true;
-    let timer: NodeJS.Timeout | undefined = undefined;
-    const fetchSellerData = async () => {
-      try {
-        setIsImageLoading(true);
-        await new Promise((resolve) => {
-          timer = setTimeout(resolve, 1000);
-        });
-
-        if (!isMounted) return;
-
-        const data = mockSellerData[0];
-        setSeller(data);
-
-        if (data.qr_payment_img_path) {
-          setSlipPreview(data.qr_payment_img_path);
-        } else {
-          if (isMounted) {
-            setIsImageLoading(false);
-          }
-        }
-      } catch (error) {
-        if (isMounted) {
-          console.error("Failed to fetch seller:", error);
-        }
-      }
-    };
-    fetchSellerData();
-    return () => {
-      isMounted = false;
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [setSlipPreview]);
+  const { userData } = useAuthStoreUserLogin();
 
   useEffect(() => {
     if (existingQRCode && !selectedFile) {
       setSlipPreview(existingQRCode.signedFileUrl);
     }
-  },[existingQRCode, selectedFile, setSlipPreview]);
+  }, [existingQRCode, selectedFile, setSlipPreview]);
 
   const handleAdd = () => {
     router.push("/account/address");
@@ -155,9 +113,11 @@ export default function SellerSettingPage() {
       try {
         await deleteAddress.mutateAsync(delAddressId);
         toast.success("ลบที่อยู่สำเร็จ");
-      }catch (error) {   
-        const err = error as Status;     
-        toast.error(err.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง");
+      } catch (error) {
+        const err = error as Status;
+        toast.error(
+          err.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง",
+        );
       }
       setIsDeleteOpen(false);
       setDelAddressId(null);
@@ -165,15 +125,14 @@ export default function SellerSettingPage() {
   };
 
   const handleUndoImage = () => {
-  if (existingQRCode) {
-    setSlipPreview(existingQRCode.signedFileUrl);
-    
-  }else{
-    setSlipPreview(null);
-  }
-  setSelectedFile(null);     
-  toast.success("คืนค่ารูปเดิมเรียบร้อย");
-};
+    if (existingQRCode) {
+      setSlipPreview(existingQRCode.signedFileUrl);
+    } else {
+      setSlipPreview(null);
+    }
+    setSelectedFile(null);
+    toast.success("คืนค่ารูปเดิมเรียบร้อย");
+  };
 
   return (
     <div>
@@ -230,63 +189,67 @@ export default function SellerSettingPage() {
 
             <hr className="my-8 border-gray-100" />
 
+            {userData?.owner && (
+              <div className="mt-8">
+            
+                {selectedFile || !existingQRCode || isShowQR ? (
+                  <div className="animate-in fade-in zoom-in-95">
+                    <QRpaymentshop
+                      qrCodeImage={slipPreview}
+                      hasExistingImage={Boolean(existingQRCode)}
+                      selectedFile={selectedFile}
+                      isImageLoading={isImageLoading}
+                      isUploading={isUploading}
+                      inputKey={inputKey}
+                      fileInputRef={fileInputRef}
+                      onTriggerFileInput={triggerFileInput}
+                      onImageChange={handleImageChange}
+                      onUndoImage={handleUndoImage}
+                      onConfirm={handleConfirm}
+                      setIsImageLoading={setIsImageLoading}
+                    />
 
-              
-            { userData?.isOwner &&(!slipPreview || isShowQR) ? (
-              <div className="animate-in fade-in zoom-in-90 ">
-                <QRpaymentshop
-                  qrCodeImage={slipPreview}
-                  hasExistingImage={Boolean(existingQRCode)}
-                  selectedFile={selectedFile}
-                  isImageLoading={isImageLoading}
-                  isUploading={isUploading}
-                  inputKey={inputKey}
-                  fileInputRef={fileInputRef}
-                  onTriggerFileInput={triggerFileInput}
-                  onImageChange={handleImageChange}
-                  onClearImage={() => {
-                    clearImage();
-                    setSelectedFile(null);
-                    setIsImageLoading(false);
-                  }}
-                  onUndoImage={handleUndoImage}
-                  onConfirm={handleConfirm}
-                  setIsImageLoading={setIsImageLoading}
-                />
-                {slipPreview && (
-                  <button
-                    onClick={() => setIsShowQR(false)}
-                    className="mt-4 text-xl font-bold text-gray-500 underline hover:text-black w-full text-center"
-                  >
-                    ซ่อนการแสดง QR
-                  </button>
+                   
+                    {existingQRCode && !selectedFile && (
+                      <button
+                        onClick={() => setIsShowQR(false)}
+                        className="mt-4 text-lg font-bold text-gray-500 underline hover:text-black w-full text-center cursor-pointer"
+                      >
+                        ซ่อนการแสดง QR
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                 
+                  <div className="p-6 border-2 border-gray-200 rounded-[2rem] bg-white flex justify-between items-center hover:border-black transition-all duration-300">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-black text-black">
+                        QR สำหรับรับชำระเงิน
+                      </h2>
+                      <p className="text-sm text-gray-500 font-bold">
+                        คลิกที่ไอคอนดวงตาเพื่อดูหรือแก้ไข QR Code
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => setIsShowQR(true)}
+                      className="p-4 bg-cprojectone hover:bg-yellow-300 rounded-2xl border-2 border-black text-black active:scale-95 transition-all cursor-pointer"
+                    >
+                      <EyeOff size={20} />
+                    </button>
+                  </div>
                 )}
               </div>
-            ) : (
-              <div className="p-6 border-2  rounded-[2rem] bg-white  flex justify-between items-center  hover:-translate-y-1 transition-transform  duration-300 ">
-                <div className="space-y-1">
-                  <h2 className="text-xl font-black text-black">
-                    QR สำหรับรับชำระเงิน
-                  </h2>
-                  <p className="text-sm text-gray-500 font-bold">
-                    คลิกที่ไอคอนดวงตาเพื่อดูหรือแก้ไข QR Code
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => setIsShowQR(true)}
-                  className="p-4 bg-cprojectone hover:bg-yellow-300 rounded-2xl border-2 border-black text-black  active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all cursor-pointer"
-                  title="คลิกเพื่อดู QR Code"
-                >
-                  <EyeOff size={16} strokeWidth={2} />
-                </button>
-              </div>
             )}
-            <h1 className="text-sm text-gray-500 w-full text-left">
-        * คลิกที่กล่องด้านบนเพื่ออัปโหลดรูป QR Code สำหรับการรับชำระเงินผ่านธนาคาร <br />
-        * รองรับไฟล์รูปภาพประเภท JPG, JPEG, PNG ขนาดไม่เกิน 2MB <br />
-        * หากต้องการเปลี่ยนรูป สามารถคลิกที่รูปเพื่อเลือกใหม่ หรือกด ใช้รูปเดิม เพื่อใช้รูปเดิม
-      </h1>
+            {userData?.owner && (
+              <h1 className="text-sm text-gray-500 w-full text-left">
+                * คลิกที่กล่องด้านบนเพื่ออัปโหลดรูป QR Code
+                สำหรับการรับชำระเงินผ่านธนาคาร <br />
+                * รองรับไฟล์รูปภาพประเภท JPG, JPEG, PNG ขนาดไม่เกิน 2MB <br />*
+                หากต้องการเปลี่ยนรูป สามารถคลิกที่รูปเพื่อเลือกใหม่ หรือกด
+                ใช้รูปเดิม เพื่อใช้รูปเดิม
+              </h1>
+            )}
           </section>
         </main>
         <Footer />

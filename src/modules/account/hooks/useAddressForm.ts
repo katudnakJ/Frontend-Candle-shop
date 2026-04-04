@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { addressService } from "../services/addressService";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/utils/api";
-import { GenericResponse, Status } from "@/types/response.type";
+import { Status } from "@/types/response.type";
 import { Addresses } from "../addresses";
 
 export const useAddressForm = (initialData?: Addresses) => {

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from "@mui/material";
+import { useState, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 
 export const ScrollToTop = ({ threshold = 400 }) => {
