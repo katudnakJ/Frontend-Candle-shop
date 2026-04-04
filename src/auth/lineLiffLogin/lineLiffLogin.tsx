@@ -30,14 +30,9 @@ return (
               <CustomerHome />
             ) : userData?.userRole?.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
               <SellerHome />
-
-            ) : userData?.userRole?.toLowerCase() === USER_ROLE.ADMIN.toLowerCase()
-            || userData?.userRole?.toLowerCase() === USER_ROLE.DEVELOPER.toLowerCase() ? (
-              <SellerHome />
-
             ) : (
               <ErrorPage 
-                message={ERROR_MESSAGE.USER_ROLE_NOT_FOUND}
+                message={ERROR_MESSAGE.SOMETHING_WENT_WRONG}
                 onRetry={() => {
                   logout();
                 }}
