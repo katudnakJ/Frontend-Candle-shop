@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePaymentSlip } from "@/modules/seller/hooks/usepaymentslip";
 import { PaymentService } from "@/modules/seller/services/payment.service";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";
+import { GetSignedFileResponse } from "@/modules/orders/type";
 
 interface PaymentMethodCardProps {
   ShopQrPayment: GetSignedFileResponse | null;
@@ -138,11 +139,14 @@ export const PaymentMethodCard = ({
                 </div>
               </div>
             ) : (
-              <div className="relative w-full min-h-[200px] max-h-[500px] border-4 border-black rounded-[2rem] overflow-hidden group shadow-lg">
-                <Image 
+              <div className="relative w-full min-h-[400px] max-h-[600px] border-4 border-black rounded-[2rem] overflow-hidden group shadow-lg">
+                <Image
                   src={slipPreview}
                   alt="Slip Preview"
-                  className="w-full h-auto max-h-[500px] object-scale-down p-2"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 100vw"
+                  unoptimized
+                  className="object-contain p-2"
                 />
                 <button
                   onClick={resetFile}
