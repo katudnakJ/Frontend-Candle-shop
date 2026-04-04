@@ -15,7 +15,7 @@ export const productSchema = z.object({
     .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
       message: "ราคาต้องเป็นตัวเลขที่ไม่ติดลบ",
     }),
-  isActive: z.boolean(),
+  active: z.boolean(),
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;

@@ -7,13 +7,13 @@ interface ShopProductCardProps {
   product: ProductHomeItem;
   onEdit: (slug: string, id: string) => void;
   onDelete: (id: string) => void;
-  isFeatured?: boolean;
+  featured?: boolean;
   isBeingDeleted?: boolean;
 }
 
 export default function ShopProductCard({
   product,
-  isFeatured = false,
+  featured = false,
   isBeingDeleted = false,
   onEdit,
   onDelete,
@@ -26,7 +26,7 @@ export default function ShopProductCard({
           ? "opacity-40 grayscale pointer-events-none scale-95"
           : ""
       } ${
-        isFeatured
+        featured
           ? "border-blue-200 shadow-md shadow-blue-50"
           : "border-gray-100 shadow-sm"
       }`}
@@ -36,7 +36,7 @@ export default function ShopProductCard({
           หยุดการขายชั่วคราว
         </div>
       )}
-      {isFeatured && (
+      {featured && (
         <div className="absolute -top-2 -left-2 bg-blue-600 text-white p-1 rounded-full shadow-lg">
           <Package size={12} className="" />
         </div>

@@ -5,8 +5,8 @@ export interface ProductItem {
   price: number;
   weight: number;
   slug: string;
-  isActive: string;
-  isFeatured: boolean | null;
+  active: boolean | null;
+  featured: boolean | null;
 }
 
 export interface ProductDetailImage {

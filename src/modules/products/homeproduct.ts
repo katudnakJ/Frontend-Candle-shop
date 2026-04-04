@@ -38,7 +38,7 @@ export interface CreateProductRequest {
   description: string;
   active: boolean;
   featured: boolean;
-  primary_index: number; 
+  primary_index: number | string; 
   imagesData: File[];
   existingImages?: string[];    
 }

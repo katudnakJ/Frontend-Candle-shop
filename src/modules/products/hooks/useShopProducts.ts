@@ -7,19 +7,24 @@ import {
 } from "@tanstack/react-query";
 import {
   getAllShopProducts,
-  deleteProduct,
-  getShopProductsBySearch,
   getProductDetailById,
+  getShopProductsBySearch,
+  deleteProduct,
+  updateProduct,
 } from "@/modules/products/services/ShopProductService";
 import { useShopProductStore } from "@/modules/products/hooks/useShopProductStore";
 import { toast } from "react-hot-toast";
-import { ProductHomeResData, SearchProductResData } from "../homeproduct";
+import {
+  CreateProductRequest,
+  ProductHomeResData,
+  SearchProductResData,
+} from "../homeproduct";
 import { useDebounce } from "use-debounce";
 import { GenericResponse, Status } from "@/types/response.type";
+import { useRouter } from "next/navigation";
 
 export const useShopProducts = () => {
   const queryClient = useQueryClient();
-
   const rawSearchQuery = useShopProductStore((state) => state.searchQuery);
   const [debouncedSearch] = useDebounce(rawSearchQuery, 800);
   const isSearchMode = debouncedSearch.trim().length > 0;
@@ -127,6 +132,50 @@ export const useShopProducts = () => {
     fetchNextPage,
     deleteProduct: deleteMutation.mutateAsync,
     editProduct: editMutation.mutate,
+  };
+};
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const mutation = useMutation({
+    mutationFn: ({
+      id,
+      payload,
+      deleteImageIds,
+      existIntoPrimary,
+    }: {
+      id: string;
+      payload: CreateProductRequest;
+      deleteImageIds?: string[];
+      existIntoPrimary?: string;
+    }) => updateProduct(id, payload, deleteImageIds, existIntoPrimary),
+
+    onSuccess: async (res) => {
+      if (res.status.statusCode.includes("200")) {
+        await queryClient.refetchQueries({
+          queryKey: ["seller-shop-product-detail"],
+          exact: false,
+        });
+        queryClient.refetchQueries({
+          queryKey: ["seller-shop-products"],
+        });
+
+        toast.success("ทำการแก้ไขสินค้าสำเร็จ");
+        // window.location.reload();
+      } else {
+        toast.error(res.status.message || "ไม่สามารถแก้ไขข้อมูลได้");
+      }
+    },
+    onError: (error: Status) => {
+      console.error("UPDATE_ERROR", error);
+      toast.error(error?.message || "แก้ไขไม่สำเร็จ");
+    },
+  });
+  return {
+    handleUpdate: mutation.mutateAsync,
+    isUpdating: mutation.isPending,
   };
 };
 

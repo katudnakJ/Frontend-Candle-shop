@@ -127,7 +127,7 @@ export default function ShopProductList() {
                 <ShopProductCard
                   key={product.productId}
                   product={product}
-                  isFeatured={true} //
+                  featured={true} //
                   onDelete={(id) => handleDelete(id)}
                   onEdit={(slug) => handleEditRedirect(slug)}
                 />

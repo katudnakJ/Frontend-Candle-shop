@@ -17,11 +17,15 @@ import { ProductHeader } from "@/modules/products/components/ProductHeader";
 import { useCreateProduct } from "@/modules/products/hooks/useCreateProduct";
 import { CreateProductRequest } from "@/modules/products/homeproduct";
 import { useSearchParams } from "next/navigation";
-import { useShopProductDetail } from "@/modules/products/hooks/useShopProducts";
+import {
+  useShopProductDetail,
+  useUpdateProduct,
+} from "@/modules/products/hooks/useShopProducts";
 
 import Footer from "@/components/layout/Footer";
 import SellerHeader from "@/components/layout/SellerHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
+import { ProductImage } from "@/modules/products/components/ImageUploadForSellerSection";
 
 export default function ManageProductsPage() {
   const searchParams = useSearchParams();
@@ -38,21 +42,24 @@ export default function ManageProductsPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isRMOpen, setIsRMOpen] = useState(false);
   const { handleCreate, isSubmitting } = useCreateProduct();
+  const { handleUpdate, isUpdating } = useUpdateProduct();
   const [tempData, setTempData] = useState<ProductFormValues | null>(null);
   const [imageIndexToDelete, setImageIndexToDelete] = useState<number | null>(
     null,
   );
+  const isBusy = isSubmitting || isUpdating;
 
   const {
     images,
-    onFileChange,
-    removeImage,
-    handleBoxClick,
-    fileInputRef,
     inputKey,
+    fileInputRef,
     isCompressing,
     resetAll,
     setImages,
+    onFileChange,
+    removeImage,
+    handleBoxClick,
+    setPrimaryImage,
   } = useProductImages(3);
 
   const {
@@ -62,6 +69,7 @@ export default function ManageProductsPage() {
     error,
   } = useShopProductDetail(productId || "");
 
+  console.log("RAWPRODUCTDETAIL", detailData);
   if (isDetailError) {
     if (process.env.NODE_ENV === "development") {
       console.log("สาเหตุการพัง:", error);
@@ -89,7 +97,7 @@ export default function ManageProductsPage() {
         if (process.env.NODE_ENV === "development") {
           console.warn("Slug mismatch detected. Redirecting to correct URL.");
         }
-  
+
         router.replace(
           `/seller/sellerproducts/manageproducts/${actualSlug}?productId=${productId}`,
         );
@@ -110,7 +118,7 @@ export default function ManageProductsPage() {
       description: "",
       weight: "",
       price: "",
-      isActive: true,
+      active: true,
     },
   });
 
@@ -134,17 +142,24 @@ export default function ManageProductsPage() {
         description: product.description,
         weight: String(product.weight),
         price: String(product.price),
-        isActive: product.isActive === "true" || product.isActive === "active",
+        active: product.active === true,
       });
 
       if (productImages) {
-        const prevImages = productImages.map((img) => ({
+        const mappedImages = productImages.map((img) => ({
           file: new File([], "existing-file"),
           preview: img.productImgPath,
           isPrimary: img.isPrimary,
           productImgId: img.productImgId,
         }));
-        setImages(prevImages);
+
+        const sortedImages = [...mappedImages].sort((a, b) => {
+        if (a.isPrimary) return -1;
+        if (b.isPrimary) return 1;
+        return 0;
+      });  
+
+        setImages(sortedImages);
       }
     }
   }, [detailData, isEditMode, reset, setImages]);
@@ -179,28 +194,96 @@ export default function ManageProductsPage() {
     setIsRMOpen(false);
   };
 
+  //====================================================================
+
   const onSubmit = async () => {
     if (!tempData) return;
 
     setIsOpen(false);
     try {
-      const existingImages = images
-        .filter((img) => img.file.size === 0)
-        .map((img) => img.preview);
+      const originalImageIds =
+        detailData?.productImages?.map((img) => img.productImgId) || [];
 
+      const currentImageIds = images
+        .map((img) => img.productImgId)
+        .filter((id): id is string => !!id);
+
+      const deleteImageIds = originalImageIds.filter(
+        (id) => !currentImageIds.includes(id),
+      );
+      const newImagesList = images.filter((img) => !img.productImgId);
+
+      const primaryImageInUI = images[0];
+
+      let finalExistIntoPrimary = "";
+      let finalPrimaryIndex: number | string = "";
+
+      if (isEditMode) {
+        if (primaryImageInUI?.productImgId) {
+          // --- เคส A: เอารูปเก่าขึ้นเป็นรูปหลัก ---
+          finalExistIntoPrimary = primaryImageInUI.productImgId;
+          finalPrimaryIndex = "";
+        } else {
+          // --- เคส B: เอารูปใหม่ที่เพิ่งอัปโหลดขึ้นเป็นรูปหลัก ---
+          finalExistIntoPrimary = "";
+          const indexInNewImages = newImagesList.findIndex(
+            (img) => img === primaryImageInUI,
+          );
+          finalPrimaryIndex = indexInNewImages !== -1 ? indexInNewImages : 0;
+        }
+      } else {
+        // --- เคสเพิ่มสินค้าใหม่ (Add Mode) ---
+        finalExistIntoPrimary = "";
+        finalPrimaryIndex = 0;
+      }
       const payload: CreateProductRequest = {
         productName: tempData.productName,
         description: tempData.description,
         price: Number(tempData.price),
         weight: Number(tempData.weight),
-        active: tempData.isActive,
-        featured: false,
-        primary_index: 0,
-        imagesData: images.map((img) => img.file),
-        existingImages: existingImages,
+        active: tempData.active,
+        featured:
+          isEditMode && detailData
+            ? (detailData.product.featured ?? false)
+            : false,
+        primary_index: finalPrimaryIndex,
+        imagesData: images
+          .filter((img) => !img.productImgId)
+          .map((img) => img.file),
       };
 
-      await handleCreate(payload);
+      if (isEditMode && productId) {
+        if (process.env.NODE_ENV === "development") {
+          console.log("===== 📝 LOGIC CHECK: PRE-SUBMISSION =====");
+          console.log("ProductName", tempData.productName);
+          console.log("Description", payload.productName);
+          console.log("Price", payload.price);
+          console.log("Weight", payload.weight);
+          console.log("Active", payload.active);
+          console.log("Featured", payload.featured);
+          console.log("Original Image IDs:", originalImageIds);
+          console.log("Current Image IDs (from UI):", currentImageIds);
+          console.log(">>> Result - deleteImageIds:", deleteImageIds);
+          console.log(
+            "Primary Image Type:",
+            finalExistIntoPrimary ? "SERVER_IMAGE" : "NEW_BLOB_IMAGE",
+          );
+          console.log(">>> Result - existIntoPrimary:", finalExistIntoPrimary);
+          console.log(
+            "New Files to Upload (imagesData):",
+            images.filter((img) => !img.productImgId).length,
+          );
+          console.log("==========================================");
+        }
+        await handleUpdate({
+          id: productId,
+          payload,
+          deleteImageIds,
+          existIntoPrimary: finalExistIntoPrimary,
+        });
+      } else {
+        await handleCreate(payload);
+      }
 
       //   console.log("=== Check FormData Content ===");
       //   formData.forEach((value, key) => {
@@ -217,7 +300,6 @@ export default function ManageProductsPage() {
 
       if (isEditMode) {
         console.log("Edit Product Success");
-        toast.success("ทำการแก้ไขสินค้าสำเร็จ!");
       } else {
         console.log("Add Product Success");
       }
@@ -265,6 +347,8 @@ export default function ManageProductsPage() {
                   handleBoxClick={handleBoxClick}
                   fileInputRef={fileInputRef}
                   inputKey={inputKey}
+                  isEditMode={isEditMode}
+                  setPrimaryImage={setPrimaryImage}
                 />
               </section>
 
@@ -287,10 +371,10 @@ export default function ManageProductsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting || isCompressing}
+                  disabled={isBusy || isCompressing}
                   className="flex-1 py-4 bg-green-400 border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all cursor-pointer"
                 >
-                  {isSubmitting
+                  {isBusy
                     ? "กำลังบันทึก..."
                     : isEditMode
                       ? "บันทึกการแก้ไข"

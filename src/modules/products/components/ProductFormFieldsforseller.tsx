@@ -120,7 +120,7 @@ export const ProductFormFields = ({
       {isEditMode && (
         <div className="flex items-center gap-3 py-4 px-1 bg-gray-50 rounded-2xl mb-4">
           <Controller
-            name="isActive"
+            name="active"
             control={control}
             render={({ field: { onChange, value } }) => (
               <FormControlLabel
