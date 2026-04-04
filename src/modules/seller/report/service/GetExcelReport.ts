@@ -1,5 +1,4 @@
 import { appConfig } from "@/config/appConfig";
-import { Status } from "@/types/response.type";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -10,7 +9,7 @@ interface GetExcelReportParams {
   format: string;
 }
 
-export const useGetExcelReport = ({
+export const GetExcelReport = ({
   month,
   year,
   format,
@@ -61,12 +60,9 @@ export const useGetExcelReport = ({
 
       toast.success("ดาวน์โหลดรายงานสำเร็จ!");
     },
-    onError: (error: Status) => {
-      const err = error as Status;
-      const message = err.message ?? "เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์";
-      toast.error(message, {
-        id: "Create-Excel-Report-error",
-      });
+    onError: () => {
+      const message = "เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์";
+      toast.error(message);
     },
   });
 };

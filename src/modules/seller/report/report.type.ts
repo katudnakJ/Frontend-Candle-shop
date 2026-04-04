@@ -21,13 +21,13 @@ interface MonthlyTotalOrdersSummary {
 
 interface MonthlyAOVSummary {
   aovThisMonth: number; // มูลค่าเฉลี่ยต่อคำสั่งซื้อ
-  percentageChangeAOV: number; // อัตราการเปลี่ยนแปลงมูลค่าเฉลี่ยต่อคำสั่งซื้อ (%)
+  aovPercentageChange: number; // อัตราการเปลี่ยนแปลงมูลค่าเฉลี่ยต่อคำสั่งซื้อ (%)
   aovTrend: string; // แนวโน้ม ดูจาก percentageChangeAOV
 }
 
 interface MonthlyNewCustomersSummary {
  totalNewCustomersThisMonth: number; // จำนวนลูกค้าใหม่ในเดือนนี้ทั้งหมด
-  percentageNewCustomersThisMonth: number; // อัตราส่วนลูกค้าใหม่ในเดือนนี้ (%)
+  newCustomersPercentageChange: number; // อัตราส่วนลูกค้าใหม่ในเดือนนี้ (%)
   newCustomerTrend: string; //  แนวโน้ม ดูจาก percentageNewCustomersThisMonth
 }
 
@@ -37,4 +37,9 @@ export interface GetDashboardReportResponse {
   monthlyAOVSummary: MonthlyAOVSummary; // สรุปมูลค่าเฉลี่ยต่อคำสั่งซื้อรายเดือน
   monthlyNewCustomersSummary: MonthlyNewCustomersSummary; // สรุปลูกค้าใหม่รายเดือน
   topSellingProductsThisMonth: ReportTopSellingProductsResp[]; // ยอดขายสินค้าสูงสุดในเดือนนี้
+}
+
+export interface TopProduct {
+  name: string;
+  value: number;
 }

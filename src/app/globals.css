@@ -20,6 +20,15 @@
 
 }
 
+html {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 18px;
+  }
+}
 
 
 @media (prefers-color-scheme: dark) {
