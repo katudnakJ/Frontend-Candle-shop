@@ -19,11 +19,6 @@ const LineLiffLogin = () => {
     userData
   } = useAuthStoreUserLogin();  
 
-     if (process.env.NODE_ENV === "development") {
-
-        console.log("USERDATA IS : ",userData)      
-     }
-
 return (
     <>
       {isLoading ? (
@@ -35,13 +30,9 @@ return (
               <CustomerHome />
             ) : userData?.userRole?.toLowerCase() === USER_ROLE.SELLER.toLowerCase() ? ( 
               <SellerHome />
-
-            ) : userData?.userRole?.toLowerCase() === USER_ROLE.ADMIN.toLowerCase() ? (
-              <SellerHome /> // for workaround admin login to access seller dashboard
-
             ) : (
               <ErrorPage 
-                message={ERROR_MESSAGE.USER_ROLE_NOT_FOUND}
+                message={ERROR_MESSAGE.SOMETHING_WENT_WRONG}
                 onRetry={() => {
                   logout();
                 }}

@@ -28,7 +28,7 @@ function AddressPageContent() {
         ) : (
           <AddressForm
             key={addressId || "new"} 
-            initialData={addressesData}
+            initialData={addressesData ?? undefined}
             onCancel={() => router.back()} 
             onSubmit={() => {
               router.push("/account/customer"); 
