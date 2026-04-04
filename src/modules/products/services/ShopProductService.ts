@@ -99,15 +99,15 @@ export const createProduct = async (
     FormData,
     GenericResponse<CreateProductResData>
   >(`/v1/products`, formData, {
-    params: {
-      productName: payload.productName,
-      price: payload.price,
-      weight: payload.weight,
-      description: payload.description,
-      active: payload.active,
-      featured: payload.featured,
-      primary_index: payload.primary_index,
-    },
+    // params: {
+    //   productName: payload.productName,
+    //   price: payload.price,
+    //   weight: payload.weight,
+    //   description: payload.description,
+    //   active: payload.active,
+    //   featured: payload.featured,
+    //   primary_index: payload.primary_index,
+    // },
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -166,6 +166,13 @@ export const updateProduct = async (
       console.log(`   - File[${i}]:`, (file as File).name),
     );
 
+    let count = 0;
+    for (const pair of formData.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+      count++;
+    }
+    console.log("Total parts in FormData:", count);
+
     console.log("--- 📦 Full FormData Content ---");
     formData.forEach((value, key) => {
       if (value instanceof File) {
@@ -198,6 +205,11 @@ export const updateProduct = async (
     // },
     headers: {
       "Content-Type": "multipart/form-data",
+    },
+    onUploadProgress: (progressEvent) => {
+      console.log(
+        `Upload Progress: ${progressEvent.loaded} / ${progressEvent.total}`,
+      );
     },
   });
 

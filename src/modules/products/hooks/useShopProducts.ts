@@ -163,7 +163,7 @@ export const useUpdateProduct = () => {
         });
 
         toast.success("ทำการแก้ไขสินค้าสำเร็จ");
-        // window.location.reload();
+         window.location.reload();
       } else {
         toast.error(res.status.message || "ไม่สามารถแก้ไขข้อมูลได้");
       }

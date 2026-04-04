@@ -214,6 +214,7 @@ export default function ManageProductsPage() {
       const newImagesList = images.filter((img) => !img.productImgId);
 
       const primaryImageInUI = images[0];
+      const originalPrimaryImgId = detailData?.productImages?.find(img => img.isPrimary)?.productImgId;
 
       let finalExistIntoPrimary = "";
       let finalPrimaryIndex: number | string = "";
@@ -221,7 +222,14 @@ export default function ManageProductsPage() {
       if (isEditMode) {
         if (primaryImageInUI?.productImgId) {
           // --- เคส A: เอารูปเก่าขึ้นเป็นรูปหลัก ---
-          finalExistIntoPrimary = primaryImageInUI.productImgId;
+          
+          if (primaryImageInUI.productImgId === originalPrimaryImgId) {
+          
+            finalExistIntoPrimary = "";
+          } else {
+           
+            finalExistIntoPrimary = primaryImageInUI.productImgId;
+          }
           finalPrimaryIndex = "";
         } else {
           // --- เคส B: เอารูปใหม่ที่เพิ่งอัปโหลดขึ้นเป็นรูปหลัก ---
@@ -247,7 +255,7 @@ export default function ManageProductsPage() {
             ? (detailData.product.featured ?? false)
             : false,
         primary_index: finalPrimaryIndex,
-        imagesData: images
+          imagesData: images
           .filter((img) => !img.productImgId)
           .map((img) => img.file),
       };
