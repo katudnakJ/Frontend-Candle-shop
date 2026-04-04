@@ -10,6 +10,7 @@ export enum ORDER_STATUS {
 export const SELLER_ORDER_TAB = [
     { key: "PD", label: "รอตรวจสอบ" },
     { key: "TS", label: "ที่ต้องจัดส่ง" },
+    { key: "TR", label: "ที่ต้องได้รับ" },
     { key: "CP", label: "สำเร็จแล้ว" },
 ]
 
