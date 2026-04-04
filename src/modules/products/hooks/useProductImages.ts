@@ -1,9 +1,11 @@
 import { useState, useRef, useCallback } from "react";
 import { toast } from "react-hot-toast";
+import { ProductImage } from "@/modules/products/components/ImageUploadForSellerSection";
 import imageCompression from "browser-image-compression";
+import { set } from "zod";
 
 export const useProductImages = (maxFiles = 3) => {
-  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
+  const [images, setImages] = useState<ProductImage[]>([]);
   const [inputKey, setInputKey] = useState(0);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,7 +31,7 @@ export const useProductImages = (maxFiles = 3) => {
     if (selectedFiles.length === 0) return;
 
     if (images.length + selectedFiles.length > maxFiles) {
-      toast.error(`ลงรูปได้สูงสุด ${maxFiles} รูปครับ`, {
+      toast.error(`ลงรูปได้สูงสุด ${maxFiles} รูป`, {
         className:
           "font-bold rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
       });
@@ -65,6 +67,7 @@ export const useProductImages = (maxFiles = 3) => {
           return {
             file: finalFile,
             preview: previewUrl,
+            productImgId: undefined,
           };
         }),
       );
@@ -77,6 +80,21 @@ export const useProductImages = (maxFiles = 3) => {
       setIsCompressing(false);
     }
   };
+
+  const setPrimaryImage = useCallback((index: number) => {
+
+    setImages((prev) => {if (index <= 0 || index >= prev.length){return prev ;}
+    const newImages = [...prev];
+    const [selectedImage] = newImages.splice(index,1)
+    newImages.unshift(selectedImage);
+    console.log("🔄 After Swap - New Primary:", {
+      preview: newImages[0].preview,
+      isFromServer: !!newImages[0].productImgId,
+      id: newImages[0].productImgId
+    });
+  return newImages;
+    });
+  }, []);
 
   const resetAll = useCallback(() => {
     setImages((prevImages) => {
@@ -128,7 +146,8 @@ export const useProductImages = (maxFiles = 3) => {
     handleBoxClick,
     onFileChange,
     removeImage,
+    setPrimaryImage,
     resetAll,
-    setImages,
+    setImages: setImages as React.Dispatch<React.SetStateAction<ProductImage[]>>,
   };
 };

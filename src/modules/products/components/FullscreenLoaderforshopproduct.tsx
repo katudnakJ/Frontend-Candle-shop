@@ -8,7 +8,7 @@ interface FullscreenLoaderProps {
 
 export default function FullscreenLoader({ message = "กำลังจัดการข้อมูล..." }: FullscreenLoaderProps) {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm transition-all">
+    <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm transition-all">
       <div className="relative flex flex-col items-center">
         
      

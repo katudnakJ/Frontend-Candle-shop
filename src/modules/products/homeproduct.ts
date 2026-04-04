@@ -2,11 +2,11 @@ export interface ProductHomeItem {
   productId: string;
   productName: string;
   price: number;
-  isActive: boolean;
+  active: boolean;
   productCreatedDate: string;
   totalSold: number;
-  productImgPath: string;
   productSlug: string;
+  productImgPath: string;
 }
 
 export interface ProductHomeResData {
@@ -18,4 +18,32 @@ export interface ProductHomeResData {
   size: number;
   startAt: number;
   totalProducts: number;
+}
+
+
+export interface SearchProductResData {
+  endAt: number;
+  hasNext: boolean;
+  page: number;
+  products: ProductHomeItem[];
+  size: number;
+  startAt: number;
+  totalProducts: number;
+}
+
+export interface CreateProductRequest {
+  productName: string;
+  price: number;
+  weight: number;
+  description: string;
+  active: boolean;
+  featured: boolean;
+  primary_index: number | string; 
+  imagesData: File[];
+  existingImages?: string[];    
+}
+
+
+export interface CreateProductResData {
+  product_id: string;
 }

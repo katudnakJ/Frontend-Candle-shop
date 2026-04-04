@@ -1,5 +1,5 @@
 
-import { keepPreviousData, useQuery, useInfiniteQuery} from "@tanstack/react-query";
+import { useInfiniteQuery} from "@tanstack/react-query";
 import { fetchShoppingCart } from "../services/ShoppingCartService";
 
 export const useGetCartData = (size: number = 100, mode: string = "normalpage") => {

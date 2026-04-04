@@ -3,7 +3,7 @@
 import { Trash2, Plus, Minus } from "lucide-react";
 
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CartItem } from "../shoppingcartInterface";
 import { SmartImage } from "@/components/commonui/SmartImage";
 import { CurrencyDisplay } from "@/utils/CurrencyDisplay";

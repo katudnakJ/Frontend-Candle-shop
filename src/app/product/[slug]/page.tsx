@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { use, useMemo, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useGetProductDetail } from "@/modules/products/hooks/useGetProductDetail";
 
 import Header from "@/components/layout/CustomerHeader";
@@ -18,7 +18,7 @@ export default function ProductDetailPage({
 }) {
   const { slug } = use(params);
   const searchParams = useSearchParams();
-
+  const router = useRouter();
   const productId = searchParams.get("id");
   const { data, isLoading, isError } = useGetProductDetail(productId);
 
@@ -30,6 +30,29 @@ export default function ProductDetailPage({
       productImages: typedData?.productImages || [],
     };
   }, [data]);
+
+  useEffect(() => {
+    if (!productId) {
+      router.replace("/");
+    }
+  }, [productId, router]);
+
+  useEffect(() => {
+    if (isError) {
+      router.replace("/");
+    }
+  }, [isError, router]);
+
+  useEffect(() => {
+    if (data && slug) {
+      const productDetailDatacheck = data?.data || data;
+      const actualSlug = productDetailDatacheck?.product.slug;
+
+      if (actualSlug && actualSlug !== slug) {
+        router.replace(`/product/${actualSlug}?id=${productId}`);
+      }
+    }
+  }, [data, slug, productId, router]);
 
   if (isLoading)
     return <div className="p-10 text-center">กำลังโหลดข้อมูล...</div>;
@@ -50,7 +73,7 @@ export default function ProductDetailPage({
 
           <div className="flex justify-center px-6 py-4 mb-10 ml-5 mr-5">
             <div className="relative aspect-square w-full max-w-[400px] rounded-3xl overflow-hidden bg-gray-50 shadow-md drop-shadow-orange-300 border-cprojectfour border-4 ">
-              {/* แสดงรูปแบบเลื่อนได้ */}
+              {/* แสดงรูปแบบเลื่อนแนวนอนได้ */}
               <ProductImageCarousel images={productImages || []} />
             </div>
           </div>
