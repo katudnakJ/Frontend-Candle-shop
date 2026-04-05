@@ -13,6 +13,9 @@ import { useGetAddressesList } from "@/modules/account/hooks/useAddressesQuery";
 import { useAddressForm } from "@/modules/account/hooks/useAddressForm";
 import { Status } from "@/types/response.type";
 import { PreviousButton } from "@/components/commonui/PreviousButton";
+import { USER_ROLE } from "@/constants/userRole";
+import { RoleGuard } from "@/auth/RoleGuard";
+
 
 export default function CustomerAccountPage() {
   const router = useRouter();
@@ -48,6 +51,7 @@ export default function CustomerAccountPage() {
   };
   return (
     <div>
+      <RoleGuard allowedRoles={[USER_ROLE.CUSTOMER, USER_ROLE.DEVELOPER]}>
       <div className="flex flex-col min-h-screen bg-white">
         <Header />
         <main className="mb-4">
@@ -62,12 +66,12 @@ export default function CustomerAccountPage() {
             )}
           </div>
 
-          {/* 1. Profile Section  */}
+          {/* Profile Section  */}
           <section className="">
             <CustomerWelcome />
           </section>
 
-          {/* 2. Address Management Section */}
+          {/*  Address Management Section */}
           <section className=" max-w-[1200px] mx-auto px-6 mt-4">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-black">ที่อยู่จัดส่ง</h2>
@@ -122,6 +126,7 @@ export default function CustomerAccountPage() {
           variant="danger"
         />
       </div>
+      </RoleGuard>
     </div>
   );
 }

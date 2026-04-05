@@ -7,11 +7,12 @@ import { Loader2 } from "lucide-react";
 import { OrderCard } from "@/modules/orders/components/OrderCard";
 import { OrderStatus } from "@/modules/orders/type";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
-import { USER_ROLE } from "@/constants/userRole";
 import { useGetOrders } from "@/modules/orders/hooks/index";
 import { CUSTOMER_ORDER_TAB } from "@/constants/status";
 import { ScrollToTop } from "@/utils/ScrollToTop";
 import { PreviousButton } from "@/components/commonui/PreviousButton";
+import { USER_ROLE } from "@/constants/userRole";
+import { RoleGuard } from "@/auth/RoleGuard";
 
 export default function OrderHistoryPage() {
   const { 
@@ -28,6 +29,7 @@ export default function OrderHistoryPage() {
 
   return (
     <>
+    <RoleGuard allowedRoles={[USER_ROLE.CUSTOMER, USER_ROLE.DEVELOPER]}>
     <ScrollToTop threshold={500} />
     <div className="flex flex-col w-full min-h-screen bg-white">
       <Header />
@@ -98,6 +100,7 @@ export default function OrderHistoryPage() {
       </main>
       <Footer />
     </div>
+    </RoleGuard>
     </>
   );
 }
