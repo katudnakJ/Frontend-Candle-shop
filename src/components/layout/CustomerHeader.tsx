@@ -9,7 +9,7 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { Fragment, useEffect} from "react";
+import { Fragment, useEffect } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -25,11 +25,12 @@ import { useQueryClient } from "@tanstack/react-query";
 const Header = () => {
   const queryClient = useQueryClient();
   const { totalItems: storeTotalItems, setTotalItems } = useCartStore();
-  const { data } = useGetCartData(100 , "checkout") 
+  const { data } = useGetCartData(100, "checkout");
   useEffect(() => {
     if (data) {
       const pages = data?.pages || [];
-      const CartCountData  = pages[pages.length - 1]?.data || pages[pages.length - 1];
+      const CartCountData =
+        pages[pages.length - 1]?.data || pages[pages.length - 1];
       const apiTotal = CartCountData.totalItems;
       if (process.env.NODE_ENV === "development") {
         console.group("🚩 Header Cart Status");
@@ -127,20 +128,6 @@ const Header = () => {
                           <ClipboardList size={18} className="mr-2 " />
                           ประวัติการสั่งซื้อ
                         </Link>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ focus }) => (
-                        <Button
-                          className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex w-full items-center px-4 py-2 text-left text-sm`}
-                          onClick={() => {
-                            queryClient.clear();
-                            localStorage.removeItem("lineLiffUserData");
-                            window.location.href = "/line-login";
-                          }}
-                        >
-                          ออกจากระบบ
-                        </Button>
                       )}
                     </MenuItem>
                   </div>
