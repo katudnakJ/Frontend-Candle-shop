@@ -49,11 +49,6 @@ export default function AddressForm({
         <div className="flex flex-col justify-center py-1">
           <span className="leading-tight">กรุณาระบุข้อมูลให้ครบถ้วน</span>
         </div>,
-        {
-          className:
-            " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-          duration: 3000,
-        },
       );
     }
   };
@@ -68,11 +63,6 @@ export default function AddressForm({
             เรียบร้อยแล้ว!
           </span>
         </div>,
-        {
-          className:
-            " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-          duration: 3000,
-        },
       );
       setOpenConfirm(false);
     } catch (error) {
