@@ -1,5 +1,4 @@
 "use client";
-// API : Get Products (Detail products)
 
 
 import {

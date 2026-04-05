@@ -1,5 +1,4 @@
 export default function LoggingOut() {
-    // รอแก้ไข CSS ให้น่ารักกว่านี้
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center">

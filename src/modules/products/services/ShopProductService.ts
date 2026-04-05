@@ -1,4 +1,3 @@
-// services/product.service.ts
 
 import { apiClient } from "@/utils/api";
 import { GenericResponse } from "@/types/response.type";
@@ -99,15 +98,6 @@ export const createProduct = async (
     FormData,
     GenericResponse<CreateProductResData>
   >(`/v1/products`, formData, {
-    // params: {
-    //   productName: payload.productName,
-    //   price: payload.price,
-    //   weight: payload.weight,
-    //   description: payload.description,
-    //   active: payload.active,
-    //   featured: payload.featured,
-    //   primary_index: payload.primary_index,
-    // },
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -189,20 +179,6 @@ export const updateProduct = async (
     FormData,
     GenericResponse<CreateProductResData>
   >(`/v1/products/${productId}`, formData, {
-    // params: {
-    //   productName: payload.productName,
-    //   price: payload.price,
-    //   weight: payload.weight,
-    //   description: payload.description,
-    //   active: payload.active,
-    //   featured: payload.featured,
-    //   primaryIndex: payload.primary_index,
-    //   existIntoPrimary: existIntoPrimary || undefined,
-    //   deleteImageIds: deleteImageIds.length > 0 ? deleteImageIds : undefined,
-    // },
-    // paramsSerializer: {
-    //   indexes: null,
-    // },
     headers: {
       "Content-Type": "multipart/form-data",
     },

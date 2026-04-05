@@ -293,7 +293,6 @@ export const OrderCard = (
                               "ระบุเลขพัสดุ\n(หากมีหลายกล่อง ให้คั่นด้วยเครื่องหมาย , หรือขึ้นบรรทัดใหม่)"
                             }
                             className="w-full p-4 border-2 border-black rounded-2xl font-bold text-[11px] focus:outline-none focus:ring-2 ring-blue-500 min-h-[100px] resize-none"
-                            // maxLength={}
                             value={trackkingno}
                             onChange={(e) => {
                               const value = e.target.value;

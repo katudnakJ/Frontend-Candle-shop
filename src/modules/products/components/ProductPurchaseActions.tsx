@@ -97,7 +97,7 @@ export default function ProductPurchaseActions({
           target="_blank"
           className="col-span-2  border border-black hover:bg-gray-50 cursor-pointer flex flex-col items-center justify-center py-2"
         >
-          <LineIcon size={32} className="md:w-[40px] md:h-[40px]" />
+          <LineIcon size={32} className="md:w-10 md:h-10" />
           <span className="text-[10px] md:text-xs text-black font-bold text-center leading-tight px-1">
             Line
           </span>

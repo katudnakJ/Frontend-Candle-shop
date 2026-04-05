@@ -25,7 +25,6 @@ import {
 import Footer from "@/components/layout/Footer";
 import SellerHeader from "@/components/layout/SellerHeader";
 import ConfirmDialog from "@/components/commonui/ConfirmDialog";
-import { ProductImage } from "@/modules/products/components/ImageUploadForSellerSection";
 
 export default function ManageProductsPage() {
   const searchParams = useSearchParams();
@@ -121,17 +120,6 @@ export default function ManageProductsPage() {
       active: true,
     },
   });
-
-  // ====================================================================
-  //   : ตรงนี้ รอเปลี่ยนไปใช้ Services API กับ  Interface ของ Product Detail
-  //   : Mock อันนี้ ใช้จำลองว่าเปลี่ยนหน้าไป  แก้ไขได้ก่อน
-  //   : ต้องมีช่อง กรอก slug ไหม
-  //   : อาจมีการกลับมาแก้ไข กรณีว่า กดแก้ไข แต่รูปไม่ได้แก้ไข จะต้องส่งกลับไปยังไงได้บ้าง
-  //      กรณีที่ 1: ส่ง Path URL เดิมกลับไปเลย
-  //      กรณีที่ 2: ไม่ส่งฟิลด์นี้กลับไปเลย
-  //      กรณีที่ 3: วิธี "ส่ง ImageID"
-  //      กรณีที่ 4: การใช้ Flag "Delete List"
-  // ====================================================================
 
   useEffect(() => {
     if (isEditMode && detailData) {
@@ -292,20 +280,6 @@ export default function ManageProductsPage() {
       } else {
         await handleCreate(payload);
       }
-
-      //   console.log("=== Check FormData Content ===");
-      //   formData.forEach((value, key) => {
-      //     if (value instanceof File) {
-      //       console.log(`${key}: [File] - ${value.name} (${value.size} bytes)`);
-      //     } else {
-      //       console.log(`${key}: ${value}`);
-      //     }
-      //   });
-
-      //   const formProps = Object.fromEntries(formData);
-      //   console.log("FormData as Object:", formProps);
-      // await productService.create(formData);
-
       if (isEditMode) {
         console.log("Edit Product Success");
       } else {
@@ -331,7 +305,7 @@ export default function ManageProductsPage() {
     <div className="flex flex-col w-full min-h-screen bg-white">
       <SellerHeader />
       <main className="grow bg-white">
-        <div className="max-w-[1200px] mx-auto p-4">
+        <div className="max-w-300 mx-auto p-4">
           <ProductHeader
             mode="sellerproducs"
             namemode={
@@ -373,14 +347,14 @@ export default function ManageProductsPage() {
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="flex-1 py-4 bg-[#E5B6A9] border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all cursor-pointer"
+                  className="flex-1 py-4 bg-[#E5B6A9] border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
                   disabled={isBusy || isCompressing}
-                  className="flex-1 py-4 bg-green-400 border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all cursor-pointer"
+                  className="flex-1 py-4 bg-green-400 border-2 border-black rounded-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
                 >
                   {isBusy
                     ? "กำลังบันทึก..."
@@ -404,7 +378,7 @@ export default function ManageProductsPage() {
             <p className="text-sm text-gray-500">
               คุณต้องการ{isEditMode ? "แก้ไข" : "เพิ่ม"}สินค้า
             </p>
-            <p className="text-xl font-black text-cprojectthree break-words px-4">
+            <p className="text-xl font-black text-cprojectthree wrap-break-word px-4">
               {tempData?.productName}
             </p>
             <p className="text-sm text-gray-500">

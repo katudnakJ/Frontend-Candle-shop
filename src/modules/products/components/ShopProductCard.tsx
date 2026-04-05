@@ -1,4 +1,3 @@
-// components/seller/ProductCard.tsx
 import { Pencil, Trash2, Package, EyeOff } from "lucide-react";
 import { ProductHomeItem } from "@/modules/products/homeproduct";
 import Image from "next/image";

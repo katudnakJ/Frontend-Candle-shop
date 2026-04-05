@@ -1,4 +1,3 @@
-// hooks/useProducts.ts
 import { InfiniteData, useQuery } from "@tanstack/react-query";
 import {
   useInfiniteQuery,
@@ -67,11 +66,6 @@ export const useShopProducts = () => {
 
       return (page as ProductHomeResData).allProducts || [];
     }) || [];
-
-  // สำหรับ รับค่าที่ เป็นสินค้าขายดี
-  // const allFeaturedProducts = !isSearchMode
-  //   ? (data?.pages[0] as ProductHomeResData)?.featuredProducts || []
-  //   : [];
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,

@@ -59,25 +59,6 @@ export default function ShoppingCartPage() {
     }
   }, [inView, hasNext, isFetchingNextPage, fetchNextPage]);
 
-
-  // const totalPages = Math.ceil(totalItems / pageSize);
-
-  // const handlePageChange = (newPage: number) => {
-  //   const displayPage = newPage + 1;
-  //   router.push(`?page=${displayPage}`, { scroll: true });
-  // };
-
-  // useEffect(() => {
-  //   if (
-  //     !isLoading &&
-  //     cartItem.length === 0 &&
-  //     totalItems > 0 &&
-  //     currentPage > 0
-  //   ) {
-  //     handlePageChange(currentPage - 1);
-  //   }
-  // }, [cartItem.length, totalItems, currentPage, isLoading]);
-
   if (!isMounted) {
     return (
       <>

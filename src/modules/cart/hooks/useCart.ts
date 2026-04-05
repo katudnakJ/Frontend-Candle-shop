@@ -52,15 +52,6 @@ export const useCart = () => {
     };
   }, [data]);
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("ITEMS IN USECART:", cartItem);
-    console.log("ShoppingCartId:", shoppingCartId);
-    console.log("EndAt:", endAt);
-    // console.log("StartAt:", startAt);
-    // console.log("HasNext:", hasNext);
-    console.log("TotalItems:", totalItemsFromApi);
-  }
-
   const {
     selectedIds,
     allCartItems,

@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, ChevronLeft, EyeOff } from "lucide-react";
 import AddressCard from "@/modules/account/components/AddressCard";
-import { mockSellerData } from "@/modules/seller/mockSellerData";
 import SellerHeader from "@/components/layout/SellerHeader";
 import Footer from "@/components/layout/Footer";
 import SellerWelcome from "@/modules/seller/components/SellerWelcome";
@@ -83,7 +82,6 @@ export default function SellerSettingPage() {
     fileInputRef,
     handleBoxClick: triggerFileInput,
     onFileChange: handleImageChange,
-    resetFile: clearImage,
     uploadSellerQrPayment,
     reUploadSellerQrPayment,
   } = usePaymentSlip(handleFileSelect);
@@ -139,7 +137,7 @@ export default function SellerSettingPage() {
       <div className="flex flex-col min-h-screen bg-white">
         <SellerHeader />
         <main className="mb-4">
-          <div className="max-w-[1200px] mx-auto p-4 flex items-center ">
+          <div className="max-w-300 mx-auto p-4 flex items-center ">
             <Link href="/">
               <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />
             </Link>
@@ -154,7 +152,7 @@ export default function SellerSettingPage() {
             <SellerWelcome mode="setting" />
           </section>
 
-          <section className=" max-w-[1200px] mx-auto px-6 mt-4 space-y-25">
+          <section className=" max-w-300 mx-auto px-6 mt-4 space-y-25">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-black">ที่อยู่ร้านค้า</h2>
               {!addressesData && (
@@ -221,7 +219,7 @@ export default function SellerSettingPage() {
                   </div>
                 ) : (
                  
-                  <div className="p-6 border-2 border-gray-200 rounded-[2rem] bg-white flex justify-between items-center hover:border-black transition-all duration-300">
+                  <div className="p-6 border-2 border-gray-200 rounded-4xl bg-white flex justify-between items-center hover:border-black transition-all duration-300">
                     <div className="space-y-1">
                       <h2 className="text-xl font-black text-black">
                         QR สำหรับรับชำระเงิน

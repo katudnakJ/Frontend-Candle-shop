@@ -1,5 +1,4 @@
 "use client";
-// API : Get Products (All products)
 
 import { useEffect } from "react";
 import {

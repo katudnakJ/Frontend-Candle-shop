@@ -106,7 +106,7 @@ export const ReportCard = ({
                   slotProps={{
     textField: {
       onKeyDown: (e) => {
-        e.preventDefault(); // 👈 กันพิมพ์ทั้งหมด
+        e.preventDefault(); 
       },
     },
   }}
