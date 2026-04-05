@@ -116,9 +116,9 @@ export default function AddressForm({
                   : "border-gray-200"
               }`}
             />
-            {errors.recipient_first_name && (
+            {errors.recipientFirstName && (
               <span className="text-red-500 text-xs">
-                {errors.recipient_first_name}
+                {errors.recipientFirstName}
               </span>
             )}
           </div>
@@ -147,9 +147,9 @@ export default function AddressForm({
                   : "border-gray-200"
               }`}
             />
-            {errors.recipient_last_name && (
+            {errors.recipientLastName && (
               <span className="text-red-500 text-xs">
-                {errors.recipient_last_name}
+                {errors.recipientLastName}
               </span>
             )}
           </div>
@@ -169,14 +169,14 @@ export default function AddressForm({
             }
             placeholder="เช่น 081-234-5678"
             className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none transition-all ${
-              errors.recipient_phone
+              errors.recipientPhone
                 ? "border-red-500 bg-red-50"
                 : "border-gray-200"
             }`}
           />
-          {errors.recipient_phone && (
+          {errors.recipientPhone && (
             <span className="text-red-500 text-xs">
-              {errors.recipient_phone}
+              {errors.recipientPhone}
             </span>
           )}
         </div>
@@ -205,9 +205,9 @@ export default function AddressForm({
                   : "border-gray-200"
               }`}
             />
-            {errors.delivery_address && (
+            {errors.deliveryAddress && (
               <span className="text-red-500 text-xs ml-1">
-                {errors.delivery_address}
+                {errors.deliveryAddress}
               </span>
             )}
           </div>
@@ -307,13 +307,13 @@ export default function AddressForm({
                     subDistrict: val || "",
                     postcode: zip.toString(),
                   }));
-                  setErrors((p) => ({ ...p, sub_district: "" }));
+                  setErrors((p) => ({ ...p, subDistrict: "" }));
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     placeholder="เลือกตำบล *"
-                    error={!!errors.sub_district}
+                    error={!!errors.subDistrict}
                     size="small"
                   />
                 )}
@@ -324,7 +324,7 @@ export default function AddressForm({
                   },
                 }}
               />
-              {errors.sub_district && (
+              {errors.subDistrict && (
                 <span className="text-red-500 text-[10px] ml-1">
                   {errors.sub_district}
                 </span>
@@ -362,9 +362,9 @@ export default function AddressForm({
                     : "bg-white text-black border-gray-200 hover:border-black"
                 }`}
               >
-                {errors.sub_district && (
+                {errors.addressLabel && (
                 <span className="text-red-500 text-[10px] ml-1">
-                  {errors.address_label}
+                  {errors.addressLabel}
                 </span>
               )}
                 {label}

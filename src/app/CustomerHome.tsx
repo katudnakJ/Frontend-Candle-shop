@@ -189,7 +189,6 @@ export default function CustomerHome() {
                 <>
                   <div className="flex justify-between mb-4">
                     <p className="text-sm text-gray-400 ">
-                      จำนวนทั้งหมด {totalProducts} ชิ้น
                     </p>
                     <button>
                       <div className="relative flex items-center gap-2">
