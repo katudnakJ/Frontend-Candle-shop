@@ -61,6 +61,16 @@ function hasSnakeCaseKey(input: unknown): boolean {
 
 // ใช้สำหรับ silent relogin เมื่อ access token หมดอายุ และ refresh token ยังไม่หมดอายุ
 async function silentReloginWithLiff() {
+
+  try {
+    await liff.init({ 
+      liffId: process.env.NEXT_PUBLIC_LINE_LIFF_ID as string 
+    });
+  } catch (initError) {
+    console.error("LIFF Init failed in Interceptor:", initError);
+    throw initError;
+  }
+
   if (!liff.isLoggedIn()) {
     throw new Error("LIFF is not logged in");
   }
@@ -97,7 +107,7 @@ apiClient.interceptors.response.use(
     if (process.env.NODE_ENV === "development") {
       console.log("🔍 [Interceptor] Error Status:", error.response?.status);
     }
-    // ลอง relogin และ replay request เดิม 1 ครั้ง
+   
     if (
       is401 &&
       originalConfig &&

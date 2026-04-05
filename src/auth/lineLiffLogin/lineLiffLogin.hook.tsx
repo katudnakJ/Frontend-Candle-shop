@@ -24,10 +24,32 @@ const useLiffLogin = () => {
   const loginMutation = useLogin;
 
   const initializeLiff = async () => {
+    const { userData: storedData } = useAuthStoreUserLogin.getState();
+    const hasLocalData = localStorage.getItem("auth-storage");
+    const hasLiffToken = Object.keys(localStorage).some(key => key.includes("accessToken"));
+
+    const savedPath = sessionStorage.getItem("last_homeproduct_page");
+
+    if (storedData && hasLocalData && hasLiffToken) {
+      if (window.location.pathname === "/") {
+        const targetPath = (savedPath && savedPath !== "/") ? savedPath : ROUTE.HOME;
+        router.push(targetPath);
+      }
+      setLoading(false);
+      return;
+    }
+
     try {
+      setLoading(true);
       await liff.init({ liffId });
+
       if (liff.isLoggedIn()) {
         const token = liff.getAccessToken() || "";
+
+        if (!token) {
+          liff.login();
+          return;
+        }
 
         const userData = await loginMutation.mutateAsync(token);
         await storeUserLogin(userData);
@@ -35,10 +57,10 @@ const useLiffLogin = () => {
         const currentQuery = window.location.search;
         if (!currentQuery && window.location.pathname === "/") {
           setTimeout(() => {
-            window.location.href = ROUTE.HOME;
-            //router.push(ROUTE.HOME);
-            // router.refresh();
-          }, 400);
+            const targetPath = (savedPath && savedPath !== "/") ? savedPath : ROUTE.HOME;
+            router.push(targetPath);
+            router.refresh();
+          }, 600);
         }
       } else {
         liff.login({
@@ -48,6 +70,9 @@ const useLiffLogin = () => {
       }
     } catch (err) {
       setError("ไม่สามารถเชื่อมต่อกับ Line ได้" as unknown as Error);
+      setLoading(false);
+      storeUserLogout();
+    } finally {
       setLoading(false);
     }
   };
