@@ -42,20 +42,25 @@ export default function CustomerHome() {
   const handlePageChange = (newPage: number) => {
     const displayPage = newPage + 1;
     if (displayPage === 1) {
+      sessionStorage.setItem("last_homeproduct_page", "/"); // บันทึกหน้าแรก
       router.push(`/`, { scroll: false });
     } else {
-      router.push(`?page=${displayPage}`, { scroll: false });
+      const query = `?page=${displayPage}`;
+      sessionStorage.setItem("last_homeproduct_page", query); // บันทึกเลขหน้า
+      router.push(query, { scroll: false });
     }
   };
 
   useEffect(() => {
-    const currentPathWithQuery = window.location.search;
-    if (pageParam > 1) {
-      sessionStorage.setItem("last_homeproduct_page", currentPathWithQuery);
-    } else {
+    const currentQuery = window.location.search;
+    const currentPath = window.location.pathname;
+
+    if (currentPath === "/" && !currentQuery) {
       sessionStorage.setItem("last_homeproduct_page", "/");
+    } else if (currentQuery.includes("page=")) {
+      sessionStorage.setItem("last_homeproduct_page", currentQuery);
     }
-  }, [pageParam]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (productSectionRef.current) {
@@ -127,7 +132,6 @@ export default function CustomerHome() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow bg-white font-sans">
-
         <div className="bg-cprojectone">
           <section>
             <CustomerWelcome />

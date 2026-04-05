@@ -40,19 +40,15 @@ export default function ProductPurchaseActions({
       {
         onSuccess: async (response) => {
           if (process.env.NODE_ENV === "development") {
-          console.log("Check Response in Component:", response);
+            console.log("Check Response in Component:", response);
           }
           queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
-          const resdata=  response?.data || response;
-          const typedData = resdata  as AddCartResData
-          const itemdata = typedData.id
-          
-          
-
+          const resdata = response?.data || response;
+          const typedData = resdata as AddCartResData;
+          const itemdata = typedData.id;
 
           if (actionType === "BUY") {
             const shoppingCartItemId = itemdata;
-           
 
             if (shoppingCartItemId) {
               setSelectedIds([shoppingCartItemId]);
@@ -61,19 +57,17 @@ export default function ProductPurchaseActions({
                 JSON.stringify([shoppingCartItemId]),
               );
             }
-            
+
             router.push("/shoppingcart/checkoutcart");
           } else {
             toast.success(`เพิ่มสินค้า ${quantity} ชิ้นลงรถเข็นแล้ว!`, {
-              className:
-                "border-2 border-cprojectone rounded-xl font-bold shadow-2xl",
-              duration: 3000,
+             
             });
             setOpenConfirm(false);
           }
         },
         onError: () => {
-         setOpenConfirm(false);
+          setOpenConfirm(false);
         },
       },
     );
@@ -91,7 +85,7 @@ export default function ProductPurchaseActions({
         <QuantityInputButton value={quantity} onChange={setQuantity} />
       </section>
 
-      <div className="grid grid-cols-10  border border-black  bg-white overflow-hidden shadow-sm">
+      <div className="grid grid-cols-10 border border-black  bg-white overflow-hidden shadow-sm">
         <Link
           href="https://line.me"
           target="_blank"
@@ -123,7 +117,7 @@ export default function ProductPurchaseActions({
             {isPending ? "กำลังเพิ่มข้อมูลการสั่งซื้อ..." : "ซื้อสินค้าทันที"}
           </span>
           <span className="text-md md:text-xl text-red-500 font-extrabold mt-1">
-            ฿<CurrencyDisplay amount={price * quantity} /> 
+            ฿<CurrencyDisplay amount={price * quantity} />
           </span>
         </button>
         <ConfirmDialog
@@ -167,7 +161,7 @@ export default function ProductPurchaseActions({
                       ยอดรวม:
                     </span>
                     <span className="text-xl font-bold text-red-500">
-                      ฿<CurrencyDisplay amount={price * quantity} /> 
+                      ฿<CurrencyDisplay amount={price * quantity} />
                     </span>
                   </div>
                 )}
@@ -179,5 +173,3 @@ export default function ProductPurchaseActions({
     </>
   );
 }
-
-

@@ -149,7 +149,8 @@ export default function CheckoutPage() {
           <section className="border-gray-300 border-b-2">
             <div className="flex font-black text-xl mb-3 gap-2 uppercase ">
               <MapPinCheck className="text-green-600" />
-              จัดส่งไปที่
+              จัดส่งไปที่ 
+              <span className="opacity-50">(คลิกเพื่อแก้ไข)</span>
             </div>
             <div className="grid grid-cols-12 w-full mb-5 ">
    

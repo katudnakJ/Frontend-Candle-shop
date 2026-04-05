@@ -29,7 +29,7 @@ export const useCheckoutMutation = () => {
       console.log("PurchasedCount:", purchasedCount);
       console.log("NewTotal:", newTotal);
       setTotalItems(newTotal);
-      toast.success("สั่งซื้อสินค้าสำเร็จ!");
+      toast.success("ยืนยันการชำระเงินเรียบร้อย");
     },
 
     onError: (error: Status) => {
