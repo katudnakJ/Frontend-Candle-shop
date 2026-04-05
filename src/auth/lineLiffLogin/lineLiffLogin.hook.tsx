@@ -31,11 +31,14 @@ const useLiffLogin = () => {
 
         const userData = await loginMutation.mutateAsync(token);
         await storeUserLogin(userData);
-        
 
         const currentQuery = window.location.search;
         if (!currentQuery && window.location.pathname === "/") {
-          router.push(ROUTE.HOME);
+          setTimeout(() => {
+            window.location.href = ROUTE.HOME;
+            //router.push(ROUTE.HOME);
+            // router.refresh();
+          }, 400);
         }
       } else {
         liff.login({
