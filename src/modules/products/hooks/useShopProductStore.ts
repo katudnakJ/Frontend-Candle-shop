@@ -1,4 +1,3 @@
-// store/useProductStore.ts
 import { create } from 'zustand';
 
 interface ProductState {

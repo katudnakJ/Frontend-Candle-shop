@@ -25,9 +25,6 @@ export const useCheckoutMutation = () => {
       const purchasedCount = checkoutItems.length;
       const newTotal = Math.max(0, totalItems - purchasedCount);
 
-      console.log("TTTtotalItems:", totalItems);
-      console.log("PurchasedCount:", purchasedCount);
-      console.log("NewTotal:", newTotal);
       setTotalItems(newTotal);
       toast.success("สั่งซื้อสินค้าสำเร็จ!");
     },

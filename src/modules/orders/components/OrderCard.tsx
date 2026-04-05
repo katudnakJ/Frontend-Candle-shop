@@ -47,10 +47,12 @@ export const OrderCard = (
     );
   };
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
+  const [isConfirmReceived, setIsConfirmReceived] = useState(false);
 
   const { 
     handlePaymentAgain,
     handleAddTrackingNumber,
+    handleConfirmReceived,
     getStatusDisplay,
     handleDowloadPDF,
     isPDFCreating,
@@ -79,7 +81,7 @@ export const OrderCard = (
 `;
 
   return (
-    <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden mb-8 transition-all">
+    <div className="bg-white border-3 border-black rounded-4xl overflow-hidden mb-8 transition-all">
       <style>{pulseStyle}</style>
       {/* <ReceiptTemplate ref={receiptRef} order={order} /> */}
 
@@ -202,7 +204,7 @@ export const OrderCard = (
                   </div>
                 )}
 
-                {(isOrderCompleted || isOrderToReceive ) && 
+                {(isOrderToShip || isOrderCompleted || isOrderToReceive ) && 
                 (
                   <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
                     <div className="flex items-center gap-3">
@@ -233,8 +235,7 @@ export const OrderCard = (
                   </div>
                 )}
 
-                {/* กรณี TS/TR*/}
-                {(isOrderToShip || isOrderToReceive || isOrderCompleted) &&
+                {( isOrderToReceive || isOrderCompleted) &&
                   isOrderExisting && (
                     <div className="flex flex-col p-4 bg-blue-50 border-2 border-black rounded-2xl gap-3  ">
                       <div className="flex items-center gap-2">
@@ -399,10 +400,32 @@ export const OrderCard = (
 
                   {role === USER_ROLE.CUSTOMER &&
                     isOrderToReceive && (
-                      <button className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
+                      <button 
+                        onClick={() => setIsConfirmReceived(true)}
+                        className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
                         ได้รับสินค้าแล้ว
                       </button>
                     )}
+
+                    {isConfirmReceived && (
+                        <>
+                          <ConfirmDialog
+                        open={isConfirmReceived}
+                        onClose={() => setIsConfirmReceived(false)}
+                        onConfirm={async () => {
+                          await handleConfirmReceived(order.orderId);
+                          setIsConfirmReceived(false);
+                        } }
+                        title="ยืนยันการรับสินค้า" content={
+                          <div className="flex flex-col gap-1">
+                            <p>คุณต้องการยืนยันการรับสินค้า</p>
+                            <p>หมายเลข {order.orderNo} หรือไม่?</p>
+                          </div>
+                        }        
+                        />                    
+                        </>
+                      )
+                    }
 
                   {isOrderPending && (
                     <>

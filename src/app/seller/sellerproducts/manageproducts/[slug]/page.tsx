@@ -65,15 +65,7 @@ export default function ManageProductsPage() {
     data: detailData,
     isLoading: isFetchingDetail,
     isError: isDetailError,
-    error,
   } = useShopProductDetail(productId || "");
-
-  console.log("RAWPRODUCTDETAIL", detailData);
-  if (isDetailError) {
-    if (process.env.NODE_ENV === "development") {
-      console.log("สาเหตุการพัง:", error);
-    }
-  }
 
   useEffect(() => {
     if (productSlug && productSlug !== "add" && !productId) {
@@ -249,28 +241,6 @@ export default function ManageProductsPage() {
       };
 
       if (isEditMode && productId) {
-        if (process.env.NODE_ENV === "development") {
-          console.log("===== 📝 LOGIC CHECK: PRE-SUBMISSION =====");
-          console.log("ProductName", tempData.productName);
-          console.log("Description", payload.productName);
-          console.log("Price", payload.price);
-          console.log("Weight", payload.weight);
-          console.log("Active", payload.active);
-          console.log("Featured", payload.featured);
-          console.log("Original Image IDs:", originalImageIds);
-          console.log("Current Image IDs (from UI):", currentImageIds);
-          console.log(">>> Result - deleteImageIds:", deleteImageIds);
-          console.log(
-            "Primary Image Type:",
-            finalExistIntoPrimary ? "SERVER_IMAGE" : "NEW_BLOB_IMAGE",
-          );
-          console.log(">>> Result - existIntoPrimary:", finalExistIntoPrimary);
-          console.log(
-            "New Files to Upload (imagesData):",
-            images.filter((img) => !img.productImgId).length,
-          );
-          console.log("==========================================");
-        }
         await handleUpdate({
           id: productId,
           payload,
@@ -280,13 +250,8 @@ export default function ManageProductsPage() {
       } else {
         await handleCreate(payload);
       }
-      if (isEditMode) {
-        console.log("Edit Product Success");
-      } else {
-        console.log("Add Product Success");
-      }
+      
     } catch (error) {
-      console.error("Submission failed in Page:", error);
     }
   };
 

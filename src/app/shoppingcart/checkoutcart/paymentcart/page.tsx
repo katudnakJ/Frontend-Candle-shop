@@ -91,19 +91,12 @@ export default function PaymentPage() {
       ? orderDetailResponse.data
       : orderDetailResponse;
   const orderDetail = rawData?.orderDetail;
-  const orderItems = rawData?.orderItems || [];
-  if (process.env.NODE_ENV === "development") {
-    console.log("RawDataorderDetailResponse:", rawData);
-    console.log("FinalOrderDetail:", orderDetail);
-    console.log("FinalOrderItem:", orderItems);
-  }
+  const orderItems = useMemo(() => rawData?.orderItems ?? [], [rawData?.orderItems]);
+  
   const { mutate: repayMutate, isPending: isRepaying } =
     useRepayUpdatePaymentSlip();
 
   const { data, isLoading } = useGetCartData(size);
-  if (process.env.NODE_ENV === "development") {
-    console.log("CheckoutPRODUCT:", data);
-  }
 
   const cartItem = useMemo(() => {
     const pages = data?.pages || [];
@@ -115,9 +108,6 @@ export default function PaymentPage() {
 
   const { data: existingQRCode, isLoading: isLoadingQR } =
     useGetQRPaymentImageForCus();
-  if (process.env.NODE_ENV === "development") {
-    console.log("ExistingQRCode:", existingQRCode);
-  }
 
   useEffect(() => {
     if (!selectedAddress && addressesData) {
@@ -241,7 +231,6 @@ export default function PaymentPage() {
     getPrimaryImage,
   ]);
 
-  console.log("PaymentData", paymentData);
   const handleConfirm = () => {
     setIsOpen(false);
 
@@ -270,14 +259,6 @@ export default function PaymentPage() {
       if (!addressId) {
         toast.error("ข้อมูลที่อยู่หรือสลิปไม่ครบถ้วน");
         return;
-      }
-
-      if (process.env.NODE_ENV === "development") {
-        console.log("Submitting with Address:", selectedAddress?.addressId);
-        console.log(
-          "Submitting Items:",
-          checkoutItems.length > 0 ? checkoutItems : selectedItems,
-        );
       }
 
       const idsToSubmit =
@@ -334,16 +315,6 @@ export default function PaymentPage() {
 
   const isAddressReady =
     mode === "repay" ? !!orderDetailResponse : !!selectedAddress;
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      console.log("=== Zustand Store Monitor ===");
-      console.log("Selected IDs:", selectedIds);
-      console.log("Checkout Items:", checkoutItems);
-      console.log("Selected Address:", selectedAddress);
-      console.log("============================");
-    }
-  }, [selectedIds, checkoutItems, selectedAddress]);
 
   if (
     !isMounted ||

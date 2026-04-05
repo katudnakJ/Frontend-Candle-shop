@@ -32,7 +32,7 @@ export default function OrderHistoryPage() {
     <div className="flex flex-col w-full min-h-screen bg-white">
       <Header />
       <main className="grow bg-white">
-        <div className="max-w-[1200px] mx-auto p-4">
+        <div className="max-w-300 mx-auto p-4">
           <PreviousButton isCusOrderHistory={true} />
           <div className="max-w-2xl md:max-w-4xl mx-auto px-4 mt-6">
             <div className="flex bg-white border-4 border-black rounded-2xl overflow-hidden  mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]  ">
@@ -69,7 +69,7 @@ export default function OrderHistoryPage() {
                   ))
                 ) : (
                   /* กรณีไม่มีข้อมูลใน Tab นั้น */
-                  <div className="text-center py-20 bg-white border-4 border-dashed border-gray-300 rounded-[2rem]">
+                  <div className="text-center py-20 bg-white border-4 border-dashed border-gray-300 rounded-4xl">
                     <p className="text-gray-400 font-black text-xl">
                       ไม่พบรายการสั่งซื้อในหน้านี้
                     </p>

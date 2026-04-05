@@ -39,7 +39,6 @@ export default function SellerSettingPage() {
   const handleFileSelect = (file: File | null) => {
     setSelectedFile(file);
   };
-  console.log("data : ", existingQRCode);
 
   const handleConfirm = () => {
     if (!selectedFile) {

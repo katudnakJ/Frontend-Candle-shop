@@ -39,9 +39,7 @@ export default function ProductPurchaseActions({
       { productId, quantity },
       {
         onSuccess: async (response) => {
-          if (process.env.NODE_ENV === "development") {
-          console.log("Check Response in Component:", response);
-          }
+
           queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
           const resdata=  response?.data || response;
           const typedData = resdata  as AddCartResData

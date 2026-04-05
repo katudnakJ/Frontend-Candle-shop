@@ -53,9 +53,6 @@ export default function ShopProductList() {
       setProductToDelete(null);
       try {
         await deleteProduct(id);
-        if (process.env.NODE_ENV === "development") {
-          console.log("ลบสินค้าสำเร็จ");
-        }
       } catch (error) {
         console.error("Failed to delete:", error);
       }

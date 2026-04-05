@@ -17,7 +17,6 @@ export default function ShopProductCard({
   onEdit,
   onDelete,
 }: ShopProductCardProps) {
-  console.log("SELLERSHOPPRODUCT", product);
   return (
     <div
       className={`relative bg-white rounded-2xl p-4 mb-3 flex gap-4 border transition-all ${
