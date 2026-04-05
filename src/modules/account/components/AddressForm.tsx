@@ -36,11 +36,11 @@ export default function AddressForm({
     currentProvinceData,
     currentAmphoeData,
     provinces,
-    handleInternalSubmit
+    handleInternalSubmit,
   } = useAddressForm(initialData);
 
   const [openConfirm, setOpenConfirm] = useState(false);
-  
+
   const handleCheckValid = () => {
     if (validateForm()) {
       setOpenConfirm(true);
@@ -49,11 +49,6 @@ export default function AddressForm({
         <div className="flex flex-col justify-center py-1">
           <span className="leading-tight">กรุณาระบุข้อมูลให้ครบถ้วน</span>
         </div>,
-        {
-          className:
-            " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-          duration: 3000,
-        },
       );
     }
   };
@@ -61,24 +56,20 @@ export default function AddressForm({
     try {
       await handleInternalSubmit(onSubmit);
       toast.success(
-      <div className="flex flex-col justify-center py-1">
-        <span className="leading-tight">
-          {" "}
-          {initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"}{" "}
-          เรียบร้อยแล้ว!
-        </span>
-      </div>,
-      {
-        className:
-          " bg-white border-2 border-cprojectone rounded-xl font-bold shadow-2xl text-black mx-auto sm:ml-auto sm:mr-6 h-20",
-        duration: 3000,
-      },
-    );
-    setOpenConfirm(false);
-    }catch (error) {
+        <div className="flex flex-col justify-center py-1">
+          <span className="leading-tight">
+            {" "}
+            {initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"}{" "}
+            เรียบร้อยแล้ว!
+          </span>
+        </div>,
+      );
+      setOpenConfirm(false);
+    } catch (error) {
       const err = error as GenericResponse<{ id: string }>;
       toast.error(
-        err?.status?.message ?? `เกิดข้อผิดพลาดในการ ${initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"} กรุณาลองใหม่อีกครั้ง`
+        err?.status?.message ??
+          `เกิดข้อผิดพลาดในการ ${initialData ? "แก้ไขที่อยู่จัดส่ง" : "เพิ่มที่อยู่จัดส่ง"} กรุณาลองใหม่อีกครั้ง`,
       );
     }
   };
@@ -110,7 +101,7 @@ export default function AddressForm({
               value={formData.recipientFirstName}
               onChange={handleChange}
               placeholder="กรุณากรอกชื่อ"
-              className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none transition-all ${
+              className={`w-full p-3 border-2 rounded-xl text-black hover:border-black focus:border-black outline-none transition-all ${
                 errors.recipientFirstName
                   ? "border-red-500 bg-red-50"
                   : "border-gray-200"
@@ -141,7 +132,7 @@ export default function AddressForm({
               value={formData.recipientLastName}
               onChange={handleChange}
               placeholder="กรุณากรอกนามสกุล"
-              className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none transition-all ${
+              className={`w-full p-3 border-2 rounded-xl text-black hover:border-black focus:border-black outline-none transition-all ${
                 errors.recipientLastName
                   ? "border-red-500 bg-red-50"
                   : "border-gray-200"
@@ -188,7 +179,9 @@ export default function AddressForm({
               <span
                 className={`text-[10px] ${formData.deliveryAddress?.length === 100 ? "text-red-500" : "text-gray-400"}`}
               >
-              <label className="text-sm font-bold text-black">ที่อยู่ *</label>
+                <label className="text-sm font-bold text-black">
+                  ที่อยู่ *
+                </label>
                 {formData.deliveryAddress?.length || 0}/100
               </span>
             </div>
@@ -199,7 +192,7 @@ export default function AddressForm({
               value={formData.deliveryAddress}
               placeholder="บ้านเลขที่, ถนน, ซอย *"
               onChange={handleChange}
-              className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none resize-none transition-all ${
+              className={`w-full p-3 border-2 rounded-xl text-black hover:border-black focus:border-black outline-none resize-none transition-all ${
                 errors.deliveryAddress
                   ? "border-red-500 bg-red-50"
                   : "border-gray-200"
@@ -234,21 +227,34 @@ export default function AddressForm({
                     {...params}
                     placeholder="เลือกจังหวัด *"
                     error={!!errors.province}
+                    className={
+                      errors.province
+                        ? "bg-red-50 rounded-xl "
+                        : "bg-white rounded-xl"
+                    }
                     variant="outlined"
                     size="small"
                   />
                 )}
-                // ใช้ className ของ Tailwind ช่วยจัดการ h-12 และ rounded
                 className="bg-white rounded-xl"
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "12px",
                     height: "48px",
+                    "& fieldset": {
+                      borderWidth: "2px",
+                      borderColor: errors.province ? "#ef4444" : "#e5e7eb",
+                    },
+
+                    "&.Mui-focused fieldset": {
+                      borderWidth: "2px",
+                      borderColor: "black",
+                    },
                   },
                 }}
               />
               {errors.province && (
-                <span className="text-red-500 text-[10px] ml-1">
+                <span className="text-red-500 text-[12px] ml-1">
                   {errors.province}
                 </span>
               )}
@@ -275,6 +281,11 @@ export default function AddressForm({
                     {...params}
                     placeholder="เลือกอำเภอ *"
                     error={!!errors.district}
+                    className={
+                      errors.district
+                        ? "bg-red-50 rounded-xl "
+                        : "bg-white rounded-xl"
+                    }
                     size="small"
                   />
                 )}
@@ -282,11 +293,20 @@ export default function AddressForm({
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "12px",
                     height: "48px",
+                    "& fieldset": {
+                      borderWidth: "2px",
+                      borderColor: errors.province ? "#ef4444" : "#e5e7eb",
+                    },
+
+                    "&.Mui-focused fieldset": {
+                      borderWidth: "2px",
+                      borderColor: "black",
+                    },
                   },
                 }}
               />
               {errors.district && (
-                <span className="text-red-500 text-[10px] ml-1">
+                <span className="text-red-500 text-[12px] ml-1">
                   {errors.district}
                 </span>
               )}
@@ -308,19 +328,35 @@ export default function AddressForm({
                     postcode: zip.toString(),
                   }));
                   setErrors((p) => ({ ...p, subDistrict: "" }));
+                  setErrors((p) => ({ ...p, subDistrict: "" }));
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     placeholder="เลือกตำบล *"
                     error={!!errors.subDistrict}
+                    error={!!errors.subDistrict}
                     size="small"
+                    className={
+                      errors.subDistrict
+                        ? "bg-red-50 rounded-xl "
+                        : "bg-white rounded-xl"
+                    }
                   />
                 )}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "12px",
                     height: "48px",
+                    "& fieldset": {
+                      borderWidth: "2px",
+                      borderColor: errors.province ? "#ef4444" : "#e5e7eb",
+                    },
+
+                    "&.Mui-focused fieldset": {
+                      borderWidth: "2px",
+                      borderColor: "black",
+                    },
                   },
                 }}
               />
@@ -333,7 +369,9 @@ export default function AddressForm({
 
             {/* รหัสไปรษณีย์ */}
             <div>
-              <label className="text-sm font-bold text-black">รหัสไปรษณีย์ *</label>
+              <label className="text-sm font-bold text-black">
+                รหัสไปรษณีย์ *
+              </label>
               <input
                 readOnly
                 value={formData.postcode ?? ""}
@@ -353,9 +391,10 @@ export default function AddressForm({
               <button
                 key={label}
                 type="button"
-                onClick={() =>
-                  setFormData((prev) => ({ ...prev, addressLabel: label }))
-                }
+                onClick={() =>{
+                  setFormData((prev) => ({ ...prev, addressLabel: label }));
+                  setErrors((prev) => ({ ...prev, addressLabel: "" }));
+                }}
                 className={`px-4 py-2 rounded-xl border-2 font-medium transition-all ${
                   formData.addressLabel === label
                     ? "bg-black text-white border-black"
@@ -371,6 +410,11 @@ export default function AddressForm({
               </button>
             ))}
           </div>
+             {errors.addressLabel && (
+                  <span className="text-red-500 text-[12px] ml-1">
+                    {errors.addressLabel}
+                  </span>
+                )}  
 
           <div className="flex item-center gap-3 pt-2 ">
             <FormControlLabel

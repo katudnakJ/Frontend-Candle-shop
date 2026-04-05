@@ -26,7 +26,7 @@ export const useCheckoutMutation = () => {
       const newTotal = Math.max(0, totalItems - purchasedCount);
 
       setTotalItems(newTotal);
-      toast.success("สั่งซื้อสินค้าสำเร็จ!");
+      toast.success("ยืนยันการชำระเงินเรียบร้อย");
     },
 
     onError: (error: Status) => {

@@ -17,6 +17,8 @@ import { useAddressForm } from "@/modules/account/hooks/useAddressForm";
 import { Status } from "@/types/response.type";
 import { useGetQRPaymentImage } from "@/modules/seller/services/payment.service";
 import { useAuthStoreUserLogin } from "@/store/userLogin";
+import { USER_ROLE } from "@/constants/userRole";
+import { RoleGuard } from "@/auth/RoleGuard";
 
 export default function SellerSettingPage() {
   const router = useRouter();
@@ -133,6 +135,7 @@ export default function SellerSettingPage() {
 
   return (
     <div>
+      <RoleGuard allowedRoles={[USER_ROLE.SELLER , USER_ROLE.ADMIN, USER_ROLE.DEVELOPER]}>
       <div className="flex flex-col min-h-screen bg-white">
         <SellerHeader />
         <main className="mb-4">
@@ -274,6 +277,7 @@ export default function SellerSettingPage() {
           variant="danger"
         />
       </div>
+      </RoleGuard>
     </div>
   );
 }

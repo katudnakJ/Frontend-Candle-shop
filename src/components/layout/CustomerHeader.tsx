@@ -9,7 +9,7 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import { Fragment, useEffect} from "react";
+import { Fragment, useEffect } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -25,11 +25,12 @@ import { useQueryClient } from "@tanstack/react-query";
 const Header = () => {
   const queryClient = useQueryClient();
   const { totalItems: storeTotalItems, setTotalItems } = useCartStore();
-  const { data } = useGetCartData(100 , "checkout") 
+  const { data } = useGetCartData(100, "checkout");
   useEffect(() => {
     if (data) {
       const pages = data?.pages || [];
-      const CartCountData  = pages[pages.length - 1]?.data || pages[pages.length - 1];
+      const CartCountData =
+        pages[pages.length - 1]?.data || pages[pages.length - 1];
       const apiTotal = CartCountData.totalItems;
 
       setTotalItems(apiTotal);

@@ -287,7 +287,7 @@ export default function PaymentPage() {
 
   const handleSuccessNavigation = () => {
     setSuccessCheckout(true);
-    toast.success("ยืนยันการชำระเงินเรียบร้อย");
+    
 
     setTimeout(() => {
       setSelectedIds([]);

@@ -33,10 +33,11 @@ export const PreviousButton = ({
       window.requestAnimationFrame(() => {
         if (savedPath === "/" || savedPath === "?page=0") {
           setBackUrl("/");
-        } else if (savedPath.startsWith("/")) {
-          setBackUrl(savedPath);
         } else {
-          setBackUrl(`/${savedPath}`);
+          const formattedPath = savedPath.startsWith("/")
+            ? savedPath
+            : `/${savedPath}`;
+          setBackUrl(formattedPath);
         }
       });
     }
@@ -115,7 +116,7 @@ export const PreviousButton = ({
           </h1>
         </div>
       )}
-         {isCusOrderHistory && (
+      {isCusOrderHistory && (
         <div className="flex items-center">
           <Link href={backUrl}>
             <ChevronLeft className="w-8 h-8 text-black hover:bg-gray-100 transition-colors rounded-full" />

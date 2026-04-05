@@ -10,6 +10,8 @@ import ProductImageCarousel from "@/modules/products/components/ProductImageCaro
 import ProductPurchaseActions from "@/modules/products/components/ProductPurchaseActions";
 import { PreviousButton } from "@/components/commonui/PreviousButton";
 import { ProductDetailResData } from "@/modules/products/detailproduct";
+import { USER_ROLE } from "@/constants/userRole";
+import { RoleGuard } from "@/auth/RoleGuard";
 
 export default function ProductDetailPage({
   params,
@@ -64,6 +66,12 @@ export default function ProductDetailPage({
 
   return (
     <div>
+        <RoleGuard
+        allowedRoles={[
+          USER_ROLE.DEVELOPER,
+          USER_ROLE.CUSTOMER,
+        ]}
+      >
       <div className="flex flex-col min-h-screen bg-white ">
         <Header />
         <main className="grow bg-white pb-20">
@@ -136,6 +144,7 @@ export default function ProductDetailPage({
         </main>
         <Footer />
       </div>
+      </RoleGuard>
     </div>
   );
 }
