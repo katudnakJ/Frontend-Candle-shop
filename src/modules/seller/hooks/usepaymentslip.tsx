@@ -19,11 +19,6 @@ export const usePaymentSlip = (
 
   const revokePreview = useCallback((url: string | null) => {
     if (url && url.startsWith("blob:")) {
-      console.log(
-        `%c[RAM Released] %cRevoking Slip: ${url}`,
-        "color: red; font-weight: bold;",
-        "color: inherit;",
-      );
       URL.revokeObjectURL(url);
     }
   }, []);
@@ -78,11 +73,7 @@ export const usePaymentSlip = (
       revokePreview(slipPreview);
 
       const previewUrl = URL.createObjectURL(finalFile);
-      console.log(
-        `%c[RAM Allocated] %cCreated Slip Preview: ${file.name}`,
-        "color: green; font-weight: bold;",
-        "color: inherit;",
-      );
+   
       setSlipPreview(previewUrl);
     } catch (error) {
       console.error("Compression failed:", error);

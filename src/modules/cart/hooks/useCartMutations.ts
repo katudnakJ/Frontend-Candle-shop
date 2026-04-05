@@ -29,26 +29,14 @@ export const useUpdateCartLocal = () => {
     queryClient.setQueryData<InfiniteData<GenericResponse<ShoppingCartData>>>(
       queryKey,
       (old) => {
-        if (process.env.NODE_ENV === "development") {
-          console.log("1. Old Cache Data:", old);
-        }
+       
         if (!old) return old;
         return {
           ...old,
-          pages: old.pages.map((page, index) => {
-            if (process.env.NODE_ENV === "development") {
-              console.log(`2. Page ${index} structure:`, page);
-            }
+          pages: old.pages.map((page) => {
 
             const target = page.data || page;
-            if (process.env.NODE_ENV === "development") {
-              console.log(
-                `3. Target cartItems in Page ${index}:`,
-                target?.cartItems,
-              );
-            }
             if (!target?.cartItems) {
-              console.error("❌ ERROR: cartItems not found in this structure!");
               return page;
             }
 
@@ -88,23 +76,14 @@ export const useUpdateCartItem = (size: number = sizesameinuseCart) => {
       queryClient.setQueryData<InfiniteData<GenericResponse<ShoppingCartData>>>(
         queryKey,
         (old) => {
-          if (process.env.NODE_ENV === "development") {
-            console.log("4. Old UpdateCart Data:", old);
-          }
+          
           if (!old) return old;
           return {
             ...old,
             pages: old.pages.map((page) => {
-              if (process.env.NODE_ENV === "development") {
-                console.log("5. Page UpdateCart structure:", page);
-              }
+             
               const target = page.data || page;
-              if (process.env.NODE_ENV === "development") {
-                console.log(
-                  "6. Target UpdateCart in Page :",
-                  target?.cartItems,
-                );
-              }
+              
               const updatedItems = target.cartItems?.map((item: CartItem) =>
                 item.shoppingCartItemId === newData.shoppingCartItemId
                   ? { ...item, quantity: newData.quantity }
@@ -131,11 +110,7 @@ export const useUpdateCartItem = (size: number = sizesameinuseCart) => {
       toast.error(message, {
         id: "update-cart-error",
       });
-      if (process.env.NODE_ENV === "development") {
-        console.error(
-          `[UpdateCart Error] Status: ${err?.statusCode ?? "N/A"}, Remark: ${err?.remark ?? "Client Error"}`,
-        );
-      }
+      
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
@@ -161,26 +136,15 @@ export const useDeleteCartItem = (size: number = sizesameinuseCart) => {
       queryClient.setQueryData<InfiniteData<GenericResponse<ShoppingCartData>>>(
         queryKey,
         (old) => {
-           if (process.env.NODE_ENV === "development") {
-            console.log("7. Old DeleteCart Data:", old);
-          }
+           
           if (!old) return old;
           return {
             ...old,
             pages: old.pages.map((page) => {
-              if (process.env.NODE_ENV === "development") {
-                console.log("8. Page DeleteCart structure:", page);
-              }
+             
               const target = page.data || page;
-                if (process.env.NODE_ENV === "development") {
-                console.log(
-                  "9. Target DeleteCart in Page :",
-                  target?.cartItems,
-                );
-              }
 
                 if (!target?.cartItems) {
-              console.error("❌ ERROR: cartItems not found Can't DeleteCartItem");
               return page;
             }
               const updatedItems = target.cartItems?.filter(

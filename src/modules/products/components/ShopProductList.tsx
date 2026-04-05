@@ -1,4 +1,3 @@
-// components/seller/ProductList.tsx
 "use client";
 
 import { useState } from "react";
@@ -22,7 +21,6 @@ export default function ShopProductList() {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const {
     nonFeaturedProducts,
-    // featuredProducts,
     isFetchingNextPage,
     isInitialLoading,
     hasNextPage,
@@ -55,9 +53,6 @@ export default function ShopProductList() {
       setProductToDelete(null);
       try {
         await deleteProduct(id);
-        if (process.env.NODE_ENV === "development") {
-          console.log("ลบสินค้าสำเร็จ");
-        }
       } catch (error) {
         console.error("Failed to delete:", error);
       }
@@ -117,25 +112,6 @@ export default function ShopProductList() {
     <>
       {isDeleting && <FullscreenLoader />}
       <div className="flex flex-col gap-6 pb-24">
-        {/* {featuredProducts.length > 0 && (
-          <section>
-            <h2 className="text-sm font-bold text-blue-600 mt-3 mb-3 font-prompt">
-              ⭐ สินค้าที่ขายดีของร้านวันนี้
-            </h2>
-            <div className="flex flex-col gap-3">
-              {featuredProducts.map((product) => (
-                <ShopProductCard
-                  key={product.productId}
-                  product={product}
-                  featured={true} //
-                  onDelete={(id) => handleDelete(id)}
-                  onEdit={(slug) => handleEditRedirect(slug)}
-                />
-              ))}
-            </div>
-          </section>
-        )} */}
-
         <section>
           <h2 className="text-sm font-bold text-gray-500 mt-5 mb-3 font-prompt">
             สินค้าที่มีจำหน่ายในร้านทั้งหมด

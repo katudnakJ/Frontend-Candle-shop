@@ -35,14 +35,8 @@ export default function CheckoutPage() {
     setSelectedAddress,
   } = useCartStore();
   const { data, isLoading } = useGetCartData();
-  if (process.env.NODE_ENV === "development") {
-    console.log("CheckoutPRODUCT:", data);
-  }
 
   const { data: addressesData } = useGetAddressesList();
-  if (process.env.NODE_ENV === "development") {
-    console.log("ADDRESS??CheckoutPRODUCT:", addressesData);
-  }
 
   const selectedAddress = useMemo(() => {
     const list = addressesData;
@@ -54,9 +48,6 @@ export default function CheckoutPage() {
     }
     return null;
   }, [addressesData]);
-  if (process.env.NODE_ENV === "development") {
-    console.log("SelectedAddress??CheckoutPRODUCT:", selectedAddress);
-  }
   const cartItem = useMemo(() => {
     const pages = data?.pages || [];
     return pages.flatMap((p) => {
@@ -131,11 +122,6 @@ export default function CheckoutPage() {
         <Footer />
       </div>
     );
-  }
-  if (process.env.NODE_ENV === "development") {
-    console.log("All Items in Store:", cartItem);
-    console.log("Selected IDs from Session:", selectedIds);
-    console.log("Filtered Selected Items:", selectedItems);
   }
 
   return (

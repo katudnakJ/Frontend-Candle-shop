@@ -1,4 +1,3 @@
-// hooks/useProducts.ts
 import { InfiniteData, useQuery } from "@tanstack/react-query";
 import {
   useInfiniteQuery,
@@ -68,25 +67,17 @@ export const useShopProducts = () => {
       return (page as ProductHomeResData).allProducts || [];
     }) || [];
 
-  // สำหรับ รับค่าที่ เป็นสินค้าขายดี
-  // const allFeaturedProducts = !isSearchMode
-  //   ? (data?.pages[0] as ProductHomeResData)?.featuredProducts || []
-  //   : [];
-
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     retry: (failureCount, error: Status) => {
       if (error?.statusCode === "500" && failureCount < 1) {
-        console.log(
-          `[Retry] กำลังลองลบใหม่อีกครั้ง... รอบที่ ${failureCount + 1}`,
-        );
+      
         return true;
       }
       return false;
     },
     retryDelay: 1000,
     onSuccess: (res: GenericResponse<null>) => {
-      console.log("RESPRODUCT", res);
       if (res.status.statusCode.includes("200")) {
         queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
         toast.success("ทำการลบสินค้าสำเร็จ");
@@ -96,15 +87,13 @@ export const useShopProducts = () => {
     },
 
     onError: (error: Status) => {
-      console.log("ERRORPRODUCT", error);
       const errorMessage = error?.message || "ไม่สามารถติดต่อ Server ได้";
       toast.error(errorMessage);
     },
   });
 
   const editMutation = useMutation({
-    mutationFn: async (id: string) => {
-      console.log("Editing...", id);
+    mutationFn: async () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
@@ -113,10 +102,7 @@ export const useShopProducts = () => {
     onError: () => toast.error("แก้ไขไม่สำเร็จ"),
   });
 
-  // const isLoading =
-  //   isFetching || deleteMutation.isPending || editMutation.isPending;
   return {
-    // featuredProducts: allFeaturedProducts,
     nonFeaturedProducts: allFetchedProducts,
     totalAll: data?.pages[0]?.totalProducts || 0,
     isInitialLoading: isFetching && !data,
@@ -137,7 +123,6 @@ export const useShopProducts = () => {
 
 export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: ({

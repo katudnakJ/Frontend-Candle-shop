@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useOrderCardService } from "../services";
 import { OrdersResponse } from "../type";
-import { ROUTE } from "@/constants/routes";
 import { getOrderReceiptWithStale } from "../services";
 
 
@@ -56,6 +55,7 @@ export const useOrderCard = (
 
     const {
         addTrackingNumber,
+        confirmReceived
     } = useOrderCardService();
 
     const [isPDFCreating, setIsPDFCreating] = useState(false);
@@ -75,7 +75,6 @@ export const useOrderCard = (
     await addTrackingNumber.mutateAsync({ orderId, trackingNumber });
     setIsVerifyOpen(false);
     router.refresh();
-    router.push(ROUTE.SELLER.ORDER);
   }
 
   const handleDowloadPDF = async(orderId: string) => {
@@ -93,11 +92,17 @@ export const useOrderCard = (
     window.open(fileUrl?.signedFileUrl, "_blank");
   }
 
+  const handleConfirmReceived = async (orderId: string) => {
+    await confirmReceived.mutateAsync(orderId);
+    router.refresh();
+  }
     return { 
         handlePaymentAgain,
         handleAddTrackingNumber,
+        handleConfirmReceived,
         getStatusDisplay,
         handleDowloadPDF,
         isPDFCreating,
      }
+
 }

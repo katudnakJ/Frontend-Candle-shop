@@ -39,9 +39,7 @@ export default function ProductPurchaseActions({
       { productId, quantity },
       {
         onSuccess: async (response) => {
-          if (process.env.NODE_ENV === "development") {
-            console.log("Check Response in Component:", response);
-          }
+
           queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
           const resdata = response?.data || response;
           const typedData = resdata as AddCartResData;
@@ -91,7 +89,7 @@ export default function ProductPurchaseActions({
           target="_blank"
           className="col-span-2  border border-black hover:bg-gray-50 cursor-pointer flex flex-col items-center justify-center py-2"
         >
-          <LineIcon size={32} className="md:w-[40px] md:h-[40px]" />
+          <LineIcon size={32} className="md:w-10 md:h-10" />
           <span className="text-[10px] md:text-xs text-black font-bold text-center leading-tight px-1">
             Line
           </span>
@@ -137,7 +135,7 @@ export default function ProductPurchaseActions({
                   : "คุณต้องการเพิ่มสินค้าลงรถเข็นใช่หรือไม่?"}
               </span>
 
-              <div className="flex flex-col space-y-2 w-full max-w-[300px]">
+              <div className="flex flex-col space-y-2 w-full max-w-75">
                 {" "}
                 <div className="flex justify-between items-start">
                   <span className="text-xl font-bold text-black whitespace-nowrap">

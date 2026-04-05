@@ -16,7 +16,6 @@ export const fetchShoppingCart = async (page: number, size: number) => {
     throw new Error("No Shopping Cart Data received from API");
   }
 
-  // console.log("fetchshoppingcartdata: " , response.data);
   return response.data;
 };
 

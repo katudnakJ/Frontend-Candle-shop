@@ -28,7 +28,7 @@ export const ScrollToTop = ({ threshold = 400 }) => {
     <button
       onClick={scrollToTop}
       className={`
-        fixed bottom-6 right-6 z-[9999]
+        fixed bottom-6 right-6 z-9999
         flex items-center justify-center
         w-15 h-15 rounded-full
         bg-[#3B382B] text-white
@@ -39,6 +39,7 @@ export const ScrollToTop = ({ threshold = 400 }) => {
           : 'opacity-0 translate-y-4 pointer-events-none'}
         hover:bg-neutral-700 hover:shadow-[0_4px_20px_rgba(0,0,0,0.22)]
         active:scale-95
+        cursor-pointer
       `}
       aria-label="Scroll to top"
     >

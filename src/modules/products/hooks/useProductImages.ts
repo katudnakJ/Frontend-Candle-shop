@@ -58,12 +58,6 @@ export const useProductImages = (maxFiles = 3) => {
           });
           const previewUrl = URL.createObjectURL(finalFile);
 
-          console.log(
-            `%c[RAM Allocated] %cCreated Preview for: ${file.name}`,
-            "color: green; font-weight: bold;",
-            "color: inherit;",
-          );
-          console.log("URL:", previewUrl);
           return {
             file: finalFile,
             preview: previewUrl,
@@ -87,11 +81,7 @@ export const useProductImages = (maxFiles = 3) => {
     const newImages = [...prev];
     const [selectedImage] = newImages.splice(index,1)
     newImages.unshift(selectedImage);
-    console.log("🔄 After Swap - New Primary:", {
-      preview: newImages[0].preview,
-      isFromServer: !!newImages[0].productImgId,
-      id: newImages[0].productImgId
-    });
+    
   return newImages;
     });
   }, []);
@@ -103,11 +93,6 @@ export const useProductImages = (maxFiles = 3) => {
 
       prevImages.forEach((img) => {
         if (img.preview.startsWith("blob:")) {
-          console.log(
-            `%c[RAM Released1] %cRevoking: ${img.preview}`,
-            "color: red; font-weight: bold;",
-            "color: inherit;",
-          );
           URL.revokeObjectURL(img.preview);
         }
       });
@@ -126,11 +111,6 @@ export const useProductImages = (maxFiles = 3) => {
       const targetImage = prev[index];
       const updated = [...prev];
      if (targetImage.preview && targetImage.preview.startsWith("blob:")) {
-      console.log(
-        `%c[RAM Released2] %cRevoking: ${targetImage.preview}`,
-        "color: red; font-weight: bold;",
-        "color: inherit;"
-      );
       URL.revokeObjectURL(targetImage.preview);
     }
       updated.splice(index, 1);

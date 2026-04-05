@@ -17,15 +17,6 @@ export const postCheckoutService = async (payload: CheckoutRequest) => {
 
     formData.append("image_data", payload.imageData);
 
-    if (process.env.NODE_ENV === "development") {
-      console.log("--- 📦Checking FormData Payload ---");
-
-      for (const pair of formData.entries()) {
-        console.log(`${pair[0]}:`, pair[1]);
-      }
-      console.log("--- 📦Ending FormData Payload ---");
-    }
-
     const response = await apiClient.post<GenericResponse<CheckoutRequest>>(
       "/v1/checkout",
       formData,

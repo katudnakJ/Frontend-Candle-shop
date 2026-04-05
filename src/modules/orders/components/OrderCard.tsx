@@ -24,20 +24,20 @@ import { useOrderCard } from "../hooks/index";
 interface OrderCardProps {
   order: OrdersResponse;
   role?: USER_ROLE | USER_ROLE.CUSTOMER;
-  defaultExpanded? : boolean;
+  defaultExpanded?: boolean;
 }
 
-export const OrderCard = (
-  { 
-    order, 
-    role, 
-    defaultExpanded 
-  }: OrderCardProps) => {
-  const trackingList = order?.trackingNo?.join(", ").split(/[,\s]+/).filter(Boolean);
+export const OrderCard = ({ order, role, defaultExpanded }: OrderCardProps) => {
+  const trackingList = order?.trackingNo
+    ?.join(", ")
+    .split(/[,\s]+/)
+    .filter(Boolean);
   const [isConfirmTrackingNoopen, setisConfirmTrackingNoopen] = useState(false);
   const [trackkingno, settrackkingno] = useState("");
   const [cleanTrackingList, setCleanTrackingList] = useState<string[]>([]);
-  const [isCardExpanded, setIsCardExpanded] = useState(defaultExpanded ?? false);
+  const [isCardExpanded, setIsCardExpanded] = useState(
+    defaultExpanded ?? false,
+  );
   const [expandedItem, setExpandedItem] = useState<string[]>([]);
   const toggleAccordion = (id: string) => {
     setExpandedItem((prev) =>
@@ -47,28 +47,35 @@ export const OrderCard = (
     );
   };
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
+  const [isConfirmReceived, setIsConfirmReceived] = useState(false);
 
-  const { 
+  const {
     handlePaymentAgain,
     handleAddTrackingNumber,
+    handleConfirmReceived,
     getStatusDisplay,
     handleDowloadPDF,
     isPDFCreating,
   } = useOrderCard(setIsVerifyOpen);
 
-
   const statusInfo = getStatusDisplay(
-    order.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED ? 
-    order.paymentStatus : order.orderStatus
+    order.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED
+      ? order.paymentStatus
+      : order.orderStatus,
   );
 
   const isSeller = role?.toUpperCase() === USER_ROLE.SELLER;
   const isCustomer = role?.toUpperCase() === USER_ROLE.CUSTOMER;
-  const isPaymentRejected = order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED;
-  const isOrderCompleted = order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED;
-  const isOrderToReceive = order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_RECEIVE;
-  const isOrderToShip = order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP;
-  const isOrderPending = order?.orderStatus.toUpperCase() === ORDER_STATUS.PENDING;
+  const isPaymentRejected =
+    order?.paymentStatus?.toUpperCase() === PAYMENT_STATUS.REJECTED;
+  const isOrderCompleted =
+    order?.orderStatus.toUpperCase() === ORDER_STATUS.COMPLETED;
+  const isOrderToReceive =
+    order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_RECEIVE;
+  const isOrderToShip =
+    order?.orderStatus.toUpperCase() === ORDER_STATUS.TO_SHIP;
+  const isOrderPending =
+    order?.orderStatus.toUpperCase() === ORDER_STATUS.PENDING;
   const isOrderExisting = order?.trackingNo && order?.trackingNo.length > 0;
 
   const pulseStyle = `
@@ -79,7 +86,7 @@ export const OrderCard = (
 `;
 
   return (
-    <div className="bg-white border-3 border-black rounded-[2rem] overflow-hidden mb-8 transition-all">
+    <div className="bg-white border-3 border-black rounded-4xl overflow-hidden mb-8 transition-all">
       <style>{pulseStyle}</style>
       {/* <ReceiptTemplate ref={receiptRef} order={order} /> */}
 
@@ -125,6 +132,9 @@ export const OrderCard = (
                       alt={item.pricePerUnit.toString()}
                       fill
                       className="object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder-image.svg";
+                      }}
                     />
                   </div>
                   <div className="flex-grow">
@@ -188,7 +198,7 @@ export const OrderCard = (
             <div className="pt-4 space-y-4">
               {/* Info Section (Tracking / RJ / CP) */}
               <div className="px-1 pb-2 space-y-3">
-                {isPaymentRejected && isCustomer &&(
+                {isPaymentRejected && isCustomer && (
                   <div className="p-4 bg-red-100 border-2 border-red-500 rounded-2xl flex items-start gap-3">
                     <AlertCircle className="text-red-600 shrink-0" />
                     <div className="text-sm">
@@ -202,8 +212,7 @@ export const OrderCard = (
                   </div>
                 )}
 
-                {(isOrderCompleted || isOrderToReceive ) && 
-                (
+                {(isOrderToShip || isOrderCompleted || isOrderToReceive) && (
                   <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
@@ -224,63 +233,66 @@ export const OrderCard = (
                     >
                       <Download size={20} className="text-black" />
                     </button>
-                  {isPDFCreating && (
-                    <div className="flex flex-col items-center py-20">
-                      <Loader2 className="animate-spin text-black mb-2" size={40} />
-                      <p className="font-bold text-gray-500">กำลังโหลดข้อมูล...</p>
-                    </div>
-                  )}
+                    {isPDFCreating && (
+                      <div className="flex flex-col items-center py-20">
+                        <Loader2
+                          className="animate-spin text-black mb-2"
+                          size={40}
+                        />
+                        <p className="font-bold text-gray-500">
+                          กำลังโหลดข้อมูล...
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* กรณี TS/TR*/}
-                {(isOrderToShip || isOrderToReceive || isOrderCompleted) &&
-                  isOrderExisting && (
-                    <div className="flex flex-col p-4 bg-blue-50 border-2 border-black rounded-2xl gap-3  ">
-                      <div className="flex items-center gap-2">
-                        <Truck className="text-blue-600" size={20} />
-                        <p className="left-0 text-[10px] font-black text-gray-500 uppercase leading-none">
-                          {order.deliveryMethod || "พัสดุ"}
-                        </p>
-                      </div>
-
-                      <div className="flex flex-col gap-2 w-full">
-                        {trackingList?.map((no, index) => (
-                          <div
-                            key={index}
-                            className="flex items-start justify-between bg-blue-50 p-3 rounded-xl border border-blue-200 w-full"
-                          >
-                            <div className="flex flex-col">
-                              <span className="text-[10px] text-blue-500 font-bold">
-                                เลขพัสดุที่ {index + 1}
-                              </span>
-                              <span className="font-bold text-sm break-all">
-                                {no}
-                              </span>
-                            </div>
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(no!);
-                                toast.success("คัดลอกเลขพัสดุแล้ว");
-                              }}
-                              className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer"
-                            >
-                              <Copy size={16} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                      <p className="w-full text-center mt-2 py-2 max-[500px]:text-[10px] text-[12px] font-black text-red-500  leading-tight">
-                        *กรณีหมายเลข Tracking No.
-                        <br className="hidden max-[440px]:block" />{" "}
-                        ผิดพลาดโปรดติดต่อร้านค้า
+                {(isOrderToReceive || isOrderCompleted) && isOrderExisting && (
+                  <div className="flex flex-col p-4 bg-blue-50 border-2 border-black rounded-2xl gap-3  ">
+                    <div className="flex items-center gap-2">
+                      <Truck className="text-blue-600" size={20} />
+                      <p className="left-0 text-[10px] font-black text-gray-500 uppercase leading-none">
+                        {order.deliveryMethod || "พัสดุ"}
                       </p>
                     </div>
-                  )}
+
+                    <div className="flex flex-col gap-2 w-full">
+                      {trackingList?.map((no, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start justify-between bg-blue-50 p-3 rounded-xl border border-blue-200 w-full"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-blue-500 font-bold">
+                              เลขพัสดุที่ {index + 1}
+                            </span>
+                            <span className="font-bold text-sm break-all">
+                              {no}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(no!);
+                              toast.success("คัดลอกเลขพัสดุแล้ว");
+                            }}
+                            className="p-2 hover:bg-blue-200 rounded-full transition-colors border-2 border-transparent active:border-black cursor-pointer"
+                          >
+                            <Copy size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="w-full text-center mt-2 py-2 max-[500px]:text-[10px] text-[12px] font-black text-red-500  leading-tight">
+                      *กรณีหมายเลข Tracking No.
+                      <br className="hidden max-[440px]:block" />{" "}
+                      ผิดพลาดโปรดติดต่อร้านค้า
+                    </p>
+                  </div>
+                )}
 
                 {isOrderToShip && !isOrderExisting && (
                   <>
-                    { isSeller ? (
+                    {isSeller ? (
                       <div className="flex flex-col gap-3 p-4 bg-blue-50 border-2 border-black rounded-[2rem]">
                         <div className="flex items-center gap-2 text-blue-700 font-black text-xs px-2 uppercase">
                           <Truck size={16} />
@@ -293,7 +305,6 @@ export const OrderCard = (
                               "ระบุเลขพัสดุ\n(หากมีหลายกล่อง ให้คั่นด้วยเครื่องหมาย , หรือขึ้นบรรทัดใหม่)"
                             }
                             className="w-full p-4 border-2 border-black rounded-2xl font-bold text-[11px] focus:outline-none focus:ring-2 ring-blue-500 min-h-[100px] resize-none"
-                            // maxLength={}
                             value={trackkingno}
                             onChange={(e) => {
                               const value = e.target.value;
@@ -372,7 +383,10 @@ export const OrderCard = (
                           ค่าจัดส่ง:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right">
-                          ฿<CurrencyDisplay amount={order?.netAmount - order?.totalAmount || 0} /> 
+                          ฿
+                          <CurrencyDisplay
+                            amount={order?.netAmount - order?.totalAmount || 0}
+                          />
                         </span>
                       </div>
 
@@ -381,7 +395,7 @@ export const OrderCard = (
                           ยอดสุทธิ:
                         </span>
                         <span className="text-sm font-black text-red-600 min-w-[80px] text-right">
-                          ฿<CurrencyDisplay amount={order.netAmount} /> 
+                          ฿<CurrencyDisplay amount={order.netAmount} />
                         </span>
                       </div>
                     </div>
@@ -394,16 +408,38 @@ export const OrderCard = (
                       onClick={() => handlePaymentAgain(order.orderId)}
                       className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-red-600 text-white border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-red-700 transition-all active:translate-y-1 active:shadow-none cursor-pointer"
                     >
-                        ชำระเงินใหม่
-                      </button>
-                    )}
+                      ชำระเงินใหม่
+                    </button>
+                  )}
 
-                  {role === USER_ROLE.CUSTOMER &&
-                    isOrderToReceive && (
-                      <button className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer">
-                        ได้รับสินค้าแล้ว
-                      </button>
-                    )}
+                  {role === USER_ROLE.CUSTOMER && isOrderToReceive && (
+                    <button
+                      onClick={() => setIsConfirmReceived(true)}
+                      className="w-full sm:flex-1 max-[340px]:text-sm py-3 bg-cprojectfour text-black border-4 border-black rounded-full font-black shadow-[4px_4px_0px_0px_rgba(210,243,222,1)] hover:bg-cprojectthree hover:text-white transition-all active:translate-y-1 active:shadow-none cursor-pointer"
+                    >
+                      ได้รับสินค้าแล้ว
+                    </button>
+                  )}
+
+                  {isConfirmReceived && (
+                    <>
+                      <ConfirmDialog
+                        open={isConfirmReceived}
+                        onClose={() => setIsConfirmReceived(false)}
+                        onConfirm={async () => {
+                          await handleConfirmReceived(order.orderId);
+                          setIsConfirmReceived(false);
+                        }}
+                        title="ยืนยันการรับสินค้า"
+                        content={
+                          <div className="flex flex-col gap-1">
+                            <p>คุณต้องการยืนยันการรับสินค้า</p>
+                            <p>หมายเลข {order.orderNo} หรือไม่?</p>
+                          </div>
+                        }
+                      />
+                    </>
+                  )}
 
                   {isOrderPending && (
                     <>
@@ -417,20 +453,22 @@ export const OrderCard = (
                         >
                           ทำการตรวจสอบ
                         </button>
-                      ) : !isPaymentRejected && (
-                        <button
-                          disabled
-                          className="w-full sm:flex-1 max-[340px]:text-[12px] py-3 border-4 rounded-full font-black cursor-not-allowed"
-                          style={{
-                            animation: "pulse-green-simple 2s infinite",
-                          }}
-                        >
-                          ร้านค้ากำลังทำการตรวจสอบ
-                        </button>
+                      ) : (
+                        !isPaymentRejected && (
+                          <button
+                            disabled
+                            className="w-full sm:flex-1 max-[340px]:text-[12px] py-3 border-4 rounded-full font-black cursor-not-allowed"
+                            style={{
+                              animation: "pulse-green-simple 2s infinite",
+                            }}
+                          >
+                            ร้านค้ากำลังทำการตรวจสอบ
+                          </button>
+                        )
                       )}
                     </>
                   )}
-</div>
+                </div>
               </div>
             </div>
           </div>
@@ -443,7 +481,7 @@ export const OrderCard = (
         />
       )}
       <ConfirmDialog
-        open={isConfirmTrackingNoopen}  
+        open={isConfirmTrackingNoopen}
         onClose={() => setisConfirmTrackingNoopen(false)}
         onConfirm={async () => {
           await handleAddTrackingNumber(order?.orderId, cleanTrackingList);

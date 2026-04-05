@@ -12,6 +12,5 @@ export const fetchOrderDetail = async (orderId: string) => {
   if (!response || !response.data) {
     throw new Error("No Order Detail data received from API");
   }
-  console.log("fetchOrderDetail",response.data.data)
   return response.data;
 };

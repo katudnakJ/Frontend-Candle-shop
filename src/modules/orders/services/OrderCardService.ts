@@ -6,7 +6,8 @@ import { AddTrackingNumberPayload } from "../type";
 
 
 export const useOrderCardService = () => {
-     const queryClient = useQueryClient()
+    const queryClient = useQueryClient()
+
     const addTrackingNumber = useMutation({
         mutationKey: ["addTrackingNumber"],
         mutationFn: async ({orderId, trackingNumber}: AddTrackingNumberPayload) => {
@@ -23,8 +24,24 @@ export const useOrderCardService = () => {
         }
     })
 
+    const confirmReceived = useMutation({
+        mutationKey: ["confirmReceived"],
+        mutationFn: async (orderId: string) => {
+            await apiClient.patch(`/v1/order/${orderId}/received`,{});
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["getOrdersByStatus"] });
+            toast.success("ยืนยันการรับสินค้าเรียบร้อยแล้ว");
+        },
+        onError: (error : Status) => {
+            toast.error(error.message ?? "เกิดข้อผิดพลาดในการยืนยันการรับสินค้า กรุณาลองใหม่อีกครั้ง");
+        }
+    })
+
+
     return {
         addTrackingNumber,
+        confirmReceived
     }
 }
 

@@ -23,10 +23,7 @@ export const useCart = () => {
     hasNextPage,
     isPlaceholderData,
   } = useGetCartData(size);
-
-  if (process.env.NODE_ENV === "development") {
-    console.log("DATA IN useCart:", data);
-  }
+  
   const { cartItem, shoppingCartId, endAt, totalItemsFromApi } = useMemo(() => {
     const pages = data?.pages || [];
 
@@ -51,15 +48,6 @@ export const useCart = () => {
       endAt: allItems.length,
     };
   }, [data]);
-
-  if (process.env.NODE_ENV === "development") {
-    console.log("ITEMS IN USECART:", cartItem);
-    console.log("ShoppingCartId:", shoppingCartId);
-    console.log("EndAt:", endAt);
-    // console.log("StartAt:", startAt);
-    // console.log("HasNext:", hasNext);
-    console.log("TotalItems:", totalItemsFromApi);
-  }
 
   const {
     selectedIds,

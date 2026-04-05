@@ -108,7 +108,7 @@ export default function AddressForm({
               }`}
             />
             {errors.recipientFirstName && (
-              <span className="text-red-500 text-[13px]">
+              <span className="text-red-500 text-xs">
                 {errors.recipientFirstName}
               </span>
             )}
@@ -139,7 +139,7 @@ export default function AddressForm({
               }`}
             />
             {errors.recipientLastName && (
-              <span className="text-red-500 text-[13px]">
+              <span className="text-red-500 text-xs">
                 {errors.recipientLastName}
               </span>
             )}
@@ -159,14 +159,14 @@ export default function AddressForm({
               setFormData((prev) => ({ ...prev, recipientPhone: v.value }))
             }
             placeholder="เช่น 081-234-5678"
-            className={`w-full p-3 border-2 rounded-xl text-black hover:border-black focus:border-black outline-none transition-all ${
+            className={`w-full p-3 border-2 rounded-xl text-black focus:border-black outline-none transition-all ${
               errors.recipientPhone
                 ? "border-red-500 bg-red-50"
                 : "border-gray-200"
             }`}
           />
           {errors.recipientPhone && (
-            <span className="text-red-500 text-[13px]">
+            <span className="text-red-500 text-xs">
               {errors.recipientPhone}
             </span>
           )}
@@ -199,7 +199,7 @@ export default function AddressForm({
               }`}
             />
             {errors.deliveryAddress && (
-              <span className="text-red-500 text-[13px] ml-1">
+              <span className="text-red-500 text-xs ml-1">
                 {errors.deliveryAddress}
               </span>
             )}
@@ -328,11 +328,13 @@ export default function AddressForm({
                     postcode: zip.toString(),
                   }));
                   setErrors((p) => ({ ...p, subDistrict: "" }));
+                  setErrors((p) => ({ ...p, subDistrict: "" }));
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     placeholder="เลือกตำบล *"
+                    error={!!errors.subDistrict}
                     error={!!errors.subDistrict}
                     size="small"
                     className={
@@ -359,8 +361,8 @@ export default function AddressForm({
                 }}
               />
               {errors.subDistrict && (
-                <span className="text-red-500 text-[12px] ml-1">
-                  {errors.subDistrict}
+                <span className="text-red-500 text-[10px] ml-1">
+                  {errors.sub_district}
                 </span>
               )}
             </div>
@@ -399,7 +401,11 @@ export default function AddressForm({
                     : "bg-white text-black border-gray-200 hover:border-black"
                 }`}
               >
-             
+                {errors.addressLabel && (
+                <span className="text-red-500 text-[10px] ml-1">
+                  {errors.addressLabel}
+                </span>
+              )}
                 {label}
               </button>
             ))}

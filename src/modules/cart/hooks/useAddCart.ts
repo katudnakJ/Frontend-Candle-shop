@@ -12,10 +12,11 @@ export const useAddCart = () => {
   return useMutation({
     mutationFn: (payload: AddShoppingCartItemReq) =>
       addShoppingCartItem(payload),
-    onSuccess: (response) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
-
-      console.log("Add to cart success:", response);
+      toast.success("เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว!", {
+        id: "add-cart-success",
+      });
     },
     onError: (error: Status) => {
       const err = error as Status;

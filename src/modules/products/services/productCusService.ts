@@ -1,5 +1,4 @@
 
-// API : Get Products (All products)
 
 
 import { apiClient } from "@/utils/api";

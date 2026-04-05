@@ -102,7 +102,6 @@ const useLiffLogin = () => {
 
   return {
     error,
-    // login,
     logout,
   };
 };

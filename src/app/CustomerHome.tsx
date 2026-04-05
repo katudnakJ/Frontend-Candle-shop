@@ -131,7 +131,8 @@ export default function CustomerHome() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow bg-white font-sans">
+      <main className="grow bg-white font-sans">
+
         <div className="bg-cprojectone">
           <section>
             <CustomerWelcome />
@@ -139,20 +140,20 @@ export default function CustomerHome() {
         </div>
 
         <div className="bg-cprojectone w-full min-h-screen">
-          <div className="max-w-[1200px] mx-auto p-6 space-y-8 bg-white rounded-3xl shadow-sm border border-gray-50/50">
+          <div className="max-w-300 mx-auto p-6 space-y-8 bg-white rounded-3xl shadow-sm border border-gray-50/50">
             {/* สินค้าแนะนำ      */}
             <section ref={productSectionRef} className="scroll-mt-10">
               <h2 className="text-2xl font-bold mb-4 text-black">
                 สินค้าแนะนำ
               </h2>
-              <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar min-h-[250px]">
+              <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar min-h-62.5">
                 {isLoading ? (
                   <RecommendedProductSkeleton />
                 ) : (
                   recommendedItems.map((item) => (
                     <div
                       key={item.productId}
-                      className="min-w-[180px] w-[180px] md:w-[200px] lg:w-[400px]"
+                      className="min-w-45 w-45 md:w-50 lg:w-100"
                     >
                       <ProductCard
                         key={item.productId}
@@ -193,7 +194,6 @@ export default function CustomerHome() {
                 <>
                   <div className="flex justify-between mb-4">
                     <p className="text-sm text-gray-400 ">
-                      จำนวนทั้งหมด {totalProducts} ชิ้น
                     </p>
                     <button>
                       <div className="relative flex items-center gap-2">
@@ -211,7 +211,7 @@ export default function CustomerHome() {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 min-h-[400px] ">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 min-h-100 ">
                     {sortedProducts.map((item, index) => (
                       <ProductCard
                         key={item.productId}

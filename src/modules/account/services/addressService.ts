@@ -6,16 +6,16 @@ export type Tambon = [string, ZipCode];
 export type Amphoe = [string, Tambon[]];
 export type Province = [string, Amphoe[]];
 
-export const MockAddress = addressdata as unknown as Province[];
+export const thaiAddress = addressdata as unknown as Province[];
 
 export const addressService = {
     
   // ดึงรายชื่อจังหวัด
-  getProvinces: () => MockAddress.map((p) => p[0]),
+  getProvinces: () => thaiAddress.map((p) => p[0]),
   
   // ดึงอำเภอในจังหวัดนั้น
   getDistricts: (provinceName: string) => {
-    const province = MockAddress.find((p) => p[0] === provinceName);
+    const province = thaiAddress.find((p) => p[0] === provinceName);
     return province ? province[1] : [];
   },
 

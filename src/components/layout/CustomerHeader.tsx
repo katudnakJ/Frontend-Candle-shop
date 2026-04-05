@@ -32,22 +32,11 @@ const Header = () => {
       const CartCountData =
         pages[pages.length - 1]?.data || pages[pages.length - 1];
       const apiTotal = CartCountData.totalItems;
-      if (process.env.NODE_ENV === "development") {
-        console.group("🚩 Header Cart Status");
-        console.log("Raw Data: ", CartCountData);
-        console.log("Raw ApiTotal: ", apiTotal);
-      }
 
       setTotalItems(apiTotal);
     }
   }, [data, setTotalItems]);
   const totalItemsCount = storeTotalItems;
-
-  if (process.env.NODE_ENV === "development") {
-    console.group("🛒 Header Cart Status");
-    console.log("%c Count: ", "color: yellow", totalItemsCount);
-    console.groupEnd();
-  }
 
   return (
     <header className=" border border-cprojectone top-0 z-50 w-full border-b bg-cprojectone backdrop-blur-md font-sans">

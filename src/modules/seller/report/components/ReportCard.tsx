@@ -1,5 +1,5 @@
 import { useState, useSyncExternalStore } from "react";
-import { GetDashboardReportResponse, TopProduct } from "../report.type";
+import { TopProduct } from "../report.type";
 import { StatCard } from "./ReportStatCard";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -106,7 +106,7 @@ export const ReportCard = ({
                   slotProps={{
     textField: {
       onKeyDown: (e) => {
-        e.preventDefault(); // 👈 กันพิมพ์ทั้งหมด
+        e.preventDefault(); 
       },
     },
   }}

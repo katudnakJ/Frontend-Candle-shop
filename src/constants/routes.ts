@@ -1,5 +1,4 @@
 
-// // กำหนด Prefix 
 const PREFIX_PRODUCTS = '/products';
 const PREFIX_SELLER = '/seller';
 

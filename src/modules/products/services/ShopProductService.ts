@@ -1,4 +1,3 @@
-// services/product.service.ts
 
 import { apiClient } from "@/utils/api";
 import { GenericResponse } from "@/types/response.type";
@@ -45,15 +44,12 @@ export const getShopProductsBySearch = async ({
 export const deleteProduct = async (
   productId: string,
 ): Promise<GenericResponse<null>> => {
-  console.log(`Sending DELETE request for product: ${productId}`);
 
   const response = await apiClient.delete(`/v1/products/${productId}`);
 
   if (!response) {
     throw new Error("Delete failed: No response from server");
   }
-  console.log("DELETERESPRODUCT", response);
-  console.log("DELETEPRODUCT", response.data);
   return response as unknown as GenericResponse<null>;
 };
 
@@ -75,39 +71,10 @@ export const createProduct = async (
     }
   });
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("3. DATA in FormData:");
-    const images = formData.getAll("imagesData");
-    if (images.length === 0) console.log("   - No new images uploaded");
-    images.forEach((file, i) =>
-      console.log(`   - File[${i}]:`, (file as File).name),
-    );
-
-    console.log("--- 📦 Full FormData Content ---");
-    formData.forEach((value, key) => {
-      if (value instanceof File) {
-        console.log(` > ${key}: [File] ${value.name}`);
-      } else {
-        console.log(` > ${key}: ${value}`);
-      }
-    });
-
-    console.log("==============================================");
-  }
-
   const response = await apiClient.post<
     FormData,
     GenericResponse<CreateProductResData>
   >(`/v1/products`, formData, {
-    // params: {
-    //   productName: payload.productName,
-    //   price: payload.price,
-    //   weight: payload.weight,
-    //   description: payload.description,
-    //   active: payload.active,
-    //   featured: payload.featured,
-    //   primary_index: payload.primary_index,
-    // },
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -143,73 +110,12 @@ export const updateProduct = async (
     }
   });
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("===== 🔍 DEBUG: UPDATE PRODUCT API CALL =====");
-    console.log("1. Product ID:", productId);
-
-    console.log("2. Query Params:", {
-      productName: payload.productName,
-      price: payload.price,
-      weight: payload.weight,
-      description: payload.description,
-      active: payload.active,
-      featured: payload.featured,
-      primaryIndex: payload.primary_index,
-      existIntoPrimary: existIntoPrimary,
-      deleteImageIds: deleteImageIds,
-    });
-
-    console.log("3. DATA in FormData:");
-    const images = formData.getAll("imagesData");
-    if (images.length === 0) console.log("   - No new images uploaded");
-    images.forEach((file, i) =>
-      console.log(`   - File[${i}]:`, (file as File).name),
-    );
-
-    let count = 0;
-    for (const pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-      count++;
-    }
-    console.log("Total parts in FormData:", count);
-
-    console.log("--- 📦 Full FormData Content ---");
-    formData.forEach((value, key) => {
-      if (value instanceof File) {
-        console.log(` > ${key}: [File] ${value.name}`);
-      } else {
-        console.log(` > ${key}: ${value}`);
-      }
-    });
-
-    console.log("==============================================");
-  }
-
   const response = await apiClient.put<
     FormData,
     GenericResponse<CreateProductResData>
   >(`/v1/products/${productId}`, formData, {
-    // params: {
-    //   productName: payload.productName,
-    //   price: payload.price,
-    //   weight: payload.weight,
-    //   description: payload.description,
-    //   active: payload.active,
-    //   featured: payload.featured,
-    //   primaryIndex: payload.primary_index,
-    //   existIntoPrimary: existIntoPrimary || undefined,
-    //   deleteImageIds: deleteImageIds.length > 0 ? deleteImageIds : undefined,
-    // },
-    // paramsSerializer: {
-    //   indexes: null,
-    // },
     headers: {
       "Content-Type": "multipart/form-data",
-    },
-    onUploadProgress: (progressEvent) => {
-      console.log(
-        `Upload Progress: ${progressEvent.loaded} / ${progressEvent.total}`,
-      );
     },
   });
 
@@ -224,14 +130,4 @@ export const getProductDetailById = async (
     GenericResponse<ProductDetailResData>
   >(`/v1/products/${productId}`);
   return response.data;
-};
-
-export const toggleProductStatus = async (
-  productId: string,
-  currentStatus: boolean,
-) => {
-  console.log(
-    `Toggling status for ${productId} from ${currentStatus} to ${!currentStatus}`,
-  );
-  return { success: true };
 };

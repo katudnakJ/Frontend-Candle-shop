@@ -105,7 +105,7 @@ apiClient.interceptors.response.use(
     const is401 = error.response?.status === 401;
 
     if (process.env.NODE_ENV === "development") {
-      console.log("🔍 [Interceptor] Error Status:", error.response?.status);
+      console.log("[Interceptor] Error Status:", error.response?.status);
     }
    
     if (
@@ -118,7 +118,7 @@ apiClient.interceptors.response.use(
 
       try {
         if (process.env.NODE_ENV === "development") {
-          console.log("🛠️ Attempting Silent Login...");
+          console.log("Attempting Silent Login...");
         }
         if (!reloginPromise) {
           reloginPromise = silentReloginWithLiff().finally(() => {
@@ -128,7 +128,7 @@ apiClient.interceptors.response.use(
 
         await reloginPromise;
         if (process.env.NODE_ENV === "development") {
-          console.log("✅ Silent Login Success! Retrying original request...");
+          console.log("Silent Login Success! Retrying original request...");
         }
         return apiClient(originalConfig);
       } catch (reloginError) {
@@ -139,7 +139,7 @@ apiClient.interceptors.response.use(
     }
     if (is401) {
       if (isRedirecting) {
-        console.log("🚧 [Interceptor] Already redirecting, ignoring this 401");
+        console.log("[Interceptor] Already redirecting, ignoring this 401");
         return Promise.reject(error);
       }
 
@@ -147,7 +147,7 @@ apiClient.interceptors.response.use(
         isRedirecting = true;
         if (process.env.NODE_ENV === "development") {
           console.log(
-            "📢 [Interceptor] Session Expired. Showing Toast and Redirecting...",
+            "[Interceptor] Session Expired. Showing Toast and Redirecting...",
           );
         }
         if (!isToastShowing) {
@@ -157,7 +157,7 @@ apiClient.interceptors.response.use(
           });
         }
         if (process.env.NODE_ENV === "development") {
-          console.log("🏠 Redirecting to login page...");
+          console.log("Redirecting to login page...");
         }
         useAuthStoreUserLogin.getState().logout();
 
@@ -166,7 +166,7 @@ apiClient.interceptors.response.use(
         }, 1500);
       } else {
         if (process.env.NODE_ENV === "development") {
-          console.log("🏠 [Interceptor] Already at home, no redirect needed.");
+          console.log("[Interceptor] Already at home, no redirect needed.");
         }
       }
 
