@@ -22,6 +22,7 @@ export const useVerificationSlip = (
   const handleConfirmPayment = async() => {
     await confirmPayment.mutateAsync(order.orderId);
     setIsVerifyOpen(false)
+    router.refresh();
     router.push(ROUTE.SELLER.ORDER);
   }
 
@@ -31,6 +32,7 @@ export const useVerificationSlip = (
       reason 
     });
     setIsVerifyOpen(false);
+     router.refresh();
     router.push(ROUTE.SELLER.ORDER);
   };
 

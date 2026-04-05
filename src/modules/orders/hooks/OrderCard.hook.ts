@@ -74,6 +74,7 @@ export const useOrderCard = (
     const handleAddTrackingNumber = async (orderId: string, trackingNumber: string[]) => {
     await addTrackingNumber.mutateAsync({ orderId, trackingNumber });
     setIsVerifyOpen(false);
+    router.refresh();
     router.push(ROUTE.SELLER.ORDER);
   }
 

@@ -14,6 +14,7 @@ export const usePaymentSlipService = () => {
         },
         onSuccess: () => {   
             queryClient.invalidateQueries({ queryKey: ["getDashboardReportsData"] });     
+            queryClient.invalidateQueries({ queryKey: ["getOrdersByStatus"] });
             toast.success("ยืนยันการชำระเงินเรียบร้อยแล้ว");
         },
         onError: () => {
@@ -31,6 +32,7 @@ export const usePaymentSlipService = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["getDashboardReportsData"] });
+            queryClient.invalidateQueries({ queryKey: ["getOrdersByStatus"] });
             toast.success("ปฏิเสธการชำระเงินเรียบร้อยแล้ว");
         },
         onError: () => {
