@@ -153,7 +153,7 @@ export default function PaymentPage() {
   }, [mode, isOrderDetailError, orderDetail, orderItems, isLoadingOrderDetail, isMounted, router]);
 
   useEffect(() => {
-    if (isMounted && !isLoading && mode !== "repay") {
+    if (isMounted && !isLoading && mode !== "repay" && !isSuccessCheckout) {
       const saved = sessionStorage.getItem("selected_checkout_ids");
       const parsedIds = saved ? JSON.parse(saved) : [];
       if (
@@ -287,16 +287,18 @@ export default function PaymentPage() {
 
   const handleSuccessNavigation = () => {
     setSuccessCheckout(true);
-    
+ 
+router.replace("/account/orderhistory");
+
 
     setTimeout(() => {
       setSelectedIds([]);
       setCheckoutItems([]);
       setSelectedAddress(null);
       sessionStorage.removeItem("selected_checkout_ids");
-    }, 300);
+    }, 800);
 
-    router.replace("/account/orderhistory");
+    
   };
 
   const handleConfirmOrder = () => {

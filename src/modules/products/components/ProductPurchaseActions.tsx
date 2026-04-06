@@ -39,7 +39,6 @@ export default function ProductPurchaseActions({
       { productId, quantity },
       {
         onSuccess: async (response) => {
-
           queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
           const resdata = response?.data || response;
           const typedData = resdata as AddCartResData;
@@ -55,12 +54,13 @@ export default function ProductPurchaseActions({
                 JSON.stringify([shoppingCartItemId]),
               );
             }
+            toast.loading("กำลังเตรียมหน้าชำระเงิน...", { duration: 1000 });
 
-            router.push("/shoppingcart/checkoutcart");
+            setTimeout(() => {
+              router.push("/shoppingcart/checkoutcart");
+            }, 1500);
           } else {
-            toast.success(`เพิ่มสินค้า ${quantity} ชิ้นลงรถเข็นแล้ว!`, {
-             
-            });
+            toast.success(`เพิ่มสินค้า ${quantity} ชิ้นลงรถเข็นแล้ว!`, {});
             setOpenConfirm(false);
           }
         },
@@ -86,12 +86,12 @@ export default function ProductPurchaseActions({
       <div className="grid grid-cols-10 border border-black  bg-white overflow-hidden shadow-sm">
         <Link
           href="https://lin.ee/RYKgjN0"
-          target="_blank"
+          target="_self"
           className="col-span-2  border border-black hover:bg-green-300 cursor-pointer flex flex-col items-center justify-center py-2"
         >
           <LineIcon size={32} className="md:w-10 md:h-10" />
           <span className="text-[10px] md:text-xs text-black font-bold text-center leading-tight px-1">
-            Line
+            ติดต่อร้านค้า
           </span>
         </Link>
 

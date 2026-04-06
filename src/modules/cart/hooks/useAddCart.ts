@@ -14,9 +14,7 @@ export const useAddCart = () => {
       addShoppingCartItem(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shopping-cart"] });
-      toast.success("เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว!", {
-        id: "add-cart-success",
-      });
+    
     },
     onError: (error: Status) => {
       const err = error as Status;

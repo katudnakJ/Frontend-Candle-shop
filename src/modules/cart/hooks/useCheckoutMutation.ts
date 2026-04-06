@@ -26,6 +26,7 @@ export const useCheckoutMutation = () => {
       const newTotal = Math.max(0, totalItems - purchasedCount);
 
       setTotalItems(newTotal);
+      toast.loading("กำลังเตรียมหน้าคำสั่งซื้อ...", { duration: 1000 });
       toast.success("ยืนยันการชำระเงินเรียบร้อย");
     },
 

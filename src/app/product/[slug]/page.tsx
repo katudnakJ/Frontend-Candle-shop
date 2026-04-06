@@ -100,24 +100,24 @@ export default function ProductDetailPage({
 
           <div className="max-w-[1200px] mx-auto ">
             <div className=" border border-gray-200 p-6  rounded-2xl shadow-sm  ml-10 mr-10">
-              <div className="flex justify-between items-center text-xl sm:text-2xl font-bold text-red-500 border-b border-gray-200 pb-4 mb-4">
+              <div className="flex justify-between items-center text-xl sm:text-[30px] font-bold text-red-500 border-b border-gray-200 pb-4 mb-4">
                 <p className="text-black">ราคา</p>
                 <p>฿{product.price} /ชิ้น</p>
               </div>
               <div className="space-y-4">
-                <div className="flex justify-between items-center text-sm sm:text-base border-b border-gray-200 pb-3">
+                <div className="flex justify-between items-center text-sm sm:text-[24px] border-b border-gray-200 pb-3">
                   <span className="text-gray-500">น้ำหนักสุทธิ</span>
                   <span className="text-black font-semibold">
                     {product.weight || "200"} กรัม
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center text-sm sm:text-base">
+                <div className="flex justify-between items-center text-sm sm:text-[24px]">
                   <span className="text-gray-500">เวลาผลิต</span>
                   <span className="text-black font-semibold">5-7 วัน</span>
                 </div>
                 <div className="pt-2 border-t border-gray-100">
-                  <p className="text-[11px] sm:text-xs text-gray-400 text-left italic">
+                  <p className="text-[13px] sm:text-[16px] text-gray-400 text-left italic">
                     *กรณีสั่งซื้อมากกว่า{" "}
                     <span className="text-red-400 font-bold">1,000 ชิ้น</span>{" "}
                     ขึ้นไป

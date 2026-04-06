@@ -58,11 +58,11 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const saved = sessionStorage.getItem("selected_checkout_ids");
-    if (saved) {
+    if (saved && selectedIds.length === 0) {
       const parsedIds = JSON.parse(saved);
-      if (parsedIds.length > 0 && selectedIds.length === 0) {
+      
         setSelectedIds(parsedIds);
-      }
+      
     }
 
     const timer = setTimeout(() => setIsMounted(true), 500);
