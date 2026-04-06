@@ -335,7 +335,6 @@ export default function AddressForm({
                     {...params}
                     placeholder="เลือกตำบล *"
                     error={!!errors.subDistrict}
-                    error={!!errors.subDistrict}
                     size="small"
                     className={
                       errors.subDistrict
@@ -362,7 +361,7 @@ export default function AddressForm({
               />
               {errors.subDistrict && (
                 <span className="text-red-500 text-[10px] ml-1">
-                  {errors.sub_district}
+                  {errors.subDistrict}
                 </span>
               )}
             </div>
@@ -391,7 +390,7 @@ export default function AddressForm({
               <button
                 key={label}
                 type="button"
-                onClick={() =>{
+                onClick={() => {
                   setFormData((prev) => ({ ...prev, addressLabel: label }));
                   setErrors((prev) => ({ ...prev, addressLabel: "" }));
                 }}
@@ -402,19 +401,19 @@ export default function AddressForm({
                 }`}
               >
                 {errors.addressLabel && (
-                <span className="text-red-500 text-[10px] ml-1">
-                  {errors.addressLabel}
-                </span>
-              )}
+                  <span className="text-red-500 text-[10px] ml-1">
+                    {errors.addressLabel}
+                  </span>
+                )}
                 {label}
               </button>
             ))}
           </div>
-             {errors.addressLabel && (
-                  <span className="text-red-500 text-[12px] ml-1">
-                    {errors.addressLabel}
-                  </span>
-                )}  
+          {errors.addressLabel && (
+            <span className="text-red-500 text-[12px] ml-1">
+              {errors.addressLabel}
+            </span>
+          )}
 
           <div className="flex item-center gap-3 pt-2 ">
             <FormControlLabel

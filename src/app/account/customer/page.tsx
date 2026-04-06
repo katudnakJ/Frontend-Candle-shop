@@ -43,7 +43,7 @@ export default function CustomerAccountPage() {
     } catch (error) {
       const err = error as Status;
       toast.error(
-        err.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง",
+        "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง",
       );
     }
     setIsDeleteOpen(false);

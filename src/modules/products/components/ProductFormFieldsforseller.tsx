@@ -79,7 +79,7 @@ export const ProductFormFields = ({
                 }`}
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xs pointer-events-none">
-                Kg
+                กรัม
               </span>
             </div>
             {errors.weight && (

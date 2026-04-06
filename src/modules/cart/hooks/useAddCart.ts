@@ -20,7 +20,7 @@ export const useAddCart = () => {
     },
     onError: (error: Status) => {
       const err = error as Status;
-      const message = err.message ?? "การเชื่อมต่อขัดข้อง";
+      const message ="การเชื่อมต่อขัดข้อง";
 
       toast.error(message, {
         id: "add-cart-error",

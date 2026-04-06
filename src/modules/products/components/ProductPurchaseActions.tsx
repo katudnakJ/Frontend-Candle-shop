@@ -85,9 +85,9 @@ export default function ProductPurchaseActions({
 
       <div className="grid grid-cols-10 border border-black  bg-white overflow-hidden shadow-sm">
         <Link
-          href="https://line.me"
+          href="https://lin.ee/RYKgjN0"
           target="_blank"
-          className="col-span-2  border border-black hover:bg-gray-50 cursor-pointer flex flex-col items-center justify-center py-2"
+          className="col-span-2  border border-black hover:bg-green-300 cursor-pointer flex flex-col items-center justify-center py-2"
         >
           <LineIcon size={32} className="md:w-10 md:h-10" />
           <span className="text-[10px] md:text-xs text-black font-bold text-center leading-tight px-1">

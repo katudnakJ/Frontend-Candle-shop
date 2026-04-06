@@ -106,7 +106,7 @@ export const useUpdateCartItem = (size: number = sizesameinuseCart) => {
         queryClient.setQueryData(queryKey, context.previousCart);
       }
       const err = error as Status;
-      const message = err.message ?? "การเชื่อมต่อขัดข้อง";
+      const message = "การเชื่อมต่อขัดข้อง";
       toast.error(message, {
         id: "update-cart-error",
       });
@@ -178,7 +178,7 @@ export const useDeleteCartItem = (size: number = sizesameinuseCart) => {
         queryClient.setQueryData(queryKey, context.previousCart);
       }
       const err = error as Status;
-      const message = err.message ?? "การเชื่อมต่อขัดข้อง";
+      const message = "การเชื่อมต่อขัดข้อง";
       toast.error(message, {
         id: "delete-cart-error",
       });

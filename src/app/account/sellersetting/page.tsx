@@ -68,7 +68,7 @@ export default function SellerSettingPage() {
       setSelectedFile(null);
     } catch (error) {
       const err = error as Status;
-      toast.error(err.message ?? "บันทึกล้มเหลว:");
+      toast.error("บันทึกล้มเหลว:");
       setIsOpen(false);
     } finally {
       setIsUploading(false);
@@ -115,7 +115,7 @@ export default function SellerSettingPage() {
       } catch (error) {
         const err = error as Status;
         toast.error(
-          err.message ?? "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง",
+          "เกิดข้อผิดพลาดในการลบที่อยู่ กรุณาลองใหม่อีกครั้ง",
         );
       }
       setIsDeleteOpen(false);

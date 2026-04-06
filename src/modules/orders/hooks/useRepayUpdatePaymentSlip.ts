@@ -16,7 +16,7 @@ export const useRepayUpdatePaymentSlip = () => {
     },
     onError: (error: Status) => {
       const err = error as Status;
-      const errorMessage = error?.message || "เกิดข้อผิดพลาดในการส่งสลิป";
+      const errorMessage ="เกิดข้อผิดพลาดในการส่งสลิป";
 
       toast.error(errorMessage, {
         id: "repay-order-error",

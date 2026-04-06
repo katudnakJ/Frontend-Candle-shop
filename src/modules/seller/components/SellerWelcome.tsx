@@ -23,7 +23,7 @@ export default function SellerWelcome({ mode }: SellerWelcomeProps) {
   useEffect(() => {
 
     if (isError) {
-    toast.error(error.message);
+    toast.error("เกิดข้อผิดพลาดในการดึงข้อมูล");
   }
 
     if (!storeLoading) {
