@@ -58,9 +58,11 @@ export const ReportCard = ({
       {isLoading ? (
         <ReportCardSkeleton />
       ) : (
+        <>
         <div
-          className={`mx-auto min-h-[60vh] max-w-215 bg-[#ffffff] px-4 pb-12 pt-8 sm:px-6 text-lg md:text-base lg:text-lg ${defultFontColor}`}
+          className={`mx-auto min-h-[60vh] max-w-215 bg-[#ffffff] px-4 pb-12 sm:px-6 text-lg md:text-base lg:text-lg ${defultFontColor}`}
         >
+          
           <h1 className="mb-6 flex items-center gap-2 font-prompt text-2xl md:text-[clamp(1.1rem,2.5vw,1.35rem)] font-medium text-[#1a1714] tracking-[-0.01em]">
             <span className="block h-[1.3em] w-1 rounded bg-[#c9a96e]" />
             Report สรุปยอดขายของสินค้า
@@ -238,6 +240,7 @@ export const ReportCard = ({
             </>
           )}
         </div>
+        </>
       )}
     </>
   );

@@ -14,7 +14,7 @@ export default function SellerReports() {
         <SellerHeader />
         <main className="grow bg-white font-sans">
           <div className="max-w-1200 mx-auto p-4">
-            <ManualBreadCrumb title="รายงานยอดขาย" href="/" />
+              <ManualBreadCrumb title="รายงานสรุปยอดขายรายเดือน" href="/" />
             < ReportCard />
           </div>
         </main>
