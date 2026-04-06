@@ -116,7 +116,7 @@ const resetFile = useCallback(() => {
       toast.success("อัปโหลดสลิปสำเร็จ");
     },
     onError: (error : Status) => {
-      toast.error(error.message ?? "เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
+      toast.error("เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
     }
   });
 
@@ -141,7 +141,7 @@ const resetFile = useCallback(() => {
       toast.success("อัปโหลดสลิปสำเร็จ");
     },
     onError: (error : Status) => {
-      toast.error(error.message ?? "เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
+      toast.error("เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
     }
   });
 

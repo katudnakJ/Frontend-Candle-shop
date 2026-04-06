@@ -38,7 +38,7 @@ export const GetExcelReport = ({
         const text = await response.data.text();
         const error = JSON.parse(text);
 
-        toast.error(error.message || "เกิดข้อผิดพลาด");
+        toast.error("เกิดข้อผิดพลาด");
         return;
       }
 

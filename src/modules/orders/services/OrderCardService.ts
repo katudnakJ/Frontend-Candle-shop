@@ -20,7 +20,7 @@ export const useOrderCardService = () => {
             toast.success("เพิ่มหมายเลขพัสดุเรียบร้อยแล้ว");
         },
         onError: (error : Status) => {
-            toast.error(error.message ?? "เกิดข้อผิดพลาดในการเพิ่มหมายเลขติดตามพัสดุ กรุณาลองใหม่อีกครั้ง");
+            toast.error("เกิดข้อผิดพลาดในการเพิ่มหมายเลขติดตามพัสดุ กรุณาลองใหม่อีกครั้ง");
         }
     })
 
@@ -34,7 +34,7 @@ export const useOrderCardService = () => {
             toast.success("ยืนยันการรับสินค้าเรียบร้อยแล้ว");
         },
         onError: (error : Status) => {
-            toast.error(error.message ?? "เกิดข้อผิดพลาดในการยืนยันการรับสินค้า กรุณาลองใหม่อีกครั้ง");
+            toast.error( "เกิดข้อผิดพลาดในการยืนยันการรับสินค้า กรุณาลองใหม่อีกครั้ง");
         }
     })
 

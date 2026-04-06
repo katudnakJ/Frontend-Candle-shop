@@ -82,12 +82,12 @@ export const useShopProducts = () => {
         queryClient.invalidateQueries({ queryKey: ["seller-shop-products"] });
         toast.success("ทำการลบสินค้าสำเร็จ");
       } else {
-        toast.error(res.status.message || "ไม่สามารถลบสินค้าได้");
+        toast.error("ไม่สามารถลบสินค้าได้");
       }
     },
 
     onError: (error: Status) => {
-      const errorMessage = error?.message || "ไม่สามารถติดต่อ Server ได้";
+      const errorMessage = "ไม่สามารถติดต่อ Server ได้";
       toast.error(errorMessage);
     },
   });
@@ -150,12 +150,12 @@ export const useUpdateProduct = () => {
         toast.success("ทำการแก้ไขสินค้าสำเร็จ");
          window.location.reload();
       } else {
-        toast.error(res.status.message || "ไม่สามารถแก้ไขข้อมูลได้");
+        toast.error("ไม่สามารถแก้ไขข้อมูลได้");
       }
     },
     onError: (error: Status) => {
       console.error("UPDATE_ERROR", error);
-      toast.error(error?.message || "แก้ไขไม่สำเร็จ");
+      toast.error("เกิดข้อผิดพบลาดในการโหลดรูป");
     },
   });
   return {
