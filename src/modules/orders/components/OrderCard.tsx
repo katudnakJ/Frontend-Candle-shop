@@ -212,7 +212,7 @@ export const OrderCard = ({ order, role, defaultExpanded }: OrderCardProps) => {
                   </div>
                 )}
 
-                {(isOrderToShip || isOrderCompleted || isOrderToReceive) && (
+                {(isOrderCompleted || isOrderToReceive) && (
                   <div className="p-4 bg-green-50 border-2 border-black rounded-2xl flex max-[390px]:flex-col justify-between items-center">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white border-2 border-black rounded-lg text-green-600">
