@@ -61,10 +61,9 @@ function hasSnakeCaseKey(input: unknown): boolean {
 
 // ใช้สำหรับ silent relogin เมื่อ access token หมดอายุ และ refresh token ยังไม่หมดอายุ
 async function silentReloginWithLiff() {
-
   try {
-    await liff.init({ 
-      liffId: process.env.NEXT_PUBLIC_LINE_LIFF_ID as string 
+    await liff.init({
+      liffId: process.env.NEXT_PUBLIC_LINE_LIFF_ID as string,
     });
   } catch (initError) {
     console.error("LIFF Init failed in Interceptor:", initError);
@@ -107,7 +106,7 @@ apiClient.interceptors.response.use(
     if (process.env.NODE_ENV === "development") {
       console.log("[Interceptor] Error Status:", error.response?.status);
     }
-   
+
     if (
       is401 &&
       originalConfig &&
@@ -191,9 +190,21 @@ apiClient.interceptors.response.use(
       remark: statusNode?.remark,
     };
     if (process.env.NODE_ENV === "development") {
-      console.error("⚠️ [Interceptor] Other Error:", error.response?.data || error.message);
+      if (error.response) {
+        console.error("⚠️ [Interceptor] Server Error:", {
+          status: error.response.status,
+          data: parsedData,
+        });
+      } else if (error.request) {
+        console.error(
+          "⚠️ [Interceptor] Network Error (No Response):",
+          error.request,
+        );
+      } else {
+        console.error("⚠️ [Interceptor] Local Error:", error.message);
+      }
     }
-    return Promise.reject(err);
+    return Promise.reject(error);
   },
 );
 
