@@ -119,6 +119,22 @@ const Header = () => {
                         </Link>
                       )}
                     </MenuItem>
+                    <MenuItem>
+                      {({ focus }) => (
+                        <Button
+                          className={`${focus ? "bg-yellow-50 text-yellow-600" : "text-gray-700"} flex w-full items-center px-4 py-2 text-left text-sm`}
+                          onClick={() => {
+
+                            window.localStorage.clear();
+                            window.sessionStorage.clear();
+                            queryClient.clear();
+                            window.location.reload();
+                          }}
+                        >
+                          ออกจากระบบ
+                        </Button>
+                      )}
+                    </MenuItem>
                   </div>
                 </MenuItems>
               </Transition>
